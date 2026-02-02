@@ -62,7 +62,7 @@ export function DashboardQuickActions({ username }: DashboardQuickActionsProps) 
     { 
         icon: Trophy, 
         label: "Leaderboard", 
-        href: "/dashboard/leaderboard" 
+        href: "/dashboard/obs/leaderboard" 
     },
     { 
       icon: History, 
