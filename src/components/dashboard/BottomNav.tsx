@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, Trophy, Layers, History } from "lucide-react";
+import { Home, History, Settings, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -9,9 +9,9 @@ export function BottomNav() {
 
   const navItems = [
     { icon: Home, label: "Home", href: "/dashboard", exact: true },
-    { icon: Trophy, label: "Leaderboard", href: "/dashboard/leaderboard", exact: false },
-    { icon: Layers, label: "Overlay", href: "/dashboard/overlay", exact: false },
+    { icon: Settings, label: "OBS Setting", href: "/dashboard/obs", exact: false },
     { icon: History, label: "History", href: "/dashboard/history", exact: false },
+    { icon: User, label: "Profile", href: "/dashboard/profile", exact: false },
   ];
 
   return (

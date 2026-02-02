@@ -30,8 +30,8 @@ export function DashboardQuickActions({ username }: DashboardQuickActionsProps) 
   const handleShare = async () => {
     const link = getDonationLink();
     const shareData = {
-      title: 'Support me on Saweria',
-      text: `Support ${username} on Saweria!`,
+      title: 'Support me on SawerSui',
+      text: `Support ${username} on SawerSui!`,
       url: link
     };
 
@@ -62,7 +62,7 @@ export function DashboardQuickActions({ username }: DashboardQuickActionsProps) 
     { 
         icon: Trophy, 
         label: "Leaderboard", 
-        href: "/dashboard/leaderboard" 
+        href: "/dashboard/obs/leaderboard" 
     },
     { 
       icon: History, 

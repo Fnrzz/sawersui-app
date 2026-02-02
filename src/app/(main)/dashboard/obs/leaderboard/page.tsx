@@ -15,9 +15,9 @@ export const metadata: Metadata = {
 
 export default async function LeaderboardPage() {
   const supabase = await createClient();
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  if (!session) {
+  if (!user) {
     redirect("/");
   }
 
@@ -25,7 +25,7 @@ export default async function LeaderboardPage() {
   const { data: profile } = await supabase
     .from("profiles")
     .select("wallet_address")
-    .eq("id", session.user.id)
+    .eq("id", user.id)
     .single();
 
   if (!profile?.wallet_address) {
@@ -49,7 +49,7 @@ export default async function LeaderboardPage() {
       {/* Header */}
       <div className="flex items-center gap-4 mb-2">
         <Link 
-          href="/dashboard"
+          href="/dashboard/obs"
           className="p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors"
         >
           <ArrowLeft className="w-6 h-6" />

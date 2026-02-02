@@ -2,18 +2,18 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { getDonations } from "@/lib/actions/donation";
 import { formatDistanceToNow } from "date-fns";
-import { ArrowLeft, Clock, History, Search } from "lucide-react";
+import { ArrowLeft, Clock, History } from "lucide-react";
 import Link from "next/link";
 
 export default async function HistoryPage() {
   const supabase = await createClient();
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  if (!session) {
+  if (!user) {
     redirect("/");
   }
 
-  const donations = await getDonations(session.user.id);
+  const donations = await getDonations(user.id);
 
   return (
     <div className="p-4 space-y-6">
