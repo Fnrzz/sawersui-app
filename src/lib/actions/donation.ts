@@ -1,6 +1,8 @@
 'use server'
 
 import { createClient, createAdminClient } from "@/lib/supabase/server";
+import { getSuiClient } from "@/lib/sui-client";
+import { CONFIG } from "@/lib/config";
 
 export interface StreamerProfile {
   id: string;
@@ -44,6 +46,84 @@ export async function saveDonation({
   amount_net: number;
   tx_digest: string;
 }) {
+  // 1. Verify Transaction Existence & Status
+  const client = getSuiClient();
+  let txBlock;
+  try {
+    txBlock = await client.getTransactionBlock({
+      digest: tx_digest,
+      options: {
+        showEffects: true,
+        showBalanceChanges: true,
+        showInput: true
+      }
+    });
+  } catch (error) {
+    console.error("Failed to fetch transaction:", error);
+    throw new Error("Invalid transaction digest or transaction not found.");
+  }
+
+  if (txBlock.effects?.status.status !== 'success') {
+    throw new Error("Transaction execution failed on-chain.");
+  }
+
+  // 2. Fetch Streamer Wallet
+  const supabaseClient = await createClient();
+  const { data: streamerProfile } = await supabaseClient
+    .from('profiles')
+    .select('wallet_address')
+    .eq('id', streamer_id)
+    .single();
+
+  if (!streamerProfile?.wallet_address) {
+    throw new Error("Streamer wallet address not found.");
+  }
+
+  // 3. Verify Amount & Recipient from Balance Changes
+  const balanceChanges = txBlock.balanceChanges || [];
+  
+  let verifiedGrossAmount = 0;
+  
+  // Simplify finding the transfer to streamer
+  // We look for a balance change where:
+  // 1. Owner is the streamer
+  // 2. CoinType is USDC
+  // 3. Amount is positive (received)
+  
+  const usdcChange = balanceChanges.find(c => 
+    c.coinType.includes(CONFIG.SUI.ADDRESS.USDC_TYPE) && 
+    BigInt(c.amount) > 0 &&
+    (
+        c.owner === streamerProfile.wallet_address || 
+        (typeof c.owner === 'object' && c.owner !== null && 'AddressOwner' in c.owner && (c.owner as { AddressOwner: string }).AddressOwner === streamerProfile.wallet_address)
+    )
+  );
+
+  if (!usdcChange) {
+     // Fallback: Check if it's a direct transfer in input/events if balanceChanges is ambiguous
+     // But strictly, a successful donation MUST result in a balance increase for the streamer.
+     throw new Error("No USDC transfer to streamer found in transaction.");
+  }
+
+  verifiedGrossAmount = Number(usdcChange.amount) / 1_000_000; // Convert from MIST/Micro to USDC
+
+  // 4. Verify Amount Logic
+  // The client sends `amount_net` which should be ~95% of gross.
+  
+  // Allow a tiny epsilon for float math if needed, but exact check is better for crypto.
+  // We will trust the ON-CHAIN amount as the source of truth.
+  // If client sent `amount_net` = 0.95, and chain says 0.95, we are good.
+  
+  if (Math.abs(verifiedGrossAmount - amount_net) > 0.01) {
+      console.warn(`[Security] Amount mismatch. Client claimed: ${amount_net}, Chain delivered: ${verifiedGrossAmount}`);
+      // We overwrite with the REAL verified amount to ensure data integrity
+      // forcing the record to match reality.
+      // throw new Error("Donation amount discrepancy."); // Optional: reject, or just correct it. 
+      // Correcting it is safer for data integrity.
+  }
+
+  const finalAmount = verifiedGrossAmount;
+
   const supabase = await createAdminClient();
   const { error } = await supabase
     .from('donations')
@@ -51,7 +131,7 @@ export async function saveDonation({
       streamer_id,
       donor_name,
       message,
-      amount_net,
+      amount_net: finalAmount, // Use verified amount
       tx_digest,
     });
 
