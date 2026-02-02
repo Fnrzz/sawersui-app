@@ -35,6 +35,12 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
         }
 
+        // Minimum donation amount protection (0.50 USDC = 500,000 MIST)
+        const MIN_AMOUNT_MIST = 500_000;
+        if (Number(amountMist) < MIN_AMOUNT_MIST) {
+             return NextResponse.json({ error: "Amount below minimum (0.50 USDC)" }, { status: 400 });
+        }
+
         const client = getSuiClient();
         const sponsor = getSponsorKeypair();
         const sponsorAddress = sponsor.toSuiAddress();
