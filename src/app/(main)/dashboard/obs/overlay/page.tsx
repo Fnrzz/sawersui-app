@@ -8,9 +8,9 @@ import { DonationAlertCard } from "@/components/overlay/DonationAlertCard";
 
 export default async function OverlayTutorialPage() {
   const supabase = await createClient();
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  if (!session) {
+  if (!user) {
     redirect("/");
   }
 
@@ -18,7 +18,7 @@ export default async function OverlayTutorialPage() {
   const { data: profile } = await supabase
     .from("profiles")
     .select("wallet_address")
-    .eq("id", session.user.id)
+    .eq("id", user.id)
     .single();
 
   if (!profile?.wallet_address) {
@@ -40,7 +40,7 @@ export default async function OverlayTutorialPage() {
       
       {/* Header */}
       <div className="flex items-center gap-4 mb-2">
-        <Link href="/dashboard" className="p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors">
+        <Link href="/dashboard/obs" className="p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors">
           <ArrowLeft className="w-6 h-6" />
         </Link>
         <h1 className="text-xl font-bold font-[family-name:var(--font-pixel)]">
