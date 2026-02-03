@@ -49,18 +49,35 @@ export async function saveDonation({
   // 1. Verify Transaction Existence & Status
   const client = getSuiClient();
   let txBlock;
-  try {
-    txBlock = await client.getTransactionBlock({
-      digest: tx_digest,
-      options: {
-        showEffects: true,
-        showBalanceChanges: true,
-        showInput: true
+  
+  // Retry mechanism for transaction indexing latency
+  let retries = 5;
+  while (retries > 0) {
+    try {
+      txBlock = await client.getTransactionBlock({
+        digest: tx_digest,
+        options: {
+          showEffects: true,
+          showBalanceChanges: true,
+          showInput: true
+        }
+      });
+      // If successful, break
+      break;
+    } catch (error) {
+      console.warn(`Attempt remaining ${retries}: Transaction ${tx_digest} not found yet...`);
+      retries--;
+      if (retries === 0) {
+        console.error("Failed to fetch transaction after retries:", error);
+        throw new Error("Invalid transaction digest or transaction not found (timeout).");
       }
-    });
-  } catch (error) {
-    console.error("Failed to fetch transaction:", error);
-    throw new Error("Invalid transaction digest or transaction not found.");
+      // Wait 1 second before retrying
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+  }
+
+  if (!txBlock) {
+     throw new Error("Transaction verification failed (undefined block).");
   }
 
   if (txBlock.effects?.status.status !== 'success') {

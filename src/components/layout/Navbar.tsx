@@ -8,6 +8,7 @@ import { useDisconnectWallet, useCurrentAccount } from "@mysten/dapp-kit";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { User } from "@supabase/supabase-js";
+import { useZkLogin } from "@/hooks/useZkLogin";
 
 interface NavbarProps {
   user?: User | null;
@@ -21,10 +22,13 @@ export function Navbar({ user }: NavbarProps) {
   const { mutate: disconnect } = useDisconnectWallet();
   const currentAccount = useCurrentAccount();
   
-  // Check for Supabase session on client side (for email login users)
+  // ZkLogin Hook
+  const { logout: zkLogout, isAuthenticated: isZkAuthenticated } = useZkLogin();
+
+  // Check for Supabase session on client side
   const [sessionUser, setSessionUser] = useState<User | null>(null);
   
-  // Track explicit logout action to ignore server state during transition
+  // Track explicit logout
   const [hasLoggedOut, setHasLoggedOut] = useState(false);
   
   useEffect(() => {
@@ -34,41 +38,32 @@ export function Navbar({ user }: NavbarProps) {
     });
   }, []);
 
-  // Show logout if any auth method is active AND we haven't just cleared it locally
-  // We reset hasLoggedOut automatically if currentAccount or sessionUser becomes truthy 
-  // because the button will show regardless of 'hasLoggedOut' if those are true.
-  // The only case 'hasLoggedOut' matters is if 'user' (server) is true but we want to simulate logout.
-  // So we don't need to manually reset 'hasLoggedOut' strictly, as long as isLoggedIn logic is correct.
-  
-  // However, to be clean, we can just check:
-  const isClientLoggedIn = !!(currentAccount || sessionUser);
-  
-  // If we have a client login, we are logged in.
-  // If not, we fall back to server user, UNLESS we explicitly logged out.
+  const isClientLoggedIn = !!(currentAccount || sessionUser || isZkAuthenticated);
   const isLoggedIn = isClientLoggedIn || (!!user && !hasLoggedOut);
 
   const handleLogout = async () => {
-    setHasLoggedOut(true); // Ignore server user state immediately
+    setHasLoggedOut(true);
 
-    // 1. Disconnect wallet if connected
-    if (currentAccount) {
-       disconnect();
-    }
+    if (currentAccount) disconnect();
 
-    // 2. Sign out from Supabase
     const supabase = createClient();
     await supabase.auth.signOut();
     
-    // 3. Clear local state immediately
+    // Call Enoki Logout
+    await zkLogout();
+    
     setSessionUser(null);
     
+    // Clear obsolete cookies/storage just in case
+    document.cookie = "zklogin_address=; path=/; max-age=0";
+    localStorage.removeItem("zklogin_session");
+    
     router.refresh();
-    router.push("/");
   };
 
   return (
     <header className="w-full px-4 py-3 flex items-center justify-between relative z-10 border-b-2 bg-transparent">
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 cursor-pointer" onClick={() => router.push("/")}>
         <Image
           src="/logo2.webp"
           alt="SawerSui Logo"
@@ -84,19 +79,19 @@ export function Navbar({ user }: NavbarProps) {
       </div>
 
       <div className="flex items-center gap-3">
-        {/* Show logout if any auth method is active */}
         {isLoggedIn && (
-           <button
-             onClick={handleLogout}
-             className={`px-3 py-2 text-[10px] font-[family-name:var(--font-pixel)] border-2 rounded-lg flex items-center gap-2 transition-all active:translate-y-0.5 hover:scale-105 ${
-               isDark 
-                 ? 'border-white text-white hover:bg-white hover:text-black' 
-                 : 'border-black text-black hover:bg-black hover:text-white'
-             }`}
-           >
-             <LogOut className="w-3 h-3" />
-             LOGOUT
-           </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleLogout}
+              className={`px-3 py-2 text-[10px] font-[family-name:var(--font-pixel)] border-2 rounded-lg flex items-center gap-2 transition-all hover:scale-105 ${
+                isDark 
+                  ? 'border-white text-white hover:bg-white hover:text-black' 
+                  : 'border-black text-black hover:bg-black hover:text-white'
+              }`}
+            >
+              <LogOut className="w-3 h-3" />
+            </button>
+          </div>
         )}
         
         <button

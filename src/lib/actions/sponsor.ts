@@ -24,7 +24,7 @@ function getSponsorKeypair(): Ed25519Keypair {
     }
 
     throw new Error("Invalid key length. Expected 32 bytes.");
-  } catch (error: unknown) {
+  } catch {
     console.error("Failed to load sponsor keypair: Invalid format.");
     throw new Error("Failed to load sponsor keypair.");
   }

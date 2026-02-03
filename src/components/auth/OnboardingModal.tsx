@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { updateProfile } from "@/lib/actions/auth";
+import { updateProfile, registerEnokiUser } from "@/lib/actions/auth";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,9 +15,11 @@ interface OnboardingModalProps {
     username?: string | null;
     display_name?: string | null;
   };
+  address?: string; // If provided, we are registering a new Enoki user
+  onSuccess?: () => void;
 }
 
-export function OnboardingModal({ open, initialData }: OnboardingModalProps) {
+export function OnboardingModal({ open, initialData, address, onSuccess }: OnboardingModalProps) {
   const [username, setUsername] = useState(initialData?.username || "");
   const [displayName, setDisplayName] = useState(initialData?.display_name || "");
   const [loading, setLoading] = useState(false);
@@ -32,9 +34,19 @@ export function OnboardingModal({ open, initialData }: OnboardingModalProps) {
     setError("");
 
     try {
-      await updateProfile(username, displayName);
+      if (address) {
+        // Enoki Registration Mode
+        const result = await registerEnokiUser(address, username, displayName);
+        if (!result.success) {
+            throw new Error(result.error || "Registration failed");
+        }
+        if (onSuccess) onSuccess();
+      } else {
+        // Standard Onboarding Mode (Update existing profile)
+        await updateProfile(username, displayName);
+      }
+      
       router.refresh();
-      // Modal should close automatically as parent re-renders with valid data
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to update profile");
     } finally {

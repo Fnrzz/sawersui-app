@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { usePathname } from "next/navigation";
-import { useCurrentAccount, ConnectButton } from "@mysten/dapp-kit";
+import { useCurrentAccount } from "@mysten/dapp-kit";
 import { Loader2, Send, CheckCircle, AlertCircle } from "lucide-react";
 import { useDonate } from "@/hooks/useDonate";
+import { useZkDonation } from "@/hooks/useZkDonation";
 import { saveDonation, StreamerProfile } from "@/lib/actions/donation";
 import { useTheme } from "@/components/theme/ThemeProvider";
 import { motion, AnimatePresence, Variants } from "framer-motion";
@@ -16,6 +16,7 @@ import { toast } from "sonner";
 
 interface DonationFormProps {
   streamer: StreamerProfile;
+  onLoginClick?: () => void;
 }
 
 type DonationStatus = "idle" | "signing" | "confirming" | "success" | "error";
@@ -67,11 +68,16 @@ const successVariants: Variants = {
   },
 };
 
-export function DonationForm({ streamer }: DonationFormProps) {
+import { useZkLogin } from "@/hooks/useZkLogin";
+
+export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const currentAccount = useCurrentAccount();
-  const pathname = usePathname();
+  const { isAuthenticated: isZkAuthenticated } = useZkLogin();
+
+  // Unified Auth State
+  const isConnected = !!currentAccount || isZkAuthenticated;
 
   // Form State
   const [amount, setAmount] = useState<number>(1);
@@ -85,10 +91,17 @@ export function DonationForm({ streamer }: DonationFormProps) {
   const [txDigest, setTxDigest] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const { donate, isLoading } = useDonate({
+  const { donate, isLoading: isWalletLoading } = useDonate({
     streamerAddress: streamer.wallet_address,
     streamerId: streamer.id,
   });
+
+  const { donateUSDC, isLoading: isZkLoading } = useZkDonation({
+    streamerAddress: streamer.wallet_address,
+    streamerId: streamer.id,
+  });
+
+  const isLoading = isWalletLoading || isZkLoading;
 
   // Get the actual amount (preset or custom)
   const getAmount = (): number => {
@@ -116,9 +129,8 @@ export function DonationForm({ streamer }: DonationFormProps) {
       return;
     }
 
-    if (!currentAccount) {
-      // Should handle via UI button, but double check
-      toast.error("Please connect wallet first");
+    if (!isConnected) {
+      // Should handle connection request if not connected, but UI hides submit button
       return;
     }
 
@@ -127,12 +139,23 @@ export function DonationForm({ streamer }: DonationFormProps) {
     setErrorMessage(null);
 
     try {
-      // Execute transaction via wallet
-      const digest = await donate({
-        amountUsdc: donationAmount,
-        donorName: donorName || "Anonim",
-        message,
-      });
+      let digest: string;
+      
+      if (isZkAuthenticated) {
+        // Use ZkLogin Donation Flow
+        digest = await donateUSDC({
+          amountUsdc: donationAmount,
+          donorName: donorName || "Anonim",
+          message,
+        });
+      } else {
+        // Use Wallet Donation Flow
+        digest = await donate({
+          amountUsdc: donationAmount,
+          donorName: donorName || "Anonim",
+          message,
+        });
+      }
 
       setStatus("confirming");
       setTxDigest(digest);
@@ -395,15 +418,27 @@ export function DonationForm({ streamer }: DonationFormProps) {
           )}
         </AnimatePresence>
       </div>
-
+      
       {/* Fixed Footer Action Area */}
       <div className={`flex-none p-4 pb-6 z-10 border-t ${
         isDark ? "bg-zinc-950 border-white/10" : "bg-white border-black/5"
       }`}>
         <motion.div variants={itemVariants}>
-          {!currentAccount ? (
+          {!isConnected ? (
             <div className="w-full">
-              <ConnectButton className="!w-full !py-4 !rounded-lg !font-bold" />
+               <button 
+                 onClick={() => {
+                   if (onLoginClick) onLoginClick();
+                 }}
+                 type="button"
+                 className={`w-full h-14 rounded-lg font-[family-name:var(--font-pixel)] font-bold text-xs tracking-widest uppercase transition-colors flex items-center justify-center gap-2 ${
+                   isDark 
+                     ? "bg-white text-black hover:bg-zinc-200" 
+                     : "bg-black text-white hover:bg-zinc-800"
+                 }`}
+               >
+                 CONNECT TO DONATE
+               </button>
             </div>
           ) : (
             <div className="space-y-3">
