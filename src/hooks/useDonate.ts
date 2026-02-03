@@ -33,25 +33,14 @@ interface UseDonateResult {
   error: string | null;
 }
 
-interface Coin {
-  coinType: string;
-  coinObjectId: string;
-  version: string;
-  digest: string;
-  balance: string;
-  previousTransaction: string;
-}
-
 // ============================================================
 // CONSTANTS
 // ============================================================
 
 const USDC_DECIMALS = 6;
 const USDC_TYPE = CONFIG.SUI.ADDRESS.USDC_TYPE;
-const PACKAGE_ID = CONFIG.SUI.ADDRESS.PACKAGE_ID;
-const CONFIG_ID = CONFIG.SUI.ADDRESS.CONFIG_ID;
 
-export function useDonate({ streamerAddress, streamerId }: UseDonateParams): UseDonateResult {
+export function useDonate({ streamerAddress }: UseDonateParams): UseDonateResult {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
@@ -59,11 +48,8 @@ export function useDonate({ streamerAddress, streamerId }: UseDonateParams): Use
   const currentAccount = useCurrentAccount();
   const { mutateAsync: signTransaction } = useSignTransaction(); 
 
-
-
-
   const donate = useCallback(async (params: DonateParams): Promise<string> => {
-    const { amountUsdc, donorName } = params;
+    const { amountUsdc } = params;
 
     if (!currentAccount?.address) {
       throw new Error("Wallet not connected");
@@ -129,20 +115,20 @@ export function useDonate({ streamerAddress, streamerId }: UseDonateParams): Use
            throw new Error(errData.error || "Server failed to sponsor transaction");
         }
 
-        const { txBytes, sponsorSignature } = await response.json();
+        const { sponsoredTransactionBytes, sponsorSignature } = await response.json();
+
+        // Deserialize to Transaction object
+        const txObject = Transaction.from(fromBase64(sponsoredTransactionBytes));
 
         // Sign with User Wallet
-        // Ensure we are passing the correct object type expected by the wallet adapter
-        // Passing the transaction object directly can cause Type Errors with some wallets due to version mismatches or strict validation.
-        // We pass the Base64 bytes (string) which dApp Kit supports, avoiding object structure issues.
         const { signature: userSignature } = await signTransaction({
-          transaction: txBytes, 
+          transaction: txObject, 
           account: currentAccount,
         });
 
         // Execute with both signatures
         const result = await suiClient.executeTransactionBlock({
-            transactionBlock: fromBase64(txBytes),
+            transactionBlock: fromBase64(sponsoredTransactionBytes),
             signature: [userSignature, sponsorSignature],
             requestType: 'WaitForLocalExecution',
             options: {
@@ -158,8 +144,7 @@ export function useDonate({ streamerAddress, streamerId }: UseDonateParams): Use
         return result.digest;
 
       } catch (sponsorErr) {
-        // eslint-disable-next-line no-console
-        console.error("[Donate] Sponsorship attempt failed:", sponsorErr);
+          console.error("[Donate] Sponsorship attempt failed:", sponsorErr);
         throw sponsorErr;
       }
 
@@ -171,7 +156,7 @@ export function useDonate({ streamerAddress, streamerId }: UseDonateParams): Use
     } finally {
       setIsLoading(false);
     }
-  }, [currentAccount, suiClient, signTransaction, streamerAddress, streamerId]);
+  }, [currentAccount, suiClient, signTransaction, streamerAddress]);
 
   return {
     donate,

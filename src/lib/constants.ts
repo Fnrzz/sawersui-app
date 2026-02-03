@@ -1,0 +1,1 @@
+export const USDC_COIN_TYPE = process.env.NEXT_PUBLIC_ADDRESS_USDC || "0xa198f3be41cda8c07b3bf3fee02263526e535d682499806979a111e88a5a8d0f::coin::COIN";

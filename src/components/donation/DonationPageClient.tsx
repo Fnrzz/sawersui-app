@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { DonationForm } from "@/components/donation/DonationForm";
 // Navbar handled by layout
 import { motion, Variants } from "framer-motion";
+import { useState } from "react";
+import { LoginModal } from "@/components/auth/LoginModal";
 
 // ============================================================
 // TYPES
@@ -30,23 +32,6 @@ const containerVariants: Variants = {
   },
 };
 
-const headerVariants: Variants = {
-  hidden: { opacity: 0, y: -20 },
-  visible: { 
-    opacity: 1, 
-    y: 0,
-    transition: { duration: 0.5, ease: "easeOut" }
-  },
-};
-
-const contentVariants: Variants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { 
-    opacity: 1, 
-    y: 0,
-    transition: { duration: 0.5, ease: "easeOut" }
-  },
-};
 
 
 
@@ -55,18 +40,31 @@ const contentVariants: Variants = {
 // ============================================================
 
 export function DonationPageClient({ streamer }: DonationPageProps) {
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
   if (!streamer) {
     notFound();
   }
 
   return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="flex-1 flex flex-col h-full bg-white dark:bg-zinc-950 overflow-hidden"
-    >
-      <DonationForm streamer={streamer} />
-    </motion.div>
+    <>
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="flex-1 flex flex-col h-full bg-white dark:bg-zinc-950 overflow-hidden"
+      >
+        <DonationForm 
+          streamer={streamer} 
+          onLoginClick={() => setIsLoginModalOpen(true)}
+        />
+      </motion.div>
+      
+      <LoginModal 
+        open={isLoginModalOpen} 
+        onOpenChange={setIsLoginModalOpen} 
+        redirectTo={`/${streamer.username}`} 
+      />
+    </>
   );
 }
