@@ -1,6 +1,6 @@
 "use client";
 
-import { Copy, Share2, History, Trophy } from "lucide-react";
+import { Copy, Share2, History, Trophy, Settings } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { useState } from "react";
@@ -60,9 +60,9 @@ export function DashboardQuickActions({ username }: DashboardQuickActionsProps) 
       onClick: handleShare 
     },
     { 
-        icon: Trophy, 
-        label: "Leaderboard", 
-        href: "/dashboard/obs/leaderboard" 
+        icon: Settings, 
+        label: "OBS Settings", 
+        href: "/dashboard/obs" 
     },
     { 
       icon: History, 
