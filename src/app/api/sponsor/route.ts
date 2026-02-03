@@ -78,11 +78,11 @@ export async function POST(req: Request) {
         // 5. Donation Logic (Split & Transfer)
         const { data: userCoins } = await client.getCoins({
             owner: sender,
-            coinType: CONFIG.SUI.ADDRESS.USDC_TYPE
+            coinType: body.coinType || CONFIG.SUI.ADDRESS.USDC_TYPE
         });
 
         if (!userCoins || userCoins.length === 0) {
-            throw new Error("User has no USDC coins");
+            return NextResponse.json({ error: "Insufficient balance or no valid coins found" }, { status: 400 });
         }
 
         const coinIds = userCoins.map(c => c.coinObjectId);
@@ -103,7 +103,7 @@ export async function POST(req: Request) {
 
         tx.moveCall({
             target: `${CONFIG.SUI.ADDRESS.PACKAGE_ID}::donation_module::donate`,
-            typeArguments: [CONFIG.SUI.ADDRESS.USDC_TYPE],
+            typeArguments: [body.coinType || CONFIG.SUI.ADDRESS.USDC_TYPE],
             arguments: [
                 tx.object(CONFIG.SUI.ADDRESS.CONFIG_ID),
                 donationCoin,
@@ -121,12 +121,11 @@ export async function POST(req: Request) {
         const { signature: sponsorSignature } = await sponsor.signTransaction(txBytes);
 
         return NextResponse.json({
-            txBytes: txBytesBase64,
+            sponsoredTransactionBytes: txBytesBase64,
             sponsorSignature
         });
 
     } catch (error: unknown) {
-        // eslint-disable-next-line no-console
         console.error("[API/Sponsor] Error:", error);
         const message = error instanceof Error ? error.message : "Known error";
         return NextResponse.json({ 

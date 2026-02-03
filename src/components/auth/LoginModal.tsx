@@ -4,20 +4,13 @@ import { useTheme } from "@/components/theme/ThemeProvider";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { ConnectButton, useCurrentAccount } from "@mysten/dapp-kit";
 import { useWalletLogin } from "@/hooks/useWalletLogin"; 
-
-// ============================================================
-// TYPES
-// ============================================================
+import { LoginWithGoogleButton } from "@/components/auth/LoginWithGoogleButton";
 
 interface LoginModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   redirectTo?: string;
 }
-
-// ============================================================
-// COMPONENT
-// ============================================================
 
 export function LoginModal({ 
   open, 
@@ -106,6 +99,21 @@ export function LoginModal({
                     }}
                   />
                 )}
+
+                <div className="relative my-4">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className={`w-full border-t ${isDark ? "border-white/10" : "border-black/10"}`} />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className={`px-2 font-[family-name:var(--font-pixel)] text-[10px] ${
+                      isDark ? "bg-black text-gray-400" : "bg-white text-gray-500"
+                    }`}>
+                      OR
+                    </span>
+                  </div>
+                </div>
+
+                <LoginWithGoogleButton redirectTo={redirectTo} />
 
                 {error && (
                   <p className="text-xs text-red-500 text-center mt-2">
