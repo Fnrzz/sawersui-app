@@ -29,6 +29,117 @@ function getSponsorKeypair(): Ed25519Keypair {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
+
+    // =================================================================
+    // NEW FLOW: Server-Side Sponsored Withdrawal
+    // =================================================================
+    if (body.isWithdrawal) {
+      const { sender, recipientAddress, amountMist } = body;
+
+      if (!sender || !recipientAddress || !amountMist) {
+        return NextResponse.json(
+          { error: "Missing required withdrawal fields" },
+          { status: 400 },
+        );
+      }
+
+      // Security Check: Value >= 0.5 USDC
+      // 500,000 using BigInt constructor for compatibility
+      const MIN_AMOUNT_MIST = BigInt("500000");
+      if (BigInt(amountMist) < MIN_AMOUNT_MIST) {
+        return NextResponse.json(
+          { error: "Amount below minimum (0.50 USDC)" },
+          { status: 400 },
+        );
+      }
+
+      const client = getSuiClient();
+      const sponsor = getSponsorKeypair();
+      const sponsorAddress = sponsor.toSuiAddress();
+
+      // 1. Fetch Sponsor's Gas Coins
+      const { data: gasCoins } = await client.getCoins({
+        owner: sponsorAddress,
+        coinType: "0x2::sui::SUI",
+      });
+
+      if (gasCoins.length === 0) {
+        throw new Error("Sponsor has no SUI for gas");
+      }
+      const gasCoin = gasCoins[0];
+
+      // 2. Build Transaction
+      const tx = new Transaction();
+      tx.setSender(sender);
+      tx.setGasOwner(sponsorAddress);
+      tx.setGasPayment([
+        {
+          objectId: gasCoin.coinObjectId,
+          version: gasCoin.version,
+          digest: gasCoin.digest,
+        },
+      ]);
+      tx.setGasBudget(50_000_000);
+      // Explicitly set expiration to None
+      tx.setExpiration({ None: true });
+
+      const rgp = await client.getReferenceGasPrice();
+      tx.setGasPrice(rgp);
+
+      // 3. User Coin Logic (Fetch USDC)
+      const { data: userCoins } = await client.getCoins({
+        owner: sender,
+        coinType: CONFIG.SUI.ADDRESS.USDC_TYPE,
+      });
+
+      if (!userCoins || userCoins.length === 0) {
+        return NextResponse.json(
+          { error: "Insufficient balance or no valid coins found" },
+          { status: 400 },
+        );
+      }
+
+      const coinIds = userCoins.map((c) => c.coinObjectId);
+      const primaryCoin = coinIds[0];
+
+      if (coinIds.length > 1) {
+        tx.mergeCoins(
+          tx.object(primaryCoin),
+          coinIds.slice(1).map((id) => tx.object(id)),
+        );
+      }
+
+      // 4. Split and Transfer
+      const [coinToTransfer] = tx.splitCoins(tx.object(primaryCoin), [
+        tx.pure.u64(amountMist),
+      ]);
+
+      tx.transferObjects([coinToTransfer], tx.pure.address(recipientAddress));
+
+      // 5. Build & Sign
+      const txBytes = await tx.build({ client });
+      const txBytesBase64 = Buffer.from(txBytes).toString("base64");
+      const { signature: sponsorSignature } =
+        await sponsor.signTransaction(txBytes);
+
+      return NextResponse.json({
+        sponsoredTransactionBytes: txBytesBase64,
+        sponsorSignature,
+      });
+    }
+
+    // =================================================================
+    // EXISTING FLOW: Sponsored Donation (Server builds transaction)
+    // =================================================================
+    // Only check for `txBytes` if it's NOT a withdrawal request,
+    // but the original code had `if (body.txBytes)` as the differentiator.
+    // The previous flow in this file was:
+    // 1. Withdrawal (Client-side) -> body.txBytes
+    // 2. Donation -> body.sender + others
+    // We are REPLACING Flow 1 with the "isWithdrawal" check above.
+
+    // So we just fall through to existing donation logic if 'isWithdrawal' is not true.
+
     const { sender, streamerAddress, amountMist } = body;
 
     if (!sender || !streamerAddress || !amountMist) {
