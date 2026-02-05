@@ -27,109 +27,234 @@ function getSponsorKeypair(): Ed25519Keypair {
 }
 
 export async function POST(req: Request) {
-    try {
-        const body = await req.json();
-        const { sender, streamerAddress, amountMist } = body;
+  try {
+    const body = await req.json();
 
-        if (!sender || !streamerAddress || !amountMist) {
-            return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
-        }
+    // =================================================================
+    // NEW FLOW: Server-Side Sponsored Withdrawal
+    // =================================================================
+    if (body.isWithdrawal) {
+      const { sender, recipientAddress, amountMist } = body;
 
-        // Minimum donation amount protection (0.50 USDC = 500,000 MIST)
-        const MIN_AMOUNT_MIST = 500_000;
-        if (Number(amountMist) < MIN_AMOUNT_MIST) {
-             return NextResponse.json({ error: "Amount below minimum (0.50 USDC)" }, { status: 400 });
-        }
+      if (!sender || !recipientAddress || !amountMist) {
+        return NextResponse.json(
+          { error: "Missing required withdrawal fields" },
+          { status: 400 },
+        );
+      }
 
-        const client = getSuiClient();
-        const sponsor = getSponsorKeypair();
-        const sponsorAddress = sponsor.toSuiAddress();
+      // Security Check: Value >= 0.5 USDC
+      // 500,000 using BigInt constructor for compatibility
+      const MIN_AMOUNT_MIST = BigInt("500000");
+      if (BigInt(amountMist) < MIN_AMOUNT_MIST) {
+        return NextResponse.json(
+          { error: "Amount below minimum (0.50 USDC)" },
+          { status: 400 },
+        );
+      }
 
-        // 1. Fetch Sponsor's Gas Coins
-        const { data: coins } = await client.getCoins({
-            owner: sponsorAddress,
-            coinType: "0x2::sui::SUI"
-        });
+      const client = getSuiClient();
+      const sponsor = getSponsorKeypair();
+      const sponsorAddress = sponsor.toSuiAddress();
 
-        if (coins.length === 0) {
-            throw new Error("Sponsor has no SUI for gas");
-        }
+      // 1. Fetch Sponsor's Gas Coins
+      const { data: gasCoins } = await client.getCoins({
+        owner: sponsorAddress,
+        coinType: "0x2::sui::SUI",
+      });
 
-        // 2. Lock a specific Gas Coin (Prevent double-spend/locking issues)
-        const gasCoin = coins[0]; 
+      if (gasCoins.length === 0) {
+        throw new Error("Sponsor has no SUI for gas");
+      }
+      const gasCoin = gasCoins[0];
 
-        // 3. Build Transaction
-        const tx = new Transaction();
-        tx.setSender(sender);
-        tx.setGasOwner(sponsorAddress);
-        tx.setGasPayment([{
-            objectId: gasCoin.coinObjectId,
-            version: gasCoin.version,
-            digest: gasCoin.digest,
-        }]);
-        tx.setGasBudget(50_000_000); 
-        // Explicitly set expiration to None to prevent "Unknown value 2 for enum TransactionExpiration" error
-        tx.setExpiration({ None: true }); 
+      // 2. Build Transaction
+      const tx = new Transaction();
+      tx.setSender(sender);
+      tx.setGasOwner(sponsorAddress);
+      tx.setGasPayment([
+        {
+          objectId: gasCoin.coinObjectId,
+          version: gasCoin.version,
+          digest: gasCoin.digest,
+        },
+      ]);
+      tx.setGasBudget(50_000_000);
+      // Explicitly set expiration to None
+      tx.setExpiration({ None: true });
 
-        // 4. Reference Gas Price (Safety)
-        const rgp = await client.getReferenceGasPrice();
-        tx.setGasPrice(rgp);
+      const rgp = await client.getReferenceGasPrice();
+      tx.setGasPrice(rgp);
 
-        // 5. Donation Logic (Split & Transfer)
-        const { data: userCoins } = await client.getCoins({
-            owner: sender,
-            coinType: body.coinType || CONFIG.SUI.ADDRESS.USDC_TYPE
-        });
+      // 3. User Coin Logic (Fetch USDC)
+      const { data: userCoins } = await client.getCoins({
+        owner: sender,
+        coinType: CONFIG.SUI.ADDRESS.USDC_TYPE,
+      });
 
-        if (!userCoins || userCoins.length === 0) {
-            return NextResponse.json({ error: "Insufficient balance or no valid coins found" }, { status: 400 });
-        }
+      if (!userCoins || userCoins.length === 0) {
+        return NextResponse.json(
+          { error: "Insufficient balance or no valid coins found" },
+          { status: 400 },
+        );
+      }
 
-        const coinIds = userCoins.map(c => c.coinObjectId);
-        const primaryCoin = coinIds[0];
+      const coinIds = userCoins.map((c) => c.coinObjectId);
+      const primaryCoin = coinIds[0];
 
-        if (coinIds.length > 1) {
-            tx.mergeCoins(
-                tx.object(primaryCoin),
-                coinIds.slice(1).map(id => tx.object(id))
-            );
-        }
+      if (coinIds.length > 1) {
+        tx.mergeCoins(
+          tx.object(primaryCoin),
+          coinIds.slice(1).map((id) => tx.object(id)),
+        );
+      }
 
-        const [donationCoin] = tx.splitCoins(tx.object(primaryCoin), [
-            tx.pure.u64(amountMist),
-        ]);
+      // 4. Split and Transfer
+      const [coinToTransfer] = tx.splitCoins(tx.object(primaryCoin), [
+        tx.pure.u64(amountMist),
+      ]);
 
-        const refId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+      tx.transferObjects([coinToTransfer], tx.pure.address(recipientAddress));
 
-        tx.moveCall({
-            target: `${CONFIG.SUI.ADDRESS.PACKAGE_ID}::donation_module::donate`,
-            typeArguments: [body.coinType || CONFIG.SUI.ADDRESS.USDC_TYPE],
-            arguments: [
-                tx.object(CONFIG.SUI.ADDRESS.CONFIG_ID),
-                donationCoin,
-                tx.pure.u64(amountMist),
-                tx.pure.address(streamerAddress),
-                tx.pure.string(refId)
-            ]
-        });
+      // 5. Build & Sign
+      const txBytes = await tx.build({ client });
+      const txBytesBase64 = Buffer.from(txBytes).toString("base64");
+      const { signature: sponsorSignature } =
+        await sponsor.signTransaction(txBytes);
 
-        // 6. Build Bytes
-        const txBytes = await tx.build({ client });
-        const txBytesBase64 = Buffer.from(txBytes).toString("base64");
-
-        // 7. Sponsor Signs
-        const { signature: sponsorSignature } = await sponsor.signTransaction(txBytes);
-
-        return NextResponse.json({
-            sponsoredTransactionBytes: txBytesBase64,
-            sponsorSignature
-        });
-
-    } catch (error: unknown) {
-        console.error("[API/Sponsor] Error:", error);
-        const message = error instanceof Error ? error.message : "Known error";
-        return NextResponse.json({ 
-            error: message || "Failed to create sponsored transaction" 
-        }, { status: 500 });
+      return NextResponse.json({
+        sponsoredTransactionBytes: txBytesBase64,
+        sponsorSignature,
+      });
     }
+
+    // =================================================================
+    // EXISTING FLOW: Sponsored Donation (Server builds transaction)
+    // =================================================================
+    // Only check for `txBytes` if it's NOT a withdrawal request,
+    // but the original code had `if (body.txBytes)` as the differentiator.
+    // The previous flow in this file was:
+    // 1. Withdrawal (Client-side) -> body.txBytes
+    // 2. Donation -> body.sender + others
+    // We are REPLACING Flow 1 with the "isWithdrawal" check above.
+
+    // So we just fall through to existing donation logic if 'isWithdrawal' is not true.
+
+    const { sender, streamerAddress, amountMist } = body;
+
+    if (!sender || !streamerAddress || !amountMist) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 },
+      );
+    }
+
+    // Minimum donation amount protection (0.50 USDC = 500,000 MIST)
+    const MIN_AMOUNT_MIST = 500_000;
+    if (Number(amountMist) < MIN_AMOUNT_MIST) {
+      return NextResponse.json(
+        { error: "Amount below minimum (0.50 USDC)" },
+        { status: 400 },
+      );
+    }
+
+    const client = getSuiClient();
+    const sponsor = getSponsorKeypair();
+    const sponsorAddress = sponsor.toSuiAddress();
+
+    // 1. Fetch Sponsor's Gas Coins
+    const { data: coins } = await client.getCoins({
+      owner: sponsorAddress,
+      coinType: "0x2::sui::SUI",
+    });
+
+    if (coins.length === 0) {
+      throw new Error("Sponsor has no SUI for gas");
+    }
+
+    // 2. Lock a specific Gas Coin (Prevent double-spend/locking issues)
+    const gasCoin = coins[0];
+
+    // 3. Build Transaction
+    const tx = new Transaction();
+    tx.setSender(sender);
+    tx.setGasOwner(sponsorAddress);
+    tx.setGasPayment([
+      {
+        objectId: gasCoin.coinObjectId,
+        version: gasCoin.version,
+        digest: gasCoin.digest,
+      },
+    ]);
+    tx.setGasBudget(50_000_000);
+    // Explicitly set expiration to None to prevent "Unknown value 2 for enum TransactionExpiration" error
+    tx.setExpiration({ None: true });
+
+    // 4. Reference Gas Price (Safety)
+    const rgp = await client.getReferenceGasPrice();
+    tx.setGasPrice(rgp);
+
+    // 5. Donation Logic (Split & Transfer)
+    const { data: userCoins } = await client.getCoins({
+      owner: sender,
+      coinType: body.coinType || CONFIG.SUI.ADDRESS.USDC_TYPE,
+    });
+
+    if (!userCoins || userCoins.length === 0) {
+      return NextResponse.json(
+        { error: "Insufficient balance or no valid coins found" },
+        { status: 400 },
+      );
+    }
+
+    const coinIds = userCoins.map((c) => c.coinObjectId);
+    const primaryCoin = coinIds[0];
+
+    if (coinIds.length > 1) {
+      tx.mergeCoins(
+        tx.object(primaryCoin),
+        coinIds.slice(1).map((id) => tx.object(id)),
+      );
+    }
+
+    const [donationCoin] = tx.splitCoins(tx.object(primaryCoin), [
+      tx.pure.u64(amountMist),
+    ]);
+
+    const refId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+
+    tx.moveCall({
+      target: `${CONFIG.SUI.ADDRESS.PACKAGE_ID}::donation_module::donate`,
+      typeArguments: [body.coinType || CONFIG.SUI.ADDRESS.USDC_TYPE],
+      arguments: [
+        tx.object(CONFIG.SUI.ADDRESS.CONFIG_ID),
+        donationCoin,
+        tx.pure.u64(amountMist),
+        tx.pure.address(streamerAddress),
+        tx.pure.string(refId),
+      ],
+    });
+
+    // 6. Build Bytes
+    const txBytes = await tx.build({ client });
+    const txBytesBase64 = Buffer.from(txBytes).toString("base64");
+
+    // 7. Sponsor Signs
+    const { signature: sponsorSignature } =
+      await sponsor.signTransaction(txBytes);
+
+    return NextResponse.json({
+      sponsoredTransactionBytes: txBytesBase64,
+      sponsorSignature,
+    });
+  } catch (error: unknown) {
+    console.error("[API/Sponsor] Error:", error);
+    const message = error instanceof Error ? error.message : "Known error";
+    return NextResponse.json(
+      {
+        error: message || "Failed to create sponsored transaction",
+      },
+      { status: 500 },
+    );
+  }
 }

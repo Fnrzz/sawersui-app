@@ -38,19 +38,19 @@ const containerVariants: Variants = {
 
 const itemVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     y: 0,
-    transition: { duration: 0.4, ease: "easeOut" }
+    transition: { duration: 0.4, ease: "easeOut" },
   },
 };
 
 const buttonVariants: Variants = {
   hidden: { opacity: 0, scale: 0.9 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     scale: 1,
-    transition: { duration: 0.3, ease: "easeOut" }
+    transition: { duration: 0.3, ease: "easeOut" },
   },
   tap: { scale: 0.95 },
   hover: { scale: 1.02 },
@@ -58,26 +58,32 @@ const buttonVariants: Variants = {
 
 const successVariants: Variants = {
   hidden: { opacity: 0, scale: 0.8 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     scale: 1,
-    transition: { 
-      duration: 0.5, 
-      ease: [0.175, 0.885, 0.32, 1.275] // Bounce effect
-    }
+    transition: {
+      duration: 0.5,
+      ease: [0.175, 0.885, 0.32, 1.275], // Bounce effect
+    },
   },
 };
 
 import { useZkLogin } from "@/hooks/useZkLogin";
+import { useUsdcBalance } from "@/hooks/useUsdcBalance";
 
 export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const currentAccount = useCurrentAccount();
-  const { isAuthenticated: isZkAuthenticated } = useZkLogin();
+  const { isAuthenticated: isZkAuthenticated, userAddress: zkAddress } =
+    useZkLogin();
 
   // Unified Auth State
   const isConnected = !!currentAccount || isZkAuthenticated;
+  const userAddress = currentAccount?.address || zkAddress;
+
+  const { balance: usdcBalance, isLoading: isBalanceLoading } =
+    useUsdcBalance(userAddress);
 
   // Form State
   const [amount, setAmount] = useState<number>(1);
@@ -140,7 +146,7 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
 
     try {
       let digest: string;
-      
+
       if (isZkAuthenticated) {
         // Use ZkLogin Donation Flow
         digest = await donateUSDC({
@@ -174,7 +180,7 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
       });
 
       setStatus("success");
-      
+
       // Show success toast
       toast.success("Donation Sent! 🎉", {
         description: `Thank you for supporting ${streamer.display_name}!`,
@@ -195,7 +201,7 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
       setStatus("error");
       const errMsg = err instanceof Error ? err.message : "Transaction failed";
       setErrorMessage(errMsg);
-      
+
       // Show error toast
       toast.error("Donation Failed", {
         description: errMsg,
@@ -206,7 +212,7 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
   // Success state with animation
   if (status === "success") {
     return (
-      <motion.div 
+      <motion.div
         className="flex flex-col items-center justify-center py-10 space-y-4"
         variants={successVariants}
         initial="hidden"
@@ -219,7 +225,7 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
         >
           <CheckCircle className="w-16 h-16 text-green-500" />
         </motion.div>
-        <motion.h3 
+        <motion.h3
           className={`text-xl font-bold ${isDark ? "text-white" : "text-black"}`}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -227,7 +233,7 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
         >
           Donation Sent! 🎉
         </motion.h3>
-        <motion.p 
+        <motion.p
           className={`text-sm text-center ${isDark ? "text-white/60" : "text-black/60"}`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -253,8 +259,8 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
   }
 
   return (
-    <motion.form 
-      onSubmit={handleSubmit} 
+    <motion.form
+      onSubmit={handleSubmit}
       className="flex flex-col h-full"
       variants={containerVariants}
       initial="hidden"
@@ -262,25 +268,24 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
     >
       {/* Scrollable Content Area */}
       <div className="flex-1 overflow-y-auto px-4 pb-4 no-scrollbar">
-        
         {/* Streamer Profile Header */}
-        <motion.div 
-          className="text-center pt-8 pb-6"
-          variants={itemVariants}
-        >
-          <h1 className={`text-2xl font-bold ${isDark ? "text-white" : "text-black"}`}>
+        <motion.div className="text-center pt-8 pb-6" variants={itemVariants}>
+          <h1
+            className={`text-2xl font-bold ${isDark ? "text-white" : "text-black"}`}
+          >
             {streamer.display_name}
           </h1>
-          <p className={`text-sm ${isDark ? "text-gray-400" : "text-gray-500"} mt-1`}>
+          <p
+            className={`text-sm ${isDark ? "text-gray-400" : "text-gray-500"} mt-1`}
+          >
             @{streamer.username}
           </p>
         </motion.div>
-        
-        <motion.div 
-          className="mb-6 text-center"
-          variants={itemVariants}
-        >
-          <p className={`text-sm ${isDark ? "text-gray-400" : "text-gray-500"}`}>
+
+        <motion.div className="mb-6 text-center" variants={itemVariants}>
+          <p
+            className={`text-sm ${isDark ? "text-gray-400" : "text-gray-500"}`}
+          >
             Support {streamer.display_name} with USDC on Sui Network
           </p>
         </motion.div>
@@ -288,15 +293,19 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
         {/* Amount Selection - Card Design */}
         <motion.div variants={itemVariants}>
           {/* Amount Display Card - Editable */}
-          <div className={`rounded-2xl p-6 mb-4 ${
-            isDark ? "bg-zinc-900" : "bg-gray-50"
-          }`}>
-            <p className={`text-xs font-medium tracking-widest text-center mb-4 ${
-              isDark ? "text-gray-400" : "text-gray-500"
-            }`}>
+          <div
+            className={`rounded-2xl p-6 mb-4 ${
+              isDark ? "bg-zinc-900" : "bg-gray-50"
+            }`}
+          >
+            <p
+              className={`text-xs font-medium tracking-widest text-center mb-4 ${
+                isDark ? "text-gray-400" : "text-gray-500"
+              }`}
+            >
               DONATION AMOUNT
             </p>
-            
+
             {/* Editable Amount Display */}
             <div className="text-center">
               <div className="relative inline-block">
@@ -319,20 +328,26 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
                   }}
                   placeholder="0"
                   className={`text-5xl font-black tracking-tight text-center bg-transparent outline-none w-full max-w-[200px] ${
-                    isDark ? "text-white placeholder:text-white/30" : "text-black placeholder:text-black/30"
+                    isDark
+                      ? "text-white placeholder:text-white/30"
+                      : "text-black placeholder:text-black/30"
                   }`}
-                  style={{ caretColor: isDark ? 'white' : 'black' }}
+                  style={{ caretColor: isDark ? "white" : "black" }}
                 />
               </div>
-              <p className={`text-sm font-bold mt-2 ${
-                isDark ? "text-gray-400" : "text-gray-500"
-              }`}>
+              <p
+                className={`text-sm font-bold mt-2 ${
+                  isDark ? "text-gray-400" : "text-gray-500"
+                }`}
+              >
                 USDC
               </p>
             </div>
 
             {/* Minimum Amount Note */}
-            <p className={`text-xs text-center mt-3 ${isDark ? "text-gray-500" : "text-gray-400"}`}>
+            <p
+              className={`text-xs text-center mt-3 ${isDark ? "text-gray-500" : "text-gray-400"}`}
+            >
               Minimum: $0.50
             </p>
           </div>
@@ -352,8 +367,8 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
                       ? "bg-white text-black"
                       : "bg-black text-white"
                     : isDark
-                    ? "bg-zinc-800 text-white hover:bg-zinc-700"
-                    : "bg-gray-100 text-black hover:bg-gray-200"
+                      ? "bg-zinc-800 text-white hover:bg-zinc-700"
+                      : "bg-gray-100 text-black hover:bg-gray-200"
                 }`}
               >
                 ${preset}
@@ -364,7 +379,9 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
 
         {/* Donor Name */}
         <motion.div className="space-y-2 mt-6" variants={itemVariants}>
-          <label className={`text-sm font-medium ${isDark ? "text-white/80" : "text-black/80"}`}>
+          <label
+            className={`text-sm font-medium ${isDark ? "text-white/80" : "text-black/80"}`}
+          >
             Your Name (Optional)
           </label>
           <input
@@ -383,7 +400,9 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
 
         {/* Message */}
         <motion.div className="space-y-2 mt-6" variants={itemVariants}>
-          <label className={`text-sm font-medium ${isDark ? "text-white/80" : "text-black/80"}`}>
+          <label
+            className={`text-sm font-medium ${isDark ? "text-white/80" : "text-black/80"}`}
+          >
             Message
           </label>
           <textarea
@@ -398,7 +417,9 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
                 : "border-black/20 bg-black/5 text-black placeholder:text-black/30"
             }`}
           />
-          <p className={`text-xs text-right ${isDark ? "text-white/40" : "text-black/40"}`}>
+          <p
+            className={`text-xs text-right ${isDark ? "text-white/40" : "text-black/40"}`}
+          >
             {message.length}/200
           </p>
         </motion.div>
@@ -406,7 +427,7 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
         {/* Error Message */}
         <AnimatePresence>
           {errorMessage && (
-            <motion.div 
+            <motion.div
               className="flex items-center gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/30 mt-4"
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
@@ -418,43 +439,66 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
           )}
         </AnimatePresence>
       </div>
-      
+
       {/* Fixed Footer Action Area */}
-      <div className={`flex-none p-4 pb-6 z-10 border-t ${
-        isDark ? "bg-zinc-950 border-white/10" : "bg-white border-black/5"
-      }`}>
+      <div
+        className={`flex-none p-4 pb-6 z-10 border-t ${
+          isDark ? "bg-zinc-950 border-white/10" : "bg-white border-black/5"
+        }`}
+      >
         <motion.div variants={itemVariants}>
           {!isConnected ? (
             <div className="w-full">
-               <button 
-                 onClick={() => {
-                   if (onLoginClick) onLoginClick();
-                 }}
-                 type="button"
-                 className={`w-full h-14 rounded-lg font-[family-name:var(--font-pixel)] font-bold text-xs tracking-widest uppercase transition-colors flex items-center justify-center gap-2 ${
-                   isDark 
-                     ? "bg-white text-black hover:bg-zinc-200" 
-                     : "bg-black text-white hover:bg-zinc-800"
-                 }`}
-               >
-                 CONNECT TO DONATE
-               </button>
+              <button
+                onClick={() => {
+                  if (onLoginClick) onLoginClick();
+                }}
+                type="button"
+                className={`w-full h-14 rounded-lg font-[family-name:var(--font-pixel)] font-bold text-xs tracking-widest uppercase transition-colors flex items-center justify-center gap-2 ${
+                  isDark
+                    ? "bg-white text-black hover:bg-zinc-200"
+                    : "bg-black text-white hover:bg-zinc-800"
+                }`}
+              >
+                CONNECT TO DONATE
+              </button>
             </div>
           ) : (
             <div className="space-y-3">
-               {/* Gas Sponsorship Badge */}
-               <div className="flex items-center justify-center gap-1.5 opacity-70">
-                <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                <p className={`text-[10px] uppercase tracking-wider font-bold ${
-                  isDark ? "text-green-400" : "text-green-600"
-                }`}>
-                  Gas Fee Sponsored
-                </p>
+              {/* Gas Sponsorship Badge */}
+              <div className="flex justify-between items-center">
+                <div
+                  className={`text-center text-xs mb-2 ${isDark ? "text-gray-400" : "text-gray-500"}`}
+                >
+                  Balance:{" "}
+                  <span
+                    className={
+                      isDark
+                        ? "text-white font-medium"
+                        : "text-black font-medium"
+                    }
+                  >
+                    {isBalanceLoading ? "..." : `$${usdcBalance.toFixed(2)}`}{" "}
+                    USDC
+                  </span>
+                </div>
+                <div className="flex items-center justify-center gap-1.5 opacity-70">
+                  <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                  <p
+                    className={`text-[10px] uppercase tracking-wider font-bold ${
+                      isDark ? "text-green-400" : "text-green-600"
+                    }`}
+                  >
+                    Gas Fee Sponsored
+                  </p>
+                </div>
               </div>
 
               <motion.button
                 type="submit"
-                disabled={isLoading || status === "signing" || status === "confirming"}
+                disabled={
+                  isLoading || status === "signing" || status === "confirming"
+                }
                 variants={buttonVariants}
                 whileHover={!isLoading ? "hover" : undefined}
                 whileTap={!isLoading ? "tap" : undefined}
