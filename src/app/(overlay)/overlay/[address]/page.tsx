@@ -1,4 +1,5 @@
 import { getStreamerByAddress } from "@/lib/actions/donation";
+import { getOverlaySettings } from "@/lib/actions/settings";
 import { DonationAlert } from "@/components/overlay/DonationAlert";
 
 interface OverlayPageProps {
@@ -19,5 +20,8 @@ export default async function OverlayPage(props: OverlayPageProps) {
     );
   }
 
-  return <DonationAlert streamerId={streamer.id} />;
+  // Fetch the streamer's overlay settings (returns defaults if none configured)
+  const settings = await getOverlaySettings(streamer.id);
+
+  return <DonationAlert streamerId={streamer.id} settings={settings} />;
 }

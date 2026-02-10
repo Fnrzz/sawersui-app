@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 export interface DonationEvent {
@@ -14,33 +14,43 @@ export interface DonationEvent {
   status: string;
 }
 
-export function useDonationEvents(streamerId?: string, onNewDonation?: (donation: DonationEvent) => void) {
+export function useDonationEvents(
+  streamerId?: string,
+  onNewDonation?: (donation: DonationEvent) => void,
+) {
+  // Store callback in a ref so the channel doesn't re-subscribe on every render
+  const callbackRef = useRef(onNewDonation);
+  callbackRef.current = onNewDonation;
+
   useEffect(() => {
     if (!streamerId) return;
 
     const supabase = createClient();
 
+    console.log("[useDonationEvents] Subscribing for streamer:", streamerId);
+
     const channel = supabase
-      .channel('realtime-donations')
+      .channel(`realtime-donations-${streamerId}`)
       .on(
-        'postgres_changes',
+        "postgres_changes",
         {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'donations',
+          event: "INSERT",
+          schema: "public",
+          table: "donations",
           filter: `streamer_id=eq.${streamerId}`,
         },
         (payload) => {
-          console.log('New Donation Event:', payload);
-          if (onNewDonation) {
-            onNewDonation(payload.new as DonationEvent);
-          }
-        }
+          console.log("[useDonationEvents] New Donation Event:", payload);
+          callbackRef.current?.(payload.new as DonationEvent);
+        },
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log("[useDonationEvents] Channel status:", status);
+      });
 
     return () => {
+      console.log("[useDonationEvents] Unsubscribing channel");
       supabase.removeChannel(channel);
     };
-  }, [streamerId, onNewDonation]); // Added onNewDonation as dependency
+  }, [streamerId]); // Only re-subscribe when streamerId changes
 }
