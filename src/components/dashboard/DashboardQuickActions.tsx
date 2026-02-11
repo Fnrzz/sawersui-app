@@ -1,6 +1,6 @@
 "use client";
 
-import { Copy, Share2, History, Settings, Wallet, Lock } from "lucide-react";
+import { Copy, Share2, History, Settings, Wallet } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { useState } from "react";
@@ -156,11 +156,6 @@ export function DashboardQuickActions({
       icon: History,
       label: "History",
       href: "/dashboard/history",
-    },
-    {
-      icon: Lock,
-      label: "Exclusive",
-      href: "/dashboard/exclusive-content",
     },
   ];
 
