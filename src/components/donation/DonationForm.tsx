@@ -17,6 +17,7 @@ import { toast } from "sonner";
 interface DonationFormProps {
   streamer: StreamerProfile;
   onLoginClick?: () => void;
+  hasExclusiveContent?: boolean;
 }
 
 type DonationStatus = "idle" | "signing" | "confirming" | "success" | "error";
@@ -73,7 +74,7 @@ import { useUsdcBalance } from "@/hooks/useUsdcBalance";
 import { useSuiNSName } from "@/hooks/useSuiNSName";
 import { useWalrusReceipt } from "@/hooks/useWalrusReceipt";
 
-export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
+export function DonationForm({ streamer, onLoginClick, hasExclusiveContent }: DonationFormProps) {
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const currentAccount = useCurrentAccount();
@@ -285,6 +286,21 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
             View Walrus Receipt →
           </motion.a>
         )}
+        {hasExclusiveContent && (
+          <motion.a
+            href={`/${streamer.username}/exclusive`}
+            className={`mt-2 px-4 py-2 rounded-lg text-sm font-bold transition-colors ${
+              isDark
+                ? "bg-purple-600 text-white hover:bg-purple-700"
+                : "bg-purple-600 text-white hover:bg-purple-700"
+            }`}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
+          >
+            Unlock Exclusive Content →
+          </motion.a>
+        )}
       </motion.div>
     );
   }
@@ -327,6 +343,29 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
             Support {streamer.display_name} with USDC on Sui Network
           </p>
         </motion.div>
+
+        {hasExclusiveContent && (
+          <motion.a
+            href={`/${streamer.username}/exclusive`}
+            className={`block mb-6 p-3 rounded-xl text-center border transition-colors ${
+              isDark
+                ? "bg-purple-900/20 border-purple-800/30 hover:bg-purple-900/30"
+                : "bg-purple-50 border-purple-200 hover:bg-purple-100"
+            }`}
+            variants={itemVariants}
+          >
+            <p
+              className={`text-xs font-bold ${isDark ? "text-purple-300" : "text-purple-700"}`}
+            >
+              This creator has exclusive content!
+            </p>
+            <p
+              className={`text-xs mt-0.5 ${isDark ? "text-purple-400" : "text-purple-600"}`}
+            >
+              Donate to unlock →
+            </p>
+          </motion.a>
+        )}
 
         {/* Amount Selection - Card Design */}
         <motion.div variants={itemVariants}>

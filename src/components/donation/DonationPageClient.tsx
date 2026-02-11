@@ -18,6 +18,7 @@ interface DonationPageProps {
     display_name: string;
     wallet_address: string;
   };
+  hasExclusiveContent?: boolean;
 }
 
 // Animation Variants
@@ -39,7 +40,7 @@ const containerVariants: Variants = {
 // CLIENT COMPONENT
 // ============================================================
 
-export function DonationPageClient({ streamer }: DonationPageProps) {
+export function DonationPageClient({ streamer, hasExclusiveContent }: DonationPageProps) {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   if (!streamer) {
@@ -54,9 +55,10 @@ export function DonationPageClient({ streamer }: DonationPageProps) {
         animate="visible"
         className="flex-1 flex flex-col h-full bg-white dark:bg-zinc-950 overflow-hidden"
       >
-        <DonationForm 
-          streamer={streamer} 
+        <DonationForm
+          streamer={streamer}
           onLoginClick={() => setIsLoginModalOpen(true)}
+          hasExclusiveContent={hasExclusiveContent}
         />
       </motion.div>
       

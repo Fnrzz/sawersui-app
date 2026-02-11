@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getStreamerByUsername } from "@/lib/actions/donation";
+import { getExclusiveContent } from "@/lib/actions/exclusive-content";
 import { DonationPageClient } from "@/components/donation/DonationPageClient";
 
 // ============================================================
@@ -25,7 +26,10 @@ export default async function DonationPage({ params }: DonationPageProps) {
     notFound();
   }
 
-  return <DonationPageClient streamer={streamer} />;
+  const exclusiveContent = await getExclusiveContent(streamer.id);
+  const hasExclusiveContent = exclusiveContent.length > 0;
+
+  return <DonationPageClient streamer={streamer} hasExclusiveContent={hasExclusiveContent} />;
 }
 
 // ============================================================
