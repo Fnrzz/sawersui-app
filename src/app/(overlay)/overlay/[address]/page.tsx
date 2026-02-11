@@ -23,5 +23,5 @@ export default async function OverlayPage(props: OverlayPageProps) {
   // Fetch the streamer's overlay settings (returns defaults if none configured)
   const settings = await getOverlaySettings(streamer.id);
 
-  return <DonationAlert streamerId={streamer.id} settings={settings} />;
+  return <DonationAlert streamerId={streamer.id} streamerAddress={address} settings={settings} />;
 }

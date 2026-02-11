@@ -160,6 +160,14 @@ export async function saveDonation({
   return { success: true };
 }
 
+export async function updateDonationBlobId(txDigest: string, blobId: string) {
+  const supabase = await createAdminClient();
+  await supabase
+    .from("donations")
+    .update({ walrus_blob_id: blobId })
+    .eq("tx_digest", txDigest);
+}
+
 export async function getDonations(streamerId: string) {
   const supabase = await createClient();
   
