@@ -166,7 +166,7 @@ export function DashboardQuickActions({
 
   return (
     <>
-      <div className="flex justify-between px-2">
+      <div className="grid grid-cols-4 gap-4">
         {actions.map((action, i) =>
           action.href ? (
             <Link
