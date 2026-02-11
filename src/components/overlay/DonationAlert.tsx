@@ -1,17 +1,19 @@
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
-import { useDonationEvents, DonationEvent } from "@/hooks/useDonationEvents";
+import { DonationEvent } from "@/hooks/useDonationEvents";
+import { useCombinedDonationEvents } from "@/hooks/useCombinedDonationEvents";
 import { AnimatePresence } from "framer-motion";
 import { DonationAlertCard } from "./DonationAlertCard";
 import { OverlaySettings } from "@/lib/overlay-settings";
 
 interface DonationAlertProps {
   streamerId: string;
+  streamerAddress?: string;
   settings?: OverlaySettings;
 }
 
-export function DonationAlert({ streamerId, settings }: DonationAlertProps) {
+export function DonationAlert({ streamerId, streamerAddress, settings }: DonationAlertProps) {
   const [queue, setQueue] = useState<DonationEvent[]>([]);
   const [currentAlert, setCurrentAlert] = useState<DonationEvent | null>(null);
   const [isShowing, setIsShowing] = useState(false);
@@ -29,8 +31,8 @@ export function DonationAlert({ streamerId, settings }: DonationAlertProps) {
     setQueue((prev) => [...prev, newDonation]);
   }, []);
 
-  // 1. Subscribe to realtime donation events
-  useDonationEvents(streamerId, handleNewDonation);
+  // 1. Subscribe to realtime donation events (Supabase + on-chain)
+  useCombinedDonationEvents(streamerId, streamerAddress, handleNewDonation);
 
   // 2. Process Queue
   useEffect(() => {

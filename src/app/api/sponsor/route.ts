@@ -5,8 +5,43 @@ import { decodeSuiPrivateKey } from "@mysten/sui/cryptography";
 import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
 import { fromBase64 } from "@mysten/sui/utils";
 import { CONFIG } from "@/lib/config";
+import type { SuiJsonRpcClient } from "@mysten/sui/jsonRpc";
 
 const SPONSOR_SECRET_KEY = process.env.SPONSOR_SECRET_KEY || "";
+
+// Dry-run transaction to estimate optimal gas budget
+async function estimateGasBudget(
+  tx: Transaction,
+  client: SuiJsonRpcClient,
+): Promise<number> {
+  const TEMP_BUDGET = 100_000_000;
+  const MIN_GAS_BUDGET = 2_000_000;
+  const GAS_BUFFER = 1.2;
+
+  tx.setGasBudget(TEMP_BUDGET);
+  const tempBytes = await tx.build({ client });
+
+  const dryRunResult = await client.dryRunTransactionBlock({
+    transactionBlock: Buffer.from(tempBytes).toString("base64"),
+  });
+
+  if (dryRunResult.effects.status.status !== "success") {
+    const errMsg =
+      typeof dryRunResult.effects.status.error === "string"
+        ? dryRunResult.effects.status.error
+        : "Transaction simulation failed";
+    throw new Error(`Dry-run failed: ${errMsg}`);
+  }
+
+  const { computationCost, storageCost, storageRebate } =
+    dryRunResult.effects.gasUsed;
+
+  const netGas =
+    Number(computationCost) + Number(storageCost) - Number(storageRebate);
+
+  const estimated = Math.ceil(Math.max(netGas, 0) * GAS_BUFFER);
+  return Math.max(estimated, MIN_GAS_BUDGET);
+}
 
 function getSponsorKeypair(): Ed25519Keypair {
   if (!SPONSOR_SECRET_KEY) {
@@ -79,7 +114,6 @@ export async function POST(req: Request) {
           digest: gasCoin.digest,
         },
       ]);
-      tx.setGasBudget(50_000_000);
       // Explicitly set expiration to None
       tx.setExpiration({ None: true });
 
@@ -116,7 +150,9 @@ export async function POST(req: Request) {
 
       tx.transferObjects([coinToTransfer], tx.pure.address(recipientAddress));
 
-      // 5. Build & Sign
+      // 5. Estimate gas via dry-run, then build & sign
+      const optimalGas = await estimateGasBudget(tx, client);
+      tx.setGasBudget(optimalGas);
       const txBytes = await tx.build({ client });
       const txBytesBase64 = Buffer.from(txBytes).toString("base64");
       const { signature: sponsorSignature } =
@@ -186,7 +222,6 @@ export async function POST(req: Request) {
         digest: gasCoin.digest,
       },
     ]);
-    tx.setGasBudget(50_000_000);
     // Explicitly set expiration to None to prevent "Unknown value 2 for enum TransactionExpiration" error
     tx.setExpiration({ None: true });
 
@@ -235,7 +270,9 @@ export async function POST(req: Request) {
       ],
     });
 
-    // 6. Build Bytes
+    // 6. Estimate gas via dry-run, then build
+    const optimalGas = await estimateGasBudget(tx, client);
+    tx.setGasBudget(optimalGas);
     const txBytes = await tx.build({ client });
     const txBytesBase64 = Buffer.from(txBytes).toString("base64");
 

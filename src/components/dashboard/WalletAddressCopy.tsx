@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Copy, Check } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSuiNSName } from "@/hooks/useSuiNSName";
 
 interface WalletAddressCopyProps {
   address: string | null;
@@ -10,6 +11,7 @@ interface WalletAddressCopyProps {
 
 export function WalletAddressCopy({ address }: WalletAddressCopyProps) {
   const [copied, setCopied] = useState(false);
+  const { name: suiNSName } = useSuiNSName(address);
 
   const handleCopy = async () => {
     if (!address) return;
@@ -30,12 +32,19 @@ export function WalletAddressCopy({ address }: WalletAddressCopyProps) {
       role="button"
       title="Click to copy address"
     >
-      <code className="text-md text-gray-500 dark:text-gray-400 font-mono">
-        {address 
-          ? `${address.slice(0, 20)}...${address.slice(-4)}` 
-          : "Generating..."
-        }
-      </code>
+      <div className="flex flex-col">
+        {suiNSName && (
+          <span className="text-xs text-blue-500 dark:text-blue-400 font-medium">
+            {suiNSName}
+          </span>
+        )}
+        <code className="text-md text-gray-500 dark:text-gray-400 font-mono">
+          {address
+            ? `${address.slice(0, 20)}...${address.slice(-4)}`
+            : "Generating..."
+          }
+        </code>
+      </div>
       <AnimatePresence mode="wait" initial={false}>
         {copied ? (
           <motion.div
