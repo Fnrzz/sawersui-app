@@ -5,7 +5,7 @@ import { useCurrentAccount } from "@mysten/dapp-kit";
 import { Loader2, Send, CheckCircle, AlertCircle } from "lucide-react";
 import { useDonate } from "@/hooks/useDonate";
 import { useZkDonation } from "@/hooks/useZkDonation";
-import { saveDonation, updateDonationBlobId, StreamerProfile } from "@/lib/actions/donation";
+import { saveDonation, StreamerProfile } from "@/lib/actions/donation";
 import { useTheme } from "@/components/theme/ThemeProvider";
 import { motion, AnimatePresence, Variants } from "framer-motion";
 import { toast } from "sonner";
@@ -71,7 +71,7 @@ const successVariants: Variants = {
 import { useZkLogin } from "@/hooks/useZkLogin";
 import { useUsdcBalance } from "@/hooks/useUsdcBalance";
 import { useSuiNSName } from "@/hooks/useSuiNSName";
-import { useWalrusReceipt } from "@/hooks/useWalrusReceipt";
+
 
 export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
   const { theme } = useTheme();
@@ -88,8 +88,6 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
     useUsdcBalance(userAddress);
 
   const { name: streamerSuiNS } = useSuiNSName(streamer.wallet_address);
-  const { storeReceipt, receiptUrl } = useWalrusReceipt();
-
   // Form State
   const [amount, setAmount] = useState<number>(1);
   const [customAmount, setCustomAmount] = useState<string>("");
@@ -186,19 +184,6 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
 
       setStatus("success");
 
-      // Store receipt on Walrus (non-blocking)
-      storeReceipt({
-        donorAddress: userAddress || "",
-        donorName: donorName || "Anonim",
-        streamerAddress: streamer.wallet_address,
-        streamerUsername: streamer.username,
-        amountUsdc: donationAmount,
-        txDigest: digest,
-        message,
-      }).then((blobId) => {
-        if (blobId) updateDonationBlobId(digest, blobId);
-      });
-
       // Show success toast
       toast.success("Donation Sent! 🎉", {
         description: `Thank you for supporting ${streamer.display_name}!`,
@@ -270,19 +255,6 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
             transition={{ delay: 0.5 }}
           >
             View Transaction →
-          </motion.a>
-        )}
-        {receiptUrl && (
-          <motion.a
-            href={receiptUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-green-500 hover:underline"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
-          >
-            View Walrus Receipt →
           </motion.a>
         )}
       </motion.div>

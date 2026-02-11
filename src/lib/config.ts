@@ -15,10 +15,6 @@ export const CONFIG = {
     URL: process.env.NEXT_PUBLIC_SUPABASE_URL!,
     ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
   },
-  WALRUS: {
-    AGGREGATOR_URL: process.env.NEXT_PUBLIC_WALRUS_AGGREGATOR_URL || "",
-    PUBLISHER_URL: process.env.NEXT_PUBLIC_WALRUS_PUBLISHER_URL || "",
-  },
   FEATURES: {
     GASLESS_USDC: process.env.NEXT_PUBLIC_GASLESS_USDC === "true",
   },

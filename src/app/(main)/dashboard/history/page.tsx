@@ -70,26 +70,14 @@ export default async function HistoryPage() {
                   <p className="text-lg font-black font-[family-name:var(--font-pixel)] text-green-600 dark:text-green-400">
                     +{donation.amount_net} USDC
                   </p>
-                  <div className="flex flex-col items-end gap-0.5">
-                    <a
-                      href={`https://suiscan.xyz/testnet/tx/${donation.tx_digest}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs text-blue-500 hover:underline"
-                    >
-                      View on Explorer
-                    </a>
-                    {donation.walrus_blob_id && (
-                      <a
-                        href={`${process.env.NEXT_PUBLIC_WALRUS_AGGREGATOR_URL || "https://aggregator.walrus-testnet.walrus.space"}/v1/blobs/${donation.walrus_blob_id}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-xs text-green-500 hover:underline"
-                      >
-                        View Receipt
-                      </a>
-                    )}
-                  </div>
+                  <a
+                    href={`https://suiscan.xyz/testnet/tx/${donation.tx_digest}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-blue-500 hover:underline"
+                  >
+                    View on Explorer
+                  </a>
                 </div>
               </div>
             ))}
