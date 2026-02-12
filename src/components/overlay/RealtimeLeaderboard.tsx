@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { useState, useCallback, useEffect } from "react";
 import { useDonationEvents } from "@/hooks/useDonationEvents";
 import { getLeaderboard, LeaderboardEntry } from "@/lib/actions/leaderboard";
@@ -21,6 +23,7 @@ export function RealtimeLeaderboard({
   streamerId,
   previewSettings,
 }: RealtimeLeaderboardProps) {
+  const t = useTranslations("Overlay");
   const [data, setData] = useState<LeaderboardEntry[]>(initialData);
   const [settings, setSettings] = useState<LeaderboardSettings | null>(
     previewSettings || null,
@@ -82,7 +85,7 @@ export function RealtimeLeaderboard({
             className="font-[family-name:var(--font-pixel)] text-lg uppercase tracking-widest text-center pt-1 drop-shadow-sm transition-colors duration-300"
             style={{ color: effectiveSettings.title_color }}
           >
-            Top Supporters
+            {t("topSupporters")}
           </h2>
         </div>
 
@@ -133,7 +136,7 @@ export function RealtimeLeaderboard({
                 className="text-sm font-[family-name:var(--font-pixel-body)] font-bold uppercase tracking-widest transition-colors duration-300"
                 style={{ color: effectiveSettings.text_color, opacity: 0.5 }}
               >
-                No donations yet
+                {t("noDonations")}
               </div>
             </div>
           )}

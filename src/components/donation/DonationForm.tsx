@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useCurrentAccount, useDisconnectWallet } from "@mysten/dapp-kit";
+import { useTranslations } from "next-intl";
 import {
   Loader2,
   Send,
@@ -46,6 +47,7 @@ const itemVariants: Variants = {
 };
 
 export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
+  const t = useTranslations("DonationForm");
   const currentAccount = useCurrentAccount();
   const { mutate: disconnect } = useDisconnectWallet();
   const {
@@ -114,13 +116,13 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
     e.preventDefault();
 
     if (!isAgeChecked || !isAgreedChecked) {
-      setErrorMessage("Mohon setujui syarat dan ketentuan.");
+      setErrorMessage(t("agreementError"));
       return;
     }
 
     const donationAmount = getAmount();
     if (donationAmount < 0.5) {
-      setErrorMessage("Minimum donation is $0.50 USDC");
+      setErrorMessage(t("minDonation"));
       return;
     }
 
@@ -161,8 +163,8 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
 
       setStatus("success");
 
-      toast.success("Donasi Terkirim! 🎉", {
-        description: `Terima kasih sudah mendukung ${streamer.display_name}!`,
+      toast.success(t("successTitle"), {
+        description: t("successDesc", { name: streamer.display_name }),
       });
 
       setTimeout(() => {
@@ -204,10 +206,10 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
           <CheckCircle className="w-16 h-16 text-green-500" />
         </motion.div>
         <h3 className="text-xl font-bold text-foreground">
-          Donasi Terkirim! 🎉
+          {t("successTitle")}
         </h3>
         <p className="text-sm text-muted-foreground text-center">
-          Terima kasih sudah mendukung {streamer.display_name}!
+          {t("successDesc", { name: streamer.display_name })}
         </p>
         {txDigest && (
           <a
@@ -216,7 +218,7 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
             rel="noopener noreferrer"
             className="text-xs text-primary hover:underline font-medium"
           >
-            Lihat Transaksi →
+            {t("viewTransaction") || "View Transaction"} →
           </a>
         )}
       </motion.div>
@@ -244,7 +246,7 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
             </div>
             <div className="flex flex-col">
               <span className="text-[10px] uppercase font-bold text-black/50 leading-none">
-                Balance
+                {t("balance")}
               </span>
               <span className="text-sm font-black text-black leading-tight">
                 {isBalanceLoading ? "..." : `$${usdcBalance.toFixed(2)}`}
@@ -256,7 +258,7 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
             type="button"
             onClick={handleLogout}
             className="p-2 hover:bg-red-100 rounded-md transition-colors group"
-            title="Logout"
+            title={t("logout") || "Logout"}
           >
             <LogOut className="w-4 h-4 text-black/40 group-hover:text-red-500" />
           </button>
@@ -266,7 +268,7 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
       {/* Jumlah */}
       <motion.div variants={itemVariants} className="mb-6">
         <label className="text-sm font-bold text-black mb-1 block">
-          Nominal: <span className="text-red-500">*</span>
+          {t("nominal")} <span className="text-red-500">*</span>
         </label>
 
         {/* Underlined Input with Prefix */}
@@ -291,7 +293,7 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
                 setIsCustom(true);
               }
             }}
-            placeholder="Ketik jumlah dukungan"
+            placeholder={t("placeholderAmount")}
             className="w-full pl-8 py-2 text-lg font-bold bg-transparent border-b-[3px] border-black text-black placeholder:text-black/30 focus:outline-none focus:border-black/60 rounded-none transition-all"
           />
         </div>
@@ -325,11 +327,11 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
       {/* Nama */}
       <motion.div className="mb-6" variants={itemVariants}>
         <label className="text-sm font-bold text-black mb-1 block">
-          Dari: <span className="text-red-500">*</span>
+          {t("from")} <span className="text-red-500">*</span>
         </label>
         <input
           type="text"
-          placeholder="Nama Kamu"
+          placeholder={t("placeholderName")}
           value={donorName}
           onChange={(e) => setDonorName(e.target.value)}
           maxLength={50}
@@ -343,10 +345,10 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
       {/* Pesan */}
       <motion.div className="mb-8" variants={itemVariants}>
         <label className="text-sm font-bold text-black mb-1 block">
-          Pesan: <span className="text-red-500">*</span>
+          {t("message")} <span className="text-red-500">*</span>
         </label>
         <textarea
-          placeholder="Selamat pagi"
+          placeholder={t("placeholderMessage")}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           maxLength={200}
@@ -369,7 +371,7 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
             )}
           </div>
           <p className="text-xs font-bold text-black/80 leading-tight pt-1 select-none">
-            Saya berusia 17 tahun atau lebih
+            {t("ageCheck")}
           </p>
         </div>
         <div
@@ -384,10 +386,7 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
             )}
           </div>
           <p className="text-xs font-bold text-black/80 leading-tight pt-1 select-none">
-            Saya memahami dan menyetujui bahwa dukungan ini saya berikan secara
-            sukarela, tidak dapat dikembalikan, bukan transaksi komersial, tidak
-            digunakan untuk aktivitas ilegal, serta telah sesuai dengan syarat
-            dan ketentuan & kebijakan privasi sawersui.co
+            {t("agreedCheck")}
           </p>
         </div>
       </div>
@@ -414,11 +413,11 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
       >
         <div className="flex flex-col justify-center mb-2 md:mb-0">
           <p className="text-sm font-bold text-black">
-            Jumlah Dukungan: ${getAmount()}
+            {t("supportAmount")} ${getAmount()}
           </p>
-          <p className="text-xs text-black/60">Biaya: 0 (Sponsored)</p>
+          <p className="text-xs text-black/60">{t("fee")}</p>
           <p className="text-3xl font-black text-black mt-1">
-            Total: ${getAmount()} USDC
+            {t("total")} ${getAmount()} USDC
           </p>
         </div>
 
@@ -428,7 +427,7 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
             type="button"
             className="w-full md:flex-1 md:max-w-[200px] py-4 rounded-lg font-black text-lg bg-[#F59E0B] text-black border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-y-1 hover:shadow-none flex items-center justify-center text-center leading-tight"
           >
-            Login Aja
+            {t("loginButton")}
           </button>
         ) : (
           <button
@@ -447,7 +446,7 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
             ) : status === "confirming" ? (
               <Loader2 className="w-6 h-6 animate-spin" />
             ) : (
-              "Kirim Dukungan"
+              t("submitButton")
             )}
           </button>
         )}
@@ -458,8 +457,11 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
         variants={itemVariants}
         className="text-center text-xs text-muted-foreground/60 mt-6 pt-4"
       >
-        Powered by <span className="text-primary font-medium">SawerSui</span> on
-        Sui Network
+        {t.rich("poweredBy", {
+          brand: (chunks) => (
+            <span className="text-primary font-medium">{chunks}</span>
+          ),
+        })}
       </motion.p>
     </motion.form>
   );

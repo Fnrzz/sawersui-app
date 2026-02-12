@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useDisconnectWallet } from "@mysten/dapp-kit";
 import { useZkLogin } from "@/hooks/useZkLogin";
+import { useTranslations } from "next-intl";
 import {
   MonitorPlay,
   Share2,
@@ -70,6 +71,7 @@ export function DashboardOverview({
   username,
   usdcBalance,
 }: DashboardOverviewProps) {
+  const t = useTranslations("Dashboard");
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
   const [amount, setAmount] = useState("");
   const [recipient, setRecipient] = useState("");
@@ -90,7 +92,7 @@ export function DashboardOverview({
       await supabase.auth.signOut();
 
       router.push("/");
-      toast.success("Logged out successfully");
+      toast.success(t("toast.logoutSuccess"));
     } catch (error) {
       toast.error("Error logging out");
     }
@@ -100,8 +102,8 @@ export function DashboardOverview({
     const url = `${window.location.origin}/${username}`;
     navigator.clipboard
       .writeText(url)
-      .then(() => toast.success("Link donasi berhasil disalin!"))
-      .catch(() => toast.error("Gagal menyalin"));
+      .then(() => toast.success(t("toast.copySuccess")))
+      .catch(() => toast.error(t("toast.copyError")));
   };
 
   const handleWithdraw = async () => {
@@ -109,24 +111,24 @@ export function DashboardOverview({
       setIsLoading(true);
       const val = parseFloat(amount);
       if (isNaN(val) || val < 0.5) {
-        toast.error("Minimum withdrawal is 0.5 USDC");
+        toast.error(t("withdraw.minAmount"));
         setIsLoading(false);
         return;
       }
       if (!recipient.startsWith("0x") || recipient.length < 50) {
-        toast.error("Invalid address format");
+        toast.error(t("withdraw.invalidAddress"));
         setIsLoading(false);
         return;
       }
 
       await withdraw({ amount: val, recipientAddress: recipient });
-      toast.success("Withdrawal successful!");
+      toast.success(t("withdraw.success"));
       setIsWithdrawOpen(false);
       setAmount("");
       setRecipient("");
     } catch (e: unknown) {
       console.error("Withdrawal error:", e);
-      const msg = e instanceof Error ? e.message : "Withdrawal failed";
+      const msg = e instanceof Error ? e.message : t("withdraw.error");
       toast.error(msg);
     } finally {
       setIsLoading(false);
@@ -147,11 +149,9 @@ export function DashboardOverview({
       >
         <div className="flex flex-col gap-1">
           <h1 className="text-3xl md:text-4xl font-black text-black">
-            Halo, {displayName}! 👋
+            {t.rich("hello", { name: displayName })}
           </h1>
-          <p className="text-black/60 font-medium text-lg">
-            Siap menerima donasi hari ini?
-          </p>
+          <p className="text-black/60 font-medium text-lg">{t("subtitle")}</p>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -178,8 +178,8 @@ export function DashboardOverview({
       >
         {/* Overlay Card - Cyan */}
         <MenuCard
-          title="Overlay"
-          description="Atur Alert dan overlay lainnya di sini. Kompatibel dengan OBS dan Streamlabs."
+          title={t("menu.overlay.title")}
+          description={t("menu.overlay.desc")}
           icon={MonitorPlay}
           colorClass="bg-[#BAE6FD]" // Cyan-200ish
           href="/dashboard/obs"
@@ -187,36 +187,34 @@ export function DashboardOverview({
 
         {/* KirimKirim / Share - Blue */}
         <MenuCard
-          title="Bagikan Link"
-          description="Bagikan link donasi kamu ke penonton agar mereka bisa mulai mendukungmu."
+          title={t("menu.share.title")}
+          description={t("menu.share.desc")}
           icon={Share2}
           colorClass="bg-[#BFDBFE]" // Blue-200ish
           onClick={handleCopyLink}
-          actionLabel="Salin Link"
+          actionLabel={t("menu.share.action")}
         />
 
         {/* Dukungan Masuk & Cashout - Purple */}
         <MenuCard
-          title="Dukungan Masuk & Cashout"
-          description={`Saldo Aktif: $${usdcBalance} USDC. Lihat histori dukungan yang masuk dan cashout di sini.`}
+          title={t("menu.balance.title")}
+          description={t("menu.balance.desc", { balance: usdcBalance })}
           icon={Wallet}
           colorClass="bg-[#DDD6FE]" // Violet-200ish
           onClick={() => {
             if (isAuthenticated) {
               setIsWithdrawOpen(true);
             } else {
-              toast.info(
-                "Withdraw hanya untuk akun Google Login. Wallet user sudah memiliki kendali penuh atas dananya.",
-              );
+              toast.info(t("withdraw.loginRequired"));
             }
           }}
-          actionLabel="Withdraw"
+          actionLabel={t("menu.balance.action")}
         />
 
         {/* Riwayat Donasi - Orange */}
         <MenuCard
-          title="Riwayat Donasi"
-          description="Lihat riwayat donasi lengkap yang masuk."
+          title={t("menu.history.title")}
+          description={t("menu.history.desc")}
           icon={History}
           colorClass="bg-[#FED7AA]" // Orange-200ish
           href="/dashboard/history"
@@ -227,14 +225,14 @@ export function DashboardOverview({
       <Dialog open={isWithdrawOpen} onOpenChange={setIsWithdrawOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Withdraw USDC</DialogTitle>
-            <DialogDescription>
-              Sponsored withdrawal (Gas-free). Minimum 0.5 USDC.
-            </DialogDescription>
+            <DialogTitle>{t("withdraw.title")}</DialogTitle>
+            <DialogDescription>{t("withdraw.desc")}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Amount (USDC)</label>
+              <label className="text-sm font-medium">
+                {t("withdraw.amount")}
+              </label>
               <input
                 type="number"
                 placeholder="0.00"
@@ -244,7 +242,9 @@ export function DashboardOverview({
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Recipient Address</label>
+              <label className="text-sm font-medium">
+                {t("withdraw.recipient")}
+              </label>
               <input
                 type="text"
                 placeholder="0x..."
@@ -259,7 +259,7 @@ export function DashboardOverview({
               onClick={() => setIsWithdrawOpen(false)}
               className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
             >
-              Cancel
+              {t("withdraw.cancel")}
             </button>
             <button
               onClick={handleWithdraw}
@@ -267,7 +267,7 @@ export function DashboardOverview({
               className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
             >
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Withdraw
+              {t("menu.balance.action")}
             </button>
           </DialogFooter>
         </DialogContent>

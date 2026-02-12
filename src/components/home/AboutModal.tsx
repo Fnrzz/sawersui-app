@@ -1,4 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Github, Twitter } from "lucide-react";
 
@@ -8,12 +9,13 @@ interface AboutModalProps {
 }
 
 export function AboutModal({ open, onOpenChange }: AboutModalProps) {
+  const t = useTranslations("Modals.About");
   return (
     <AnimatePresence>
       {open && (
         <Dialog open={open} onOpenChange={onOpenChange}>
           <DialogContent className="sm:max-w-md p-0 overflow-hidden bg-transparent border-none shadow-none">
-            <DialogTitle className="sr-only">About SawerSui</DialogTitle>
+            <DialogTitle className="sr-only">{t("title")}</DialogTitle>
 
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
@@ -25,31 +27,35 @@ export function AboutModal({ open, onOpenChange }: AboutModalProps) {
               {/* Header */}
               <div className="p-6 text-center border-b border-border bg-amber-50">
                 <h2 className="text-lg font-extrabold text-foreground uppercase tracking-wide mb-1">
-                  About SawerSui
+                  {t("title")}
                 </h2>
-                <p className="text-xs text-muted-foreground">
-                  Next Gen Donation Platform
-                </p>
+                <p className="text-xs text-muted-foreground">{t("subtitle")}</p>
               </div>
 
               {/* Content */}
               <div className="p-6 space-y-4 text-center">
                 <p className="text-sm leading-relaxed text-muted-foreground">
-                  SawerSui is a decentralized livestream donation platform built
-                  on the{" "}
-                  <span className="text-foreground font-bold">Sui Network</span>
-                  .
+                  {t.rich("desc1", {
+                    bold: (chunks) => (
+                      <span className="text-foreground font-bold">
+                        {chunks}
+                      </span>
+                    ),
+                  })}
                 </p>
                 <p className="text-sm leading-relaxed text-muted-foreground">
-                  Empower content creators with instant, low-fee transactions.
-                  No intermediaries, just direct support from fans to creators.
+                  {t("desc2")}
                 </p>
 
                 <div className="mt-2 p-3 rounded-xl text-xs font-medium border bg-muted border-border text-muted-foreground">
                   <p>
-                    <span className="font-bold text-foreground">Note:</span> A
-                    5% platform fee is applied to every transaction to support
-                    development and ongoing maintenance.
+                    {t.rich("note", {
+                      bold: (chunks) => (
+                        <span className="font-bold text-foreground">
+                          {chunks}
+                        </span>
+                      ),
+                    })}
                   </p>
                 </div>
 
