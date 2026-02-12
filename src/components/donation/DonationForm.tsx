@@ -1,18 +1,23 @@
-"use client";
-
 import { useState } from "react";
-import { useCurrentAccount } from "@mysten/dapp-kit";
-import { Loader2, Send, CheckCircle, AlertCircle } from "lucide-react";
+import { useCurrentAccount, useDisconnectWallet } from "@mysten/dapp-kit";
+import {
+  Loader2,
+  Send,
+  CheckCircle,
+  AlertCircle,
+  Heart,
+  Check,
+  LogOut,
+  Wallet,
+} from "lucide-react";
 import { useDonate } from "@/hooks/useDonate";
 import { useZkDonation } from "@/hooks/useZkDonation";
 import { saveDonation, StreamerProfile } from "@/lib/actions/donation";
-import { useTheme } from "@/components/theme/ThemeProvider";
 import { motion, AnimatePresence, Variants } from "framer-motion";
 import { toast } from "sonner";
-
-// ============================================================
-// TYPES
-// ============================================================
+import { useZkLogin } from "@/hooks/useZkLogin";
+import { useUsdcBalance } from "@/hooks/useUsdcBalance";
+import { signOut } from "@/lib/actions/auth";
 
 interface DonationFormProps {
   streamer: StreamerProfile;
@@ -21,78 +26,50 @@ interface DonationFormProps {
 
 type DonationStatus = "idle" | "signing" | "confirming" | "success" | "error";
 
-// Amount presets in USDC
-const AMOUNT_PRESETS = [1, 5, 10];
+const AMOUNT_PRESETS = [1, 5, 10, 25, 50, 100];
 
-// Animation Variants
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: {
-      staggerChildren: 0.08,
-      delayChildren: 0.1,
-    },
+    transition: { staggerChildren: 0.06, delayChildren: 0.08 },
   },
 };
 
 const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0, y: 16 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.4, ease: "easeOut" },
+    transition: { duration: 0.35, ease: "easeOut" },
   },
 };
-
-const buttonVariants: Variants = {
-  hidden: { opacity: 0, scale: 0.9 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    transition: { duration: 0.3, ease: "easeOut" },
-  },
-  tap: { scale: 0.95 },
-  hover: { scale: 1.02 },
-};
-
-const successVariants: Variants = {
-  hidden: { opacity: 0, scale: 0.8 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    transition: {
-      duration: 0.5,
-      ease: [0.175, 0.885, 0.32, 1.275], // Bounce effect
-    },
-  },
-};
-
-import { useZkLogin } from "@/hooks/useZkLogin";
-import { useUsdcBalance } from "@/hooks/useUsdcBalance";
 
 export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
-  const { theme } = useTheme();
-  const isDark = theme === "dark";
   const currentAccount = useCurrentAccount();
-  const { isAuthenticated: isZkAuthenticated, userAddress: zkAddress } =
-    useZkLogin();
+  const { mutate: disconnect } = useDisconnectWallet();
+  const {
+    isAuthenticated: isZkAuthenticated,
+    userAddress: zkAddress,
+    logout: zkLogout,
+  } = useZkLogin();
 
-  // Unified Auth State
   const isConnected = !!currentAccount || isZkAuthenticated;
   const userAddress = currentAccount?.address || zkAddress;
 
   const { balance: usdcBalance, isLoading: isBalanceLoading } =
     useUsdcBalance(userAddress);
 
-  // Form State
-  const [amount, setAmount] = useState<number>(1);
+  const [amount, setAmount] = useState<number>(5);
   const [customAmount, setCustomAmount] = useState<string>("");
   const [isCustom, setIsCustom] = useState(false);
   const [donorName, setDonorName] = useState("");
   const [message, setMessage] = useState("");
 
-  // Transaction State
+  // Checkbox States
+  const [isAgeChecked, setIsAgeChecked] = useState(false);
+  const [isAgreedChecked, setIsAgreedChecked] = useState(false);
+
   const [status, setStatus] = useState<DonationStatus>("idle");
   const [txDigest, setTxDigest] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -109,7 +86,16 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
 
   const isLoading = isWalletLoading || isZkLoading;
 
-  // Get the actual amount (preset or custom)
+  const handleLogout = async () => {
+    if (currentAccount) {
+      disconnect();
+    } else if (isZkAuthenticated) {
+      await zkLogout();
+    }
+    await signOut();
+    window.location.reload();
+  };
+
   const getAmount = (): number => {
     if (isCustom && customAmount) {
       const parsed = parseFloat(customAmount);
@@ -118,16 +104,19 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
     return amount;
   };
 
-  // Handle preset button click
   const handlePresetClick = (preset: number) => {
     setAmount(preset);
     setIsCustom(false);
     setCustomAmount("");
   };
 
-  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!isAgeChecked || !isAgreedChecked) {
+      setErrorMessage("Mohon setujui syarat dan ketentuan.");
+      return;
+    }
 
     const donationAmount = getAmount();
     if (donationAmount < 0.5) {
@@ -135,12 +124,8 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
       return;
     }
 
-    if (!isConnected) {
-      // Should handle connection request if not connected, but UI hides submit button
-      return;
-    }
+    if (!isConnected) return;
 
-    // Proceed with wallet donation
     setStatus("signing");
     setErrorMessage(null);
 
@@ -148,14 +133,12 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
       let digest: string;
 
       if (isZkAuthenticated) {
-        // Use ZkLogin Donation Flow
         digest = await donateUSDC({
           amountUsdc: donationAmount,
           donorName: donorName || "Anonim",
           message,
         });
       } else {
-        // Use Wallet Donation Flow
         digest = await donate({
           amountUsdc: donationAmount,
           donorName: donorName || "Anonim",
@@ -166,11 +149,8 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
       setStatus("confirming");
       setTxDigest(digest);
 
-      // Calculate net amount (95% to streamer, 5% fee)
-      // This ensures the database reflects what the streamer actually received
       const netAmount = donationAmount * 0.95;
 
-      // Save to Supabase
       await saveDonation({
         streamer_id: streamer.id,
         donor_name: donorName || "Anonim",
@@ -181,42 +161,40 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
 
       setStatus("success");
 
-      // Show success toast
-      toast.success("Donation Sent! 🎉", {
-        description: `Thank you for supporting ${streamer.display_name}!`,
+      toast.success("Donasi Terkirim! 🎉", {
+        description: `Terima kasih sudah mendukung ${streamer.display_name}!`,
       });
 
-      // Reset form after success
       setTimeout(() => {
-        setAmount(1);
+        setAmount(5);
         setCustomAmount("");
         setIsCustom(false);
         setDonorName("");
         setMessage("");
         setStatus("idle");
         setTxDigest(null);
+        // Do not reset checkboxes to force re-read? Or reset them?
+        // Typically better to leave them or reset. I'll reset them.
+        setIsAgeChecked(false);
+        setIsAgreedChecked(false);
       }, 5000);
     } catch (err) {
       console.error("Donation failed:", err);
       setStatus("error");
-      const errMsg = err instanceof Error ? err.message : "Transaction failed";
+      const errMsg = err instanceof Error ? err.message : "Transaction gagal";
       setErrorMessage(errMsg);
-
-      // Show error toast
-      toast.error("Donation Failed", {
-        description: errMsg,
-      });
+      toast.error("Donasi Gagal", { description: errMsg });
     }
   };
 
-  // Success state with animation
+  // Success State
   if (status === "success") {
     return (
       <motion.div
-        className="flex flex-col items-center justify-center py-10 space-y-4"
-        variants={successVariants}
-        initial="hidden"
-        animate="visible"
+        className="flex flex-col items-center justify-center py-12 space-y-4"
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.4 }}
       >
         <motion.div
           initial={{ scale: 0 }}
@@ -225,34 +203,21 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
         >
           <CheckCircle className="w-16 h-16 text-green-500" />
         </motion.div>
-        <motion.h3
-          className={`text-xl font-bold ${isDark ? "text-white" : "text-black"}`}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          Donation Sent! 🎉
-        </motion.h3>
-        <motion.p
-          className={`text-sm text-center ${isDark ? "text-white/60" : "text-black/60"}`}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-        >
-          Thank you for supporting {streamer.display_name}!
-        </motion.p>
+        <h3 className="text-xl font-bold text-foreground">
+          Donasi Terkirim! 🎉
+        </h3>
+        <p className="text-sm text-muted-foreground text-center">
+          Terima kasih sudah mendukung {streamer.display_name}!
+        </p>
         {txDigest && (
-          <motion.a
+          <a
             href={`https://suiscan.xyz/testnet/tx/${txDigest}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs text-blue-500 hover:underline"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
+            className="text-xs text-primary hover:underline font-medium"
           >
-            View Transaction →
-          </motion.a>
+            Lihat Transaksi →
+          </a>
         )}
       </motion.div>
     );
@@ -261,274 +226,241 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
   return (
     <motion.form
       onSubmit={handleSubmit}
-      className="flex flex-col h-full"
+      className="flex flex-col"
       variants={containerVariants}
       initial="hidden"
       animate="visible"
     >
-      {/* Scrollable Content Area */}
-      <div className="flex-1 overflow-y-auto px-4 pb-4 no-scrollbar">
-        {/* Streamer Profile Header */}
-        <motion.div className="text-center pt-8 pb-6" variants={itemVariants}>
-          <h1
-            className={`text-2xl font-bold ${isDark ? "text-white" : "text-black"}`}
-          >
-            {streamer.display_name}
-          </h1>
-          <p
-            className={`text-sm ${isDark ? "text-gray-400" : "text-gray-500"} mt-1`}
-          >
-            @{streamer.username}
-          </p>
-        </motion.div>
-
-        <motion.div className="mb-6 text-center" variants={itemVariants}>
-          <p
-            className={`text-sm ${isDark ? "text-gray-400" : "text-gray-500"}`}
-          >
-            Support {streamer.display_name} with USDC on Sui Network
-          </p>
-        </motion.div>
-
-        {/* Amount Selection - Card Design */}
-        <motion.div variants={itemVariants}>
-          {/* Amount Display Card - Editable */}
-          <div
-            className={`rounded-2xl p-6 mb-4 ${
-              isDark ? "bg-zinc-900" : "bg-gray-50"
-            }`}
-          >
-            <p
-              className={`text-xs font-medium tracking-widest text-center mb-4 ${
-                isDark ? "text-gray-400" : "text-gray-500"
-              }`}
-            >
-              DONATION AMOUNT
-            </p>
-
-            {/* Editable Amount Display */}
-            <div className="text-center">
-              <div className="relative inline-block">
-                <input
-                  type="text"
-                  inputMode="decimal"
-                  value={isCustom ? customAmount : amount.toString()}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    if (/^\d*\.?\d*$/.test(value)) {
-                      setCustomAmount(value);
-                      setIsCustom(true);
-                    }
-                  }}
-                  onFocus={() => {
-                    if (!isCustom) {
-                      setCustomAmount(amount.toString());
-                      setIsCustom(true);
-                    }
-                  }}
-                  placeholder="0"
-                  className={`text-5xl font-black tracking-tight text-center bg-transparent outline-none w-full max-w-[200px] ${
-                    isDark
-                      ? "text-white placeholder:text-white/30"
-                      : "text-black placeholder:text-black/30"
-                  }`}
-                  style={{ caretColor: isDark ? "white" : "black" }}
-                />
-              </div>
-              <p
-                className={`text-sm font-bold mt-2 ${
-                  isDark ? "text-gray-400" : "text-gray-500"
-                }`}
-              >
-                USDC
-              </p>
+      {/* Auth Status Header */}
+      {isConnected && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center justify-between mb-6 bg-gray-50 p-3 rounded-lg border-2 border-black/10"
+        >
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center">
+              <Wallet className="w-4 h-4 text-white" />
             </div>
-
-            {/* Minimum Amount Note */}
-            <p
-              className={`text-xs text-center mt-3 ${isDark ? "text-gray-500" : "text-gray-400"}`}
-            >
-              Minimum: $0.50
-            </p>
+            <div className="flex flex-col">
+              <span className="text-[10px] uppercase font-bold text-black/50 leading-none">
+                Balance
+              </span>
+              <span className="text-sm font-black text-black leading-tight">
+                {isBalanceLoading ? "..." : `$${usdcBalance.toFixed(2)}`}
+              </span>
+            </div>
           </div>
 
-          {/* Quick Amount Presets */}
-          <div className="grid grid-cols-3 gap-2">
-            {AMOUNT_PRESETS.map((preset) => (
-              <motion.button
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="p-2 hover:bg-red-100 rounded-md transition-colors group"
+            title="Logout"
+          >
+            <LogOut className="w-4 h-4 text-black/40 group-hover:text-red-500" />
+          </button>
+        </motion.div>
+      )}
+
+      {/* Jumlah */}
+      <motion.div variants={itemVariants} className="mb-6">
+        <label className="text-sm font-bold text-black mb-1 block">
+          Nominal: <span className="text-red-500">*</span>
+        </label>
+
+        {/* Underlined Input with Prefix */}
+        <div className="relative mb-4">
+          <span className="absolute left-0 top-1/2 -translate-y-1/2 text-black font-bold text-lg">
+            $
+          </span>
+          <input
+            type="text"
+            inputMode="decimal"
+            value={isCustom ? customAmount : ""}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (/^\d*\.?\d*$/.test(value)) {
+                setCustomAmount(value);
+                setIsCustom(true);
+              }
+            }}
+            onFocus={() => {
+              if (!isCustom) {
+                setCustomAmount(amount.toString());
+                setIsCustom(true);
+              }
+            }}
+            placeholder="Ketik jumlah dukungan"
+            className="w-full pl-8 py-2 text-lg font-bold bg-transparent border-b-[3px] border-black text-black placeholder:text-black/30 focus:outline-none focus:border-black/60 rounded-none transition-all"
+          />
+        </div>
+
+        {/* Quick Presets - Colored Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-1">
+          {AMOUNT_PRESETS.slice(0, 4).map((preset, idx) => {
+            // Cyclical colors: Teal, Blue, Orange, Purple
+            const colors = [
+              "bg-[#99F6E4]", // Teal
+              "bg-[#3B82F6]", // Blue
+              "bg-[#F59E0B]", // Orange
+              "bg-[#A78BFA]", // Purple
+            ];
+            const colorClass = colors[idx % colors.length];
+
+            return (
+              <button
                 key={preset}
                 type="button"
                 onClick={() => handlePresetClick(preset)}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className={`py-3 rounded-lg text-sm font-medium transition-all ${
-                  !isCustom && amount === preset
-                    ? isDark
-                      ? "bg-white text-black"
-                      : "bg-black text-white"
-                    : isDark
-                      ? "bg-zinc-800 text-white hover:bg-zinc-700"
-                      : "bg-gray-100 text-black hover:bg-gray-200"
-                }`}
+                className={`py-3 rounded-lg text-sm font-black border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-y-1 hover:shadow-none active:translate-y-1 active:shadow-none ${colorClass} text-black`}
               >
                 ${preset}
-              </motion.button>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Donor Name */}
-        <motion.div className="space-y-2 mt-6" variants={itemVariants}>
-          <label
-            className={`text-sm font-medium ${isDark ? "text-white/80" : "text-black/80"}`}
-          >
-            Your Name (Optional)
-          </label>
-          <input
-            type="text"
-            placeholder="Anonim"
-            value={donorName}
-            onChange={(e) => setDonorName(e.target.value)}
-            maxLength={50}
-            className={`w-full px-4 py-3 rounded-lg text-sm border transition-all ${
-              isDark
-                ? "border-white/20 bg-white/5 text-white placeholder:text-white/30"
-                : "border-black/20 bg-black/5 text-black placeholder:text-black/30"
-            }`}
-          />
-        </motion.div>
-
-        {/* Message */}
-        <motion.div className="space-y-2 mt-6" variants={itemVariants}>
-          <label
-            className={`text-sm font-medium ${isDark ? "text-white/80" : "text-black/80"}`}
-          >
-            Message
-          </label>
-          <textarea
-            placeholder="Say something nice..."
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            maxLength={200}
-            rows={3}
-            className={`w-full px-4 py-3 rounded-lg text-sm border resize-none transition-all ${
-              isDark
-                ? "border-white/20 bg-white/5 text-white placeholder:text-white/30"
-                : "border-black/20 bg-black/5 text-black placeholder:text-black/30"
-            }`}
-          />
-          <p
-            className={`text-xs text-right ${isDark ? "text-white/40" : "text-black/40"}`}
-          >
-            {message.length}/200
-          </p>
-        </motion.div>
-
-        {/* Error Message */}
-        <AnimatePresence>
-          {errorMessage && (
-            <motion.div
-              className="flex items-center gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/30 mt-4"
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-            >
-              <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
-              <p className="text-sm text-red-500">{errorMessage}</p>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-
-      {/* Fixed Footer Action Area */}
-      <div
-        className={`flex-none p-4 pb-6 z-10 border-t ${
-          isDark ? "bg-zinc-950 border-white/10" : "bg-white border-black/5"
-        }`}
-      >
-        <motion.div variants={itemVariants}>
-          {!isConnected ? (
-            <div className="w-full">
-              <button
-                onClick={() => {
-                  if (onLoginClick) onLoginClick();
-                }}
-                type="button"
-                className={`w-full h-14 rounded-lg font-[family-name:var(--font-pixel)] font-bold text-xs tracking-widest uppercase transition-colors flex items-center justify-center gap-2 ${
-                  isDark
-                    ? "bg-white text-black hover:bg-zinc-200"
-                    : "bg-black text-white hover:bg-zinc-800"
-                }`}
-              >
-                CONNECT TO DONATE
               </button>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {/* Gas Sponsorship Badge */}
-              <div className="flex justify-between items-center">
-                <div
-                  className={`text-center text-xs mb-2 ${isDark ? "text-gray-400" : "text-gray-500"}`}
-                >
-                  Balance:{" "}
-                  <span
-                    className={
-                      isDark
-                        ? "text-white font-medium"
-                        : "text-black font-medium"
-                    }
-                  >
-                    {isBalanceLoading ? "..." : `$${usdcBalance.toFixed(2)}`}{" "}
-                    USDC
-                  </span>
-                </div>
-                <div className="flex items-center justify-center gap-1.5 opacity-70">
-                  <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                  <p
-                    className={`text-[10px] uppercase tracking-wider font-bold ${
-                      isDark ? "text-green-400" : "text-green-600"
-                    }`}
-                  >
-                    Gas Fee Sponsored
-                  </p>
-                </div>
-              </div>
+            );
+          })}
+        </div>
+      </motion.div>
 
-              <motion.button
-                type="submit"
-                disabled={
-                  isLoading || status === "signing" || status === "confirming"
-                }
-                variants={buttonVariants}
-                whileHover={!isLoading ? "hover" : undefined}
-                whileTap={!isLoading ? "tap" : undefined}
-                className={`w-full py-4 rounded-lg font-[family-name:var(--font-pixel)] text-xs tracking-wider uppercase flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-                  isDark
-                    ? "bg-white text-black hover:bg-zinc-200"
-                    : "bg-black text-white hover:bg-zinc-800"
-                }`}
-              >
-                {status === "signing" ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Waiting for signature...
-                  </>
-                ) : status === "confirming" ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Confirming...
-                  </>
-                ) : (
-                  <>
-                    <Send className="w-4 h-4" />
-                    Sawer ${getAmount().toFixed(2)}
-                  </>
-                )}
-              </motion.button>
-            </div>
-          )}
-        </motion.div>
+      {/* Nama */}
+      <motion.div className="mb-6" variants={itemVariants}>
+        <label className="text-sm font-bold text-black mb-1 block">
+          Dari: <span className="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          placeholder="Nama Kamu"
+          value={donorName}
+          onChange={(e) => setDonorName(e.target.value)}
+          maxLength={50}
+          className="w-full py-2 text-lg font-bold bg-transparent border-b-[3px] border-black text-black placeholder:text-black/30 focus:outline-none focus:border-black/60 rounded-none transition-all px-0"
+        />
+      </motion.div>
+
+      {/* Email (Visual Only for now to match ref, or map to contact field if exists, otherwise skip or make decorative) */}
+      {/* Skipping Email to keep logic simple, adding Pesan */}
+
+      {/* Pesan */}
+      <motion.div className="mb-8" variants={itemVariants}>
+        <label className="text-sm font-bold text-black mb-1 block">
+          Pesan: <span className="text-red-500">*</span>
+        </label>
+        <textarea
+          placeholder="Selamat pagi"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          maxLength={200}
+          rows={1}
+          className="w-full py-2 text-lg font-bold bg-transparent border-b-[3px] border-black text-black placeholder:text-black/30 resize-none focus:outline-none focus:border-black/60 rounded-none transition-all px-0 min-h-[40px]"
+        />
+      </motion.div>
+
+      {/* Checkboxes */}
+      <div className="space-y-3 mb-8">
+        <div
+          className="flex items-start gap-3 cursor-pointer group"
+          onClick={() => setIsAgeChecked(!isAgeChecked)}
+        >
+          <div
+            className={`w-6 h-6 border-[3px] border-black flex-shrink-0 flex items-center justify-center transition-colors ${isAgeChecked ? "bg-black" : "bg-transparent group-hover:bg-black/5"}`}
+          >
+            {isAgeChecked && (
+              <Check className="w-4 h-4 text-white stroke-[4]" />
+            )}
+          </div>
+          <p className="text-xs font-bold text-black/80 leading-tight pt-1 select-none">
+            Saya berusia 17 tahun atau lebih
+          </p>
+        </div>
+        <div
+          className="flex items-start gap-3 cursor-pointer group"
+          onClick={() => setIsAgreedChecked(!isAgreedChecked)}
+        >
+          <div
+            className={`w-6 h-6 border-[3px] border-black flex-shrink-0 flex items-center justify-center transition-colors ${isAgreedChecked ? "bg-black" : "bg-transparent group-hover:bg-black/5"}`}
+          >
+            {isAgreedChecked && (
+              <Check className="w-4 h-4 text-white stroke-[4]" />
+            )}
+          </div>
+          <p className="text-xs font-bold text-black/80 leading-tight pt-1 select-none">
+            Saya memahami dan menyetujui bahwa dukungan ini saya berikan secara
+            sukarela, tidak dapat dikembalikan, bukan transaksi komersial, tidak
+            digunakan untuk aktivitas ilegal, serta telah sesuai dengan syarat
+            dan ketentuan & kebijakan privasi sawersui.co
+          </p>
+        </div>
       </div>
+
+      {/* Error */}
+      <AnimatePresence>
+        {errorMessage && (
+          <motion.div
+            className="flex items-center gap-2 p-3 rounded-lg bg-red-100 border-2 border-black mb-4 font-bold"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+          >
+            <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
+            <p className="text-sm text-red-600">{errorMessage}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* CTA Area - Split Layout */}
+      <motion.div
+        className="flex flex-col md:flex-row items-stretch justify-between gap-4 -mx-6 -mb-6 p-6 md:-mx-8 md:-mb-8 md:p-6 border-t-[3px] border-black rounded-b-lg"
+        variants={itemVariants}
+      >
+        <div className="flex flex-col justify-center mb-2 md:mb-0">
+          <p className="text-sm font-bold text-black">
+            Jumlah Dukungan: ${getAmount()}
+          </p>
+          <p className="text-xs text-black/60">Biaya: 0 (Sponsored)</p>
+          <p className="text-3xl font-black text-black mt-1">
+            Total: ${getAmount()} USDC
+          </p>
+        </div>
+
+        {!isConnected ? (
+          <button
+            onClick={() => onLoginClick?.()}
+            type="button"
+            className="w-full md:flex-1 md:max-w-[200px] py-4 rounded-lg font-black text-lg bg-[#F59E0B] text-black border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-y-1 hover:shadow-none flex items-center justify-center text-center leading-tight"
+          >
+            Login Aja
+          </button>
+        ) : (
+          <button
+            type="submit"
+            disabled={
+              isLoading ||
+              status === "signing" ||
+              status === "confirming" ||
+              !isAgeChecked ||
+              !isAgreedChecked
+            }
+            className="w-full md:flex-1 md:max-w-[200px] py-4 rounded-lg font-black text-md bg-[#F59E0B] text-black border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-y-1 hover:shadow-none flex items-center justify-center text-center leading-tight disabled:opacity-50 disabled:pointer-events-none disabled:shadow-none disabled:translate-y-1 disabled:bg-gray-400"
+          >
+            {status === "signing" ? (
+              <Loader2 className="w-6 h-6 animate-spin" />
+            ) : status === "confirming" ? (
+              <Loader2 className="w-6 h-6 animate-spin" />
+            ) : (
+              "Kirim Dukungan"
+            )}
+          </button>
+        )}
+      </motion.div>
+
+      {/* Powered By */}
+      <motion.p
+        variants={itemVariants}
+        className="text-center text-xs text-muted-foreground/60 mt-6 pt-4"
+      >
+        Powered by <span className="text-primary font-medium">SawerSui</span> on
+        Sui Network
+      </motion.p>
     </motion.form>
   );
 }

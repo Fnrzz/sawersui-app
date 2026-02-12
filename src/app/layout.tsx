@@ -1,26 +1,19 @@
 import type { Metadata } from "next";
-import { Press_Start_2P, VT323 } from "next/font/google";
+import { Inter } from "next/font/google";
 import { Providers } from "./providers";
 import { Toaster } from "sonner";
 import "./globals.css";
 
-const pressStart = Press_Start_2P({
-  weight: "400",
-  variable: "--font-pixel",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-const vt323 = VT323({
-  weight: "400",
-  variable: "--font-pixel-body",
+const inter = Inter({
+  variable: "--font-sans-var",
   subsets: ["latin"],
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "SawerSui",
-  description: "Web3 Donation Platform on Sui",
+  title: "SawerSui — Web3 Donation Platform",
+  description:
+    "Dukung kreator favoritmu dengan crypto di Sui Network. Low fees, instant overlay, easy login.",
   icons: {
     icon: "/logo2.webp",
     apple: "/logo2.webp",
@@ -32,20 +25,17 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   return (
     <html lang="en">
-      <body
-        className={`${pressStart.variable} ${vt323.variable} antialiased`}
-      >
+      <body className={`${inter.variable} font-sans antialiased`}>
         <Providers>{children}</Providers>
-        <Toaster 
-          position="top-center" 
-          richColors 
+        <Toaster
+          position="top-center"
+          richColors
           closeButton
           toastOptions={{
             style: {
-              fontFamily: 'var(--font-pixel-body)',
+              fontFamily: "var(--font-sans-var)",
             },
           }}
         />

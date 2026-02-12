@@ -2,14 +2,11 @@
 
 import { notFound } from "next/navigation";
 import { DonationForm } from "@/components/donation/DonationForm";
-// Navbar handled by layout
 import { motion, Variants } from "framer-motion";
 import { useState } from "react";
 import { LoginModal } from "@/components/auth/LoginModal";
-
-// ============================================================
-// TYPES
-// ============================================================
+import Image from "next/image";
+import Link from "next/link";
 
 interface DonationPageProps {
   streamer: {
@@ -20,24 +17,14 @@ interface DonationPageProps {
   };
 }
 
-// Animation Variants
 const containerVariants: Variants = {
-  hidden: { opacity: 0 },
+  hidden: { opacity: 0, y: 16 },
   visible: {
     opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.05,
-    },
+    y: 0,
+    transition: { duration: 0.4, ease: "easeOut" },
   },
 };
-
-
-
-
-// ============================================================
-// CLIENT COMPONENT
-// ============================================================
 
 export function DonationPageClient({ streamer }: DonationPageProps) {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -48,22 +35,54 @@ export function DonationPageClient({ streamer }: DonationPageProps) {
 
   return (
     <>
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        className="flex-1 flex flex-col h-full bg-white dark:bg-zinc-950 overflow-hidden"
-      >
-        <DonationForm 
-          streamer={streamer} 
-          onLoginClick={() => setIsLoginModalOpen(true)}
-        />
-      </motion.div>
-      
-      <LoginModal 
-        open={isLoginModalOpen} 
-        onOpenChange={setIsLoginModalOpen} 
-        redirectTo={`/${streamer.username}`} 
+      <div className="min-h-screen flex flex-col bg-[#FEFCE8] font-sans">
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col items-center justify-start px-4 pb-20 pt-4">
+          {/* Profile Section (Outside Card) */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col items-center mb-8 text-center max-w-lg"
+          >
+            <div className="relative mb-4">
+              <div className="w-24 h-24 rounded-full overflow-hidden border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-white">
+                {/* Placeholder AVATAR if no image, using first letter */}
+                <div className="w-full h-full flex items-center justify-center bg-gray-200 text-3xl font-black">
+                  {streamer.display_name.charAt(0).toUpperCase()}
+                </div>
+              </div>
+            </div>
+
+            <h1 className="text-3xl font-black text-black mb-1">
+              {streamer.display_name}
+            </h1>
+
+            <p className="text-sm font-bold text-black/80 leading-relaxed max-w-md">
+              gue apresiasi banget lu udah ngecek halaman ini, semoga lu semua
+              yang disini makin cepat tercapai apa yang diinginkan 🙏
+            </p>
+          </motion.div>
+
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="w-full max-w-xl"
+          >
+            <div className="bg-white border-[3px] border-black rounded-lg p-6 md:p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] relative z-10">
+              <DonationForm
+                streamer={streamer}
+                onLoginClick={() => setIsLoginModalOpen(true)}
+              />
+            </div>
+          </motion.div>
+        </div>
+      </div>
+
+      <LoginModal
+        open={isLoginModalOpen}
+        onOpenChange={setIsLoginModalOpen}
+        redirectTo={`/${streamer.username}`}
       />
     </>
   );
