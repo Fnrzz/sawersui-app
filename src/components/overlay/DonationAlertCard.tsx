@@ -24,7 +24,7 @@ export function DonationAlertCard({
   const content = (
     <>
       {/* Header Bar */}
-      <div className="bg-black/20 p-4 border-b-4 border-black flex items-center justify-center">
+      <div className="bg-black/20 p-4 border-b-[3px] border-black flex items-center justify-center">
         <h3 className="font-[family-name:var(--font-pixel)] text-lg text-white uppercase tracking-widest text-center pt-1 drop-shadow-md">
           New Donation
         </h3>
@@ -32,6 +32,7 @@ export function DonationAlertCard({
 
       {/* Content Body */}
       <div className="p-6 flex flex-col gap-4">
+        {/* ... content ... */}
         {/* Donor Name */}
         <h2
           className="text-3xl font-bold font-[family-name:var(--font-pixel-body)] tracking-wide drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
@@ -64,7 +65,7 @@ export function DonationAlertCard({
   );
 
   const sharedClassName =
-    "w-full max-w-md overflow-hidden border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]";
+    "w-full max-w-md overflow-hidden border-[3px] border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-xl";
 
   // Preview mode: plain div for instant reactivity (no framer-motion caching)
   if (preview) {

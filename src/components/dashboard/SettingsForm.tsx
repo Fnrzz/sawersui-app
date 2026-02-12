@@ -10,10 +10,6 @@ import { saveOverlaySettings } from "@/lib/actions/settings";
 import { DonationAlertCard } from "@/components/overlay/DonationAlertCard";
 import { RotateCcw, Save, Upload, Volume2, X } from "lucide-react";
 
-/**
- * Debounced color field — color picker updates instantly,
- * text input debounces 400ms and only applies valid 6-digit hex.
- */
 function DebouncedColorField({
   label,
   value,
@@ -26,7 +22,6 @@ function DebouncedColorField({
   const [textValue, setTextValue] = useState(value);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Sync textValue when parent value changes (e.g. reset, color picker)
   useEffect(() => {
     setTextValue(value);
   }, [value]);
@@ -43,7 +38,6 @@ function DebouncedColorField({
     [onChange],
   );
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
@@ -51,21 +45,20 @@ function DebouncedColorField({
   }, []);
 
   return (
-    <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-zinc-800 rounded-2xl">
-      {/* Color Swatch — updates preview instantly */}
+    <div className="flex items-center gap-3 p-3 bg-muted rounded-xl">
       <div className="relative shrink-0">
         <input
           type="color"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-10 h-10 rounded-xl cursor-pointer appearance-none bg-transparent border-2 border-gray-200 dark:border-white/15 [&::-webkit-color-swatch-wrapper]:p-0.5 [&::-webkit-color-swatch]:rounded-lg [&::-webkit-color-swatch]:border-none"
+          className="w-10 h-10 rounded-xl cursor-pointer appearance-none bg-transparent border-2 border-border [&::-webkit-color-swatch-wrapper]:p-0.5 [&::-webkit-color-swatch]:rounded-lg [&::-webkit-color-swatch]:border-none"
         />
       </div>
 
-      {/* Label */}
-      <span className="text-sm font-semibold flex-1">{label}</span>
+      <span className="text-sm font-semibold text-foreground flex-1">
+        {label}
+      </span>
 
-      {/* Hex Input — debounced */}
       <input
         type="text"
         value={textValue}
@@ -77,14 +70,13 @@ function DebouncedColorField({
           }
         }}
         onBlur={() => {
-          // Apply immediately on blur if valid
           if (/^#[0-9A-Fa-f]{6}$/.test(textValue)) {
             onChange(textValue);
           } else {
-            setTextValue(value); // revert to last valid
+            setTextValue(value);
           }
         }}
-        className="w-24 px-3 py-2 text-xs font-mono text-center bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20"
+        className="w-24 px-3 py-2 text-base font-mono text-center bg-white rounded-xl border border-border focus:outline-none focus:ring-2 focus:ring-primary/20"
         maxLength={7}
         placeholder="#000000"
       />
@@ -99,7 +91,6 @@ interface SettingsFormProps {
 export function SettingsForm({ initialSettings }: SettingsFormProps) {
   const [isPending, startTransition] = useTransition();
 
-  // Color states
   const [cardBgColor, setCardBgColor] = useState(initialSettings.card_bg_color);
   const [senderColor, setSenderColor] = useState(initialSettings.sender_color);
   const [amountColor, setAmountColor] = useState(initialSettings.amount_color);
@@ -107,13 +98,11 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
     initialSettings.message_color,
   );
 
-  // Sound state
   const [soundFile, setSoundFile] = useState<File | null>(null);
   const [existingSoundUrl, setExistingSoundUrl] = useState<string | null>(
     initialSettings.sound_url,
   );
 
-  // Min amount state
   const [minAmount, setMinAmount] = useState(initialSettings.min_amount);
 
   const colorFields = [
@@ -124,26 +113,25 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
       key: "card_bg_color",
     },
     {
-      label: "Sender Name",
+      label: "Nama Pengirim",
       value: senderColor,
       setter: setSenderColor,
       key: "sender_color",
     },
     {
-      label: "Amount Text",
+      label: "Teks Jumlah",
       value: amountColor,
       setter: setAmountColor,
       key: "amount_color",
     },
     {
-      label: "Message Text",
+      label: "Teks Pesan",
       value: messageColor,
       setter: setMessageColor,
       key: "message_color",
     },
   ];
 
-  // Live preview settings object
   const liveSettings: OverlaySettings = {
     user_id: initialSettings.user_id,
     card_bg_color: cardBgColor,
@@ -180,9 +168,9 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
       const result = await saveOverlaySettings(formData);
 
       if (result.success) {
-        toast.success("Settings saved!");
+        toast.success("Pengaturan berhasil disimpan!");
       } else {
-        toast.error(result.error || "Failed to save settings.");
+        toast.error(result.error || "Gagal menyimpan pengaturan.");
       }
     });
   }
@@ -194,9 +182,38 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
 
   return (
     <div className="space-y-6">
-      {/* Color Pickers */}
-      <div className="bg-white dark:bg-zinc-900 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-white/5 space-y-5">
-        <h2 className="font-bold text-lg">Colors</h2>
+      {/* Preview */}
+      <div className="space-y-3">
+        <h2 className="font-black text-lg text-black">Live Preview</h2>
+        <div className="bg-white rounded-xl p-6 border-[3px] border-black shadow-[6px_6px_0px_0px_#000] flex flex-col items-center justify-center min-h-[300px] relative overflow-hidden">
+          <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:16px_16px]" />
+
+          <div className="relative z-10 w-full flex justify-center">
+            <DonationAlertCard
+              data={{
+                id: "preview",
+                streamer_id: "preview",
+                donor_name: "John Doe",
+                message: "Keren streamnya! Lanjutkan! 🎉",
+                amount_net: 25,
+                tx_digest: "0x000",
+                created_at: new Date().toISOString(),
+                status: "completed",
+              }}
+              settings={liveSettings}
+              preview
+            />
+          </div>
+
+          <p className="mt-6 text-xs font-bold text-black/40 font-mono">
+            Warna berubah langsung saat kamu pilih
+          </p>
+        </div>
+      </div>
+
+      {/* Colors */}
+      <div className="bg-white border-[3px] border-black rounded-xl p-6 space-y-5 shadow-[6px_6px_0px_0px_#000]">
+        <h2 className="font-black text-lg text-black">Warna</h2>
 
         <div className="space-y-3">
           {colorFields.map((field) => (
@@ -212,39 +229,39 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
         <button
           type="button"
           onClick={handleResetDefaults}
-          className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+          className="flex items-center gap-2 text-sm font-bold text-black/60 hover:text-black transition-colors"
         >
           <RotateCcw className="w-4 h-4" />
-          Reset to defaults
+          Reset ke default
         </button>
       </div>
 
-      {/* Sound Upload */}
-      <div className="bg-white dark:bg-zinc-900 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-white/5 space-y-4">
-        <h2 className="font-bold text-lg flex items-center gap-2">
-          <Volume2 className="w-5 h-5" />
-          Alert Sound
+      {/* Sound */}
+      <div className="bg-white border-[3px] border-black rounded-xl p-6 space-y-4 shadow-[6px_6px_0px_0px_#000]">
+        <h2 className="font-black text-lg text-black flex items-center gap-2">
+          <Volume2 className="w-5 h-5 text-black" />
+          Suara Alert
         </h2>
 
         {soundFile || existingSoundUrl ? (
-          <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-zinc-800 rounded-xl border border-gray-200 dark:border-white/10">
-            <Volume2 className="w-5 h-5 text-green-500 shrink-0" />
-            <span className="text-sm font-medium truncate flex-1">
+          <div className="flex items-center gap-3 p-3 bg-white rounded-lg border-2 border-black">
+            <Volume2 className="w-5 h-5 text-black shrink-0" />
+            <span className="text-sm font-bold truncate flex-1 text-black">
               {soundFile ? soundFile.name : "Custom alert sound"}
             </span>
             <button
               type="button"
               onClick={handleSoundRemove}
-              className="p-1 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-lg transition-colors"
+              className="p-1 hover:bg-gray-100 rounded-md transition-colors border-2 border-transparent hover:border-black"
             >
-              <X className="w-4 h-4 text-gray-400" />
+              <X className="w-4 h-4 text-black" />
             </button>
           </div>
         ) : (
-          <label className="flex flex-col items-center justify-center gap-2 p-6 border-2 border-dashed border-gray-300 dark:border-white/10 rounded-2xl cursor-pointer hover:border-gray-400 dark:hover:border-white/20 transition-colors">
-            <Upload className="w-8 h-8 text-gray-400" />
-            <span className="text-sm text-gray-500">
-              Upload MP3, WAV, or OGG (max 2MB)
+          <label className="flex flex-col items-center justify-center gap-2 p-6 border-2 border-dashed border-black/30 rounded-xl cursor-pointer hover:border-black hover:bg-gray-50 transition-all">
+            <Upload className="w-8 h-8 text-black/40" />
+            <span className="text-sm font-bold text-black/60">
+              Upload MP3, WAV, atau OGG (maks 2MB)
             </span>
             <input
               type="file"
@@ -258,18 +275,18 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
           </label>
         )}
 
-        <p className="text-xs text-gray-400">
-          Leave empty to use the default notification sound.
+        <p className="text-xs font-medium text-black/50">
+          Kosongkan untuk menggunakan suara default.
         </p>
       </div>
 
       {/* Min Amount */}
-      <div className="bg-white dark:bg-zinc-900 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-white/5 space-y-4">
-        <h2 className="font-bold text-lg">Minimum Donation</h2>
-        <p className="text-xs text-gray-400">
-          Donations below this amount will not appear on the overlay.
+      <div className="bg-white border-[3px] border-black rounded-xl p-6 space-y-4 shadow-[6px_6px_0px_0px_#000]">
+        <h2 className="font-black text-lg text-black">Minimum Donasi</h2>
+        <p className="text-xs font-medium text-black/60">
+          Donasi di bawah nominal ini tidak akan muncul di overlay.
         </p>
-        <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-zinc-800 rounded-2xl">
+        <div className="flex items-center gap-3 p-3 bg-white border-2 border-black rounded-lg">
           <input
             type="number"
             min="0"
@@ -278,52 +295,22 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
             onChange={(e) =>
               setMinAmount(Math.max(0, parseFloat(e.target.value) || 0.5))
             }
-            className="flex-1 px-4 py-3 text-base font-mono bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20"
+            className="flex-1 px-2 py-1 text-base font-black font-mono bg-transparent outline-none text-black placeholder:text-black/30"
             placeholder="0.5"
           />
-          <span className="text-sm font-bold text-gray-500 shrink-0">USDC</span>
+          <span className="text-sm font-black text-black shrink-0">USDC</span>
         </div>
       </div>
 
-      {/* Live Preview */}
-      <div className="space-y-3">
-        <h2 className="font-bold text-lg px-2">Live Preview</h2>
-        <div className="bg-zinc-100 dark:bg-zinc-900/50 rounded-3xl p-6 border border-gray-200 dark:border-white/5 flex flex-col items-center justify-center min-h-[300px] relative overflow-hidden">
-          {/* Checkerboard background */}
-          <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:16px_16px]" />
-
-          <div className="relative z-10 w-full flex justify-center">
-            <DonationAlertCard
-              data={{
-                id: "preview",
-                streamer_id: "preview",
-                donor_name: "John Doe",
-                message: "Great stream! Keep it up 🎉",
-                amount_net: 25,
-                tx_digest: "0x000",
-                created_at: new Date().toISOString(),
-                status: "completed",
-              }}
-              settings={liveSettings}
-              preview
-            />
-          </div>
-
-          <p className="mt-6 text-xs text-gray-400 font-mono">
-            Colors update instantly as you pick them
-          </p>
-        </div>
-      </div>
-
-      {/* Save Button */}
+      {/* Save */}
       <button
         type="button"
         onClick={handleSave}
         disabled={isPending}
-        className="w-full py-4 rounded-2xl bg-black dark:bg-white text-white dark:text-black font-bold text-base flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50"
+        className="w-full py-4 rounded-xl bg-[#C1E1C1] text-black border-[3px] border-black shadow-[4px_4px_0px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_#000] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all font-black text-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:pointer-events-none"
       >
         <Save className="w-5 h-5" />
-        {isPending ? "Saving..." : "Save Settings"}
+        {isPending ? "Menyimpan..." : "Simpan Pengaturan"}
       </button>
     </div>
   );

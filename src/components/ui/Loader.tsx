@@ -4,8 +4,8 @@ export interface LoaderProps {
 
 export function Loader({ fullScreen = false }: LoaderProps) {
   const containerClasses = fullScreen
-    ? "flex items-center justify-center min-h-screen bg-white dark:bg-zinc-950 z-50 fixed inset-0"
-    : "flex items-center justify-center w-full h-full min-h-[50vh] bg-white dark:bg-zinc-950";
+    ? "flex items-center justify-center min-h-screen  z-50 fixed inset-0"
+    : "flex items-center justify-center w-full h-full min-h-[70vh] ";
 
   return (
     <div className={containerClasses}>
