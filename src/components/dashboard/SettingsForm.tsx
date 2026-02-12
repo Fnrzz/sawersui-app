@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { useState, useTransition, useRef, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 import {
@@ -89,6 +91,8 @@ interface SettingsFormProps {
 }
 
 export function SettingsForm({ initialSettings }: SettingsFormProps) {
+  const t = useTranslations("Settings");
+  const tAction = useTranslations("Action");
   const [isPending, startTransition] = useTransition();
 
   const [cardBgColor, setCardBgColor] = useState(initialSettings.card_bg_color);
@@ -107,25 +111,25 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
 
   const colorFields = [
     {
-      label: "Background",
+      label: t("labels.background"),
       value: cardBgColor,
       setter: setCardBgColor,
       key: "card_bg_color",
     },
     {
-      label: "Nama Pengirim",
+      label: t("labels.sender"),
       value: senderColor,
       setter: setSenderColor,
       key: "sender_color",
     },
     {
-      label: "Teks Jumlah",
+      label: t("labels.amount"),
       value: amountColor,
       setter: setAmountColor,
       key: "amount_color",
     },
     {
-      label: "Teks Pesan",
+      label: t("labels.message"),
       value: messageColor,
       setter: setMessageColor,
       key: "message_color",
@@ -168,9 +172,9 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
       const result = await saveOverlaySettings(formData);
 
       if (result.success) {
-        toast.success("Pengaturan berhasil disimpan!");
+        toast.success(t("Dashboard.toast.settingsSaved"));
       } else {
-        toast.error(result.error || "Gagal menyimpan pengaturan.");
+        toast.error(result.error || t("Dashboard.toast.settingsFailed"));
       }
     });
   }
@@ -184,7 +188,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
     <div className="space-y-6">
       {/* Preview */}
       <div className="space-y-3">
-        <h2 className="font-black text-lg text-black">Live Preview</h2>
+        <h2 className="font-black text-lg text-black">{t("livePreview")}</h2>
         <div className="bg-white rounded-xl p-6 border-[3px] border-black shadow-[6px_6px_0px_0px_#000] flex flex-col items-center justify-center min-h-[300px] relative overflow-hidden">
           <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:16px_16px]" />
 
@@ -206,14 +210,14 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
           </div>
 
           <p className="mt-6 text-xs font-bold text-black/40 font-mono">
-            Warna berubah langsung saat kamu pilih
+            {t("previewDesc")}
           </p>
         </div>
       </div>
 
       {/* Colors */}
       <div className="bg-white border-[3px] border-black rounded-xl p-6 space-y-5 shadow-[6px_6px_0px_0px_#000]">
-        <h2 className="font-black text-lg text-black">Warna</h2>
+        <h2 className="font-black text-lg text-black">{t("colors")}</h2>
 
         <div className="space-y-3">
           {colorFields.map((field) => (
@@ -232,7 +236,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
           className="flex items-center gap-2 text-sm font-bold text-black/60 hover:text-black transition-colors"
         >
           <RotateCcw className="w-4 h-4" />
-          Reset ke default
+          {tAction("reset") || "Reset to Defaults"}
         </button>
       </div>
 
@@ -240,7 +244,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
       <div className="bg-white border-[3px] border-black rounded-xl p-6 space-y-4 shadow-[6px_6px_0px_0px_#000]">
         <h2 className="font-black text-lg text-black flex items-center gap-2">
           <Volume2 className="w-5 h-5 text-black" />
-          Suara Alert
+          {t("sound")}
         </h2>
 
         {soundFile || existingSoundUrl ? (
@@ -261,7 +265,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
           <label className="flex flex-col items-center justify-center gap-2 p-6 border-2 border-dashed border-black/30 rounded-xl cursor-pointer hover:border-black hover:bg-gray-50 transition-all">
             <Upload className="w-8 h-8 text-black/40" />
             <span className="text-sm font-bold text-black/60">
-              Upload MP3, WAV, atau OGG (maks 2MB)
+              {tAction("upload") || "Upload MP3, WAV, or OGG (max 2MB)"}
             </span>
             <input
               type="file"
@@ -275,16 +279,14 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
           </label>
         )}
 
-        <p className="text-xs font-medium text-black/50">
-          Kosongkan untuk menggunakan suara default.
-        </p>
+        <p className="text-xs font-medium text-black/50">{t("soundDesc")}</p>
       </div>
 
       {/* Min Amount */}
       <div className="bg-white border-[3px] border-black rounded-xl p-6 space-y-4 shadow-[6px_6px_0px_0px_#000]">
-        <h2 className="font-black text-lg text-black">Minimum Donasi</h2>
+        <h2 className="font-black text-lg text-black">{t("minDonation")}</h2>
         <p className="text-xs font-medium text-black/60">
-          Donasi di bawah nominal ini tidak akan muncul di overlay.
+          {t("minDonationDesc")}
         </p>
         <div className="flex items-center gap-3 p-3 bg-white border-2 border-black rounded-lg">
           <input
@@ -310,7 +312,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
         className="w-full py-4 rounded-xl bg-[#C1E1C1] text-black border-[3px] border-black shadow-[4px_4px_0px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_#000] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all font-black text-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:pointer-events-none"
       >
         <Save className="w-5 h-5" />
-        {isPending ? "Menyimpan..." : "Simpan Pengaturan"}
+        {isPending ? tAction("saving") : tAction("save")}
       </button>
     </div>
   );

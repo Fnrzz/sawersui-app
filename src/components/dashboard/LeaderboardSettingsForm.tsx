@@ -1,4 +1,5 @@
 "use client";
+import { useTranslations } from "next-intl";
 
 import { useState, useTransition, useRef, useEffect, useCallback } from "react";
 import { toast } from "sonner";
@@ -91,6 +92,7 @@ interface LeaderboardSettingsFormProps {
 export function LeaderboardSettingsForm({
   initialSettings,
 }: LeaderboardSettingsFormProps) {
+  const t = useTranslations();
   const [isPending, startTransition] = useTransition();
 
   const [bgColor, setBgColor] = useState(initialSettings.bg_color);
@@ -100,25 +102,25 @@ export function LeaderboardSettingsForm({
 
   const colorFields = [
     {
-      label: "Background Color",
+      label: t("Settings.labels.background"),
       value: bgColor,
       setter: setBgColor,
       key: "bg_color",
     },
     {
-      label: "Title Color",
+      label: t("Settings.labels.titleColor"),
       value: titleColor,
       setter: setTitleColor,
       key: "title_color",
     },
     {
-      label: "Text Color",
+      label: t("Settings.labels.textColor"),
       value: textColor,
       setter: setTextColor,
       key: "text_color",
     },
     {
-      label: "Rank Badge Color",
+      label: t("Settings.labels.rankColor"),
       value: rankColor,
       setter: setRankColor,
       key: "rank_color",
@@ -151,9 +153,9 @@ export function LeaderboardSettingsForm({
       const result = await updateLeaderboardSettings(formData);
 
       if (result.success) {
-        toast.success("Settings saved successfully!");
+        toast.success(t("Dashboard.toast.settingsSaved"));
       } else {
-        toast.error(result.error || "Failed to save settings.");
+        toast.error(result.error || t("Dashboard.toast.settingsFailed"));
       }
     });
   }
@@ -164,7 +166,7 @@ export function LeaderboardSettingsForm({
       <div className="space-y-4">
         <h3 className="font-black text-lg px-2 flex items-center gap-2 text-black">
           <Monitor className="w-5 h-5" />
-          Live Preview
+          {t("Settings.livePreview") || "Live Preview"}
         </h3>
 
         <div className="bg-zinc-100 border-[3px] border-black rounded-xl p-6 shadow-[6px_6px_0px_0px_#000] flex flex-col items-center justify-center min-h-[300px] relative overflow-hidden">
@@ -180,17 +182,17 @@ export function LeaderboardSettingsForm({
               previewSettings={liveSettings}
             />
           </div>
-          <p className="mt-8 text-xs font-bold text-black/40 font-mono text-center">
-            This is how it will look on your stream.
-            <br />
-            Colors update instantly!
+          <p className="mt-8 text-xs font-bold text-black/40 font-mono text-center whitespace-pre-line">
+            {t("LeaderboardSettings.previewDesc")}
           </p>
         </div>
       </div>
       <div className="space-y-6">
         {/* Colors */}
         <div className="bg-white border-[3px] border-black rounded-xl p-6 space-y-5 shadow-[6px_6px_0px_0px_#000]">
-          <h2 className="font-black text-lg text-black">Customize Colors</h2>
+          <h2 className="font-black text-lg text-black">
+            {t("LeaderboardSettings.customize")}
+          </h2>
 
           <div className="space-y-3">
             {colorFields.map((field) => (
@@ -209,7 +211,7 @@ export function LeaderboardSettingsForm({
             className="flex items-center gap-2 text-sm font-bold text-black/60 hover:text-black transition-colors"
           >
             <RotateCcw className="w-4 h-4" />
-            Reset to Defaults
+            {t("Action.reset") || "Reset to Defaults"}
           </button>
         </div>
 
@@ -221,7 +223,9 @@ export function LeaderboardSettingsForm({
           className="w-full py-4 rounded-xl bg-[#C1E1C1] text-black border-[3px] border-black shadow-[4px_4px_0px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_#000] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all font-black text-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:pointer-events-none"
         >
           <Save className="w-5 h-5" />
-          {isPending ? "Saving..." : "Save Settings"}
+          {isPending
+            ? t("Action.saving") || "Saving..."
+            : t("Action.save") || "Save Settings"}
         </button>
       </div>
     </div>

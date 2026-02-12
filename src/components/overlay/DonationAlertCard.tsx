@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { DonationEvent } from "@/hooks/useDonationEvents";
 import { OverlaySettings } from "@/lib/overlay-settings";
 
@@ -16,6 +17,7 @@ export function DonationAlertCard({
   settings,
   preview,
 }: DonationAlertCardProps) {
+  const t = useTranslations("Overlay");
   const bgColor = settings?.card_bg_color ?? "#5B21B6";
   const senderColor = settings?.sender_color ?? "#FFDF20";
   const amountColor = settings?.amount_color ?? "#A3E635";
@@ -26,7 +28,7 @@ export function DonationAlertCard({
       {/* Header Bar */}
       <div className="bg-black/20 p-4 border-b-[3px] border-black flex items-center justify-center">
         <h3 className="font-[family-name:var(--font-pixel)] text-lg text-white uppercase tracking-widest text-center pt-1 drop-shadow-md">
-          New Donation
+          {t("newDonation")}
         </h3>
       </div>
 

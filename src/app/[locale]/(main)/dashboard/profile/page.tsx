@@ -1,10 +1,13 @@
 import { createClient } from "@/lib/supabase/server";
+import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { WalletAddressCopy } from "@/components/dashboard/WalletAddressCopy";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
 export default async function ProfilePage() {
+  const t = await getTranslations("Profile");
+  const tAction = await getTranslations("Action");
   const supabase = await createClient();
   const {
     data: { user },
@@ -23,7 +26,7 @@ export default async function ProfilePage() {
   if (!profile) {
     return (
       <div className="text-center text-muted-foreground py-12">
-        Profil tidak ditemukan
+        {t("notFound")}
       </div>
     );
   }
@@ -36,13 +39,13 @@ export default async function ProfilePage() {
           className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors w-fit"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back to Dashboard
+          {tAction("backToDashboard")}
         </Link>
         <div>
-          <h1 className="text-2xl font-extrabold text-foreground">Profil</h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            Informasi akun kamu
-          </p>
+          <h1 className="text-2xl font-extrabold text-foreground">
+            {t("title")}
+          </h1>
+          <p className="text-muted-foreground text-sm mt-1">{t("subtitle")}</p>
         </div>
       </div>
 
@@ -61,14 +64,14 @@ export default async function ProfilePage() {
 
         <div className="space-y-1">
           <label className="text-xs text-muted-foreground uppercase tracking-wider font-bold">
-            Alamat Wallet
+            {t("walletAddress")}
           </label>
           <WalletAddressCopy address={profile.wallet_address} />
         </div>
 
         <div className="space-y-1">
           <label className="text-xs text-muted-foreground uppercase tracking-wider font-bold">
-            Email
+            {t("email")}
           </label>
           <p className="text-sm font-medium text-foreground">
             {user.email || "—"}

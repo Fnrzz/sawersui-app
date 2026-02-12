@@ -1,4 +1,5 @@
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { ConnectButton, useCurrentAccount } from "@mysten/dapp-kit";
@@ -16,6 +17,7 @@ export function LoginModal({
   onOpenChange,
   redirectTo = "/dashboard",
 }: LoginModalProps) {
+  const t = useTranslations("Modals.Login");
   const router = useRouter();
   const currentAccount = useCurrentAccount();
 
@@ -34,7 +36,7 @@ export function LoginModal({
       {open && (
         <Dialog open={open} onOpenChange={onOpenChange}>
           <DialogContent className="sm:max-w-md p-0 overflow-hidden bg-transparent border-none shadow-none">
-            <DialogTitle className="sr-only">Connect Wallet</DialogTitle>
+            <DialogTitle className="sr-only">{t("connectWallet")}</DialogTitle>
 
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
@@ -46,11 +48,9 @@ export function LoginModal({
               {/* Header */}
               <div className="p-6 text-center border-b border-border bg-amber-50">
                 <h2 className="text-lg font-extrabold text-foreground mb-1">
-                  Login ke SawerSui
+                  {t("title")}
                 </h2>
-                <p className="text-xs text-muted-foreground">
-                  Connect wallet atau login dengan Google
-                </p>
+                <p className="text-xs text-muted-foreground">{t("subtitle")}</p>
               </div>
 
               {/* Content */}
@@ -62,12 +62,12 @@ export function LoginModal({
                     disabled={isSigning}
                     className="w-full py-3.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-muted border border-border text-foreground hover:bg-muted/80"
                   >
-                    {isSigning ? "Signing..." : "Sign In with Wallet"}
+                    {isSigning ? t("signing") : t("signInWallet")}
                   </button>
                 ) : (
                   <ConnectButton
                     className="w-full"
-                    connectText="Connect Wallet"
+                    connectText={t("connectWallet")}
                     style={{
                       width: "100%",
                       justifyContent: "center",
@@ -86,7 +86,7 @@ export function LoginModal({
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
                     <span className="px-3 bg-white text-muted-foreground text-xs font-medium">
-                      atau
+                      {t("or")}
                     </span>
                   </div>
                 </div>

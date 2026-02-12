@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { getDonations } from "@/lib/actions/donation";
 import { formatDistanceToNow } from "date-fns";
@@ -10,6 +11,8 @@ interface HistoryPageProps {
 }
 
 export default async function HistoryPage({ searchParams }: HistoryPageProps) {
+  const t = await getTranslations("History");
+  const tAction = await getTranslations("Action");
   const supabase = await createClient();
   const {
     data: { user },
@@ -34,19 +37,19 @@ export default async function HistoryPage({ searchParams }: HistoryPageProps) {
           className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors w-fit"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back to Dashboard
+          {tAction("backToDashboard")}
         </Link>
         <div className="flex justify-between items-end">
           <div>
             <h1 className="text-2xl font-extrabold text-foreground">
-              Riwayat Donasi
+              {t("title")}
             </h1>
             <p className="text-muted-foreground text-sm mt-1">
-              Semua donasi yang kamu terima ({total} total)
+              {t("subtitle", { total })}
             </p>
           </div>
           <span className="text-sm font-medium bg-muted px-3 py-1 rounded-md">
-            Page {page} of {totalPages || 1}
+            {t("page", { current: page, total: totalPages || 1 })}
           </span>
         </div>
       </div>
@@ -55,7 +58,7 @@ export default async function HistoryPage({ searchParams }: HistoryPageProps) {
         {donations.length === 0 ? (
           <div className="p-12 text-center text-muted-foreground bg-white border border-border rounded-2xl shadow-sm">
             <History className="w-10 h-10 mx-auto mb-3 opacity-40" />
-            <p className="text-sm">Belum ada donasi.</p>
+            <p className="text-sm">{t("empty")}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -101,7 +104,7 @@ export default async function HistoryPage({ searchParams }: HistoryPageProps) {
                         </p>
                       ) : (
                         <p className="text-xs text-black/40 italic text-center py-4">
-                          Tidak ada pesan
+                          {t("noMessage")}
                         </p>
                       )}
                     </div>
@@ -111,7 +114,7 @@ export default async function HistoryPage({ searchParams }: HistoryPageProps) {
                   <div className="mt-6 pt-4 border-t-2 border-black/10 flex justify-between items-end">
                     <div>
                       <p className="text-xs font-bold text-black/60 uppercase tracking-wider mb-0.5">
-                        Amount
+                        {t("amount")}
                       </p>
                       <p className="text-2xl font-black text-black">
                         ${donation.amount_net.toFixed(2)}
@@ -122,7 +125,7 @@ export default async function HistoryPage({ searchParams }: HistoryPageProps) {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="p-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
-                      title="View on Explorer"
+                      title={tAction("viewTransaction")}
                     >
                       <ExternalLink className="w-4 h-4" />
                     </a>
@@ -145,7 +148,7 @@ export default async function HistoryPage({ searchParams }: HistoryPageProps) {
               }`}
               aria-disabled={page <= 1}
             >
-              Previous
+              {t("previous")}
             </Link>
             <span className="font-bold text-lg">
               {page} / {totalPages}
@@ -159,7 +162,7 @@ export default async function HistoryPage({ searchParams }: HistoryPageProps) {
               }`}
               aria-disabled={page >= totalPages}
             >
-              Next
+              {t("next")}
             </Link>
           </div>
         )}

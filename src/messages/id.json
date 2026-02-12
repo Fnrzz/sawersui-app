@@ -1,0 +1,183 @@
+{
+  "HomePage": {
+    "banner": "🎉 SawerSui — Platform donasi Web3 pertama di Sui Network! Dukung streamer favoritmu dengan USDC. Gas fee disponsori!",
+    "hero": {
+      "title": "Jembatan interaksi dengan",
+      "subtitle": "penontonmu!",
+      "description": "Platform donasi Web3 di Sui Network untuk para streamer dan kreator konten Indonesia.",
+      "loginButton": "Masuk / Daftar",
+      "aboutButton": "Tentang"
+    },
+    "features": {
+      "title": "Kenapa",
+      "brand": "SawerSui",
+      "easyLogin": {
+        "title": "Easy Login",
+        "desc": "Login dengan Google atau connect wallet. Tanpa install app, tanpa ribet."
+      },
+      "lowFees": {
+        "title": "Low Fees",
+        "desc": "Gas fee disponsori. Donasi sampai ke kreator tanpa potongan besar."
+      },
+      "instantOverlay": {
+        "title": "Instant Overlay",
+        "desc": "Notifikasi donasi langsung muncul di OBS kamu secara real-time."
+      },
+      "usdcStablecoin": {
+        "title": "USDC Stablecoin",
+        "desc": "Donasi pakai USDC — stabil, aman, dan bisa di-withdraw kapan saja."
+      }
+    }
+  },
+  "Action": {
+    "login": "Masuk",
+    "dashboard": "Dasbor",
+    "logout": "Keluar",
+    "backToDashboard": "Kembali ke Dashboard",
+    "save": "Simpan Pengaturan",
+    "saving": "Menyimpan...",
+    "reset": "Reset ke Default",
+    "upload": "Upload MP3, WAV, atau OGG (maks 2MB)",
+    "remove": "Hapus",
+    "copy": "Salin Link",
+    "viewTransaction": "Lihat Transaksi"
+  },
+  "Dashboard": {
+    "hello": "Halo, {name}! 👋",
+    "subtitle": "Siap menerima donasi hari ini?",
+    "menu": {
+      "overlay": {
+        "title": "Overlay",
+        "desc": "Atur Alert dan overlay lainnya di sini. Kompatibel dengan OBS dan Streamlabs."
+      },
+      "share": {
+        "title": "Bagikan Link",
+        "desc": "Bagikan link donasi kamu ke penonton agar mereka bisa mulai mendukungmu.",
+        "action": "Salin Link"
+      },
+      "balance": {
+        "title": "Dukungan Masuk & Cashout",
+        "desc": "Saldo Aktif: ${balance} USDC. Lihat histori dukungan yang masuk dan cashout di sini.",
+        "action": "Withdraw"
+      },
+      "history": {
+        "title": "Riwayat Donasi",
+        "desc": "Lihat riwayat donasi lengkap yang masuk."
+      }
+    },
+    "withdraw": {
+      "title": "Withdraw USDC",
+      "desc": "Sponsored withdrawal (Gas-free). Minimum 0.5 USDC.",
+      "amount": "Jumlah (USDC)",
+      "recipient": "Alamat Penerima",
+      "cancel": "Batal",
+      "minAmount": "Minimum penarikan adalah 0.5 USDC",
+      "invalidAddress": "Format alamat tidak valid",
+      "success": "Penarikan berhasil!",
+      "error": "Penarikan gagal",
+      "loginRequired": "Withdraw hanya untuk akun Google Login. Wallet user sudah memiliki kendali penuh atas dananya."
+    },
+    "toast": {
+      "logoutSuccess": "Berhasil keluar",
+      "copySuccess": "Link donasi berhasil disalin!",
+      "copyError": "Gagal menyalin",
+      "settingsSaved": "Pengaturan berhasil disimpan!",
+      "settingsFailed": "Gagal menyimpan pengaturan."
+    }
+  },
+  "DonationForm": {
+    "nominal": "Nominal:",
+    "from": "Dari:",
+    "message": "Pesan:",
+    "placeholderAmount": "Ketik jumlah dukungan",
+    "placeholderName": "Nama Kamu",
+    "placeholderMessage": "Selamat pagi",
+    "ageCheck": "Saya berusia 17 tahun atau lebih",
+    "agreedCheck": "Saya memahami dan menyetujui bahwa dukungan ini saya berikan secara sukarela, tidak dapat dikembalikan, bukan transaksi komersial, tidak digunakan untuk aktivitas ilegal, serta telah sesuai dengan syarat dan ketentuan & kebijakan privasi sawersui.co",
+    "loginButton": "Login Aja",
+    "submitButton": "Kirim Dukungan",
+    "balance": "Balance",
+    "supportAmount": "Jumlah Dukungan:",
+    "fee": "Biaya: 0 (Sponsored)",
+    "total": "Total:",
+    "successTitle": "Donasi Terkirim! 🎉",
+    "successDesc": "Terima kasih sudah mendukung {name}!",
+    "poweredBy": "Powered by <brand>SawerSui</brand> on Sui Network",
+    "minDonation": "Minimum donation is $0.50 USDC",
+    "agreementError": "Mohon setujui syarat dan ketentuan."
+  },
+  "Settings": {
+    "livePreview": "Live Preview",
+    "colors": "Warna",
+    "sound": "Suara Alert",
+    "minDonation": "Minimum Donasi",
+    "previewDesc": "Warna berubah langsung saat kamu pilih",
+    "soundDesc": "Kosongkan untuk menggunakan suara default.",
+    "minDonationDesc": "Donasi di bawah nominal ini tidak akan muncul di overlay.",
+    "labels": {
+      "background": "Background",
+      "sender": "Nama Pengirim",
+      "amount": "Teks Jumlah",
+      "message": "Teks Pesan",
+      "titleColor": "Warna Judul",
+      "textColor": "Warna Teks",
+      "rankColor": "Warna Badge Rank"
+    }
+  },
+  "LeaderboardSettings": {
+    "customize": "Kustomisasi Warna",
+    "previewDesc": "Ini tampilan yang akan muncul di stream kamu.\nWarna berubah secara instan!"
+  },
+  "History": {
+    "title": "Riwayat Donasi",
+    "subtitle": "Semua donasi yang kamu terima ({total} total)",
+    "empty": "Belum ada donasi.",
+    "page": "Halaman {current} dari {total}",
+    "previous": "Sebelumnya",
+    "next": "Selanjutnya",
+    "amount": "Jumlah",
+    "noMessage": "Tidak ada pesan"
+  },
+  "OBS": {
+    "title": "Pengaturan OBS",
+    "subtitle": "Konfigurasi overlay untuk streaming kamu",
+    "overlay": {
+      "title": "Notifikasi Overlay",
+      "desc": "Alert box real-time saat ada donasi masuk. Wajib dipasang!"
+    },
+    "leaderboard": {
+      "title": "Leaderboard Overlay",
+      "desc": "Tampilkan klasemen pendukung terbanyak di stream kamu."
+    }
+  },
+  "Profile": {
+    "title": "Profil",
+    "subtitle": "Informasi akun kamu",
+    "walletAddress": "Alamat Wallet",
+    "email": "Email",
+    "notFound": "Profil tidak ditemukan"
+  },
+  "Modals": {
+    "About": {
+      "title": "Tentang SawerSui",
+      "subtitle": "Platform Donasi Generasi Baru",
+      "desc1": "SawerSui adalah platform donasi livestream terdesentralisasi yang dibangun di <bold>Sui Network</bold>.",
+      "desc2": "Berdayakan kreator konten dengan transaksi instan dan biaya rendah. Tanpa perantara, dukungan langsung dari penggemar ke kreator.",
+      "note": "<bold>Catatan:</bold> Biaya platform 5% dikenakan pada setiap transaksi untuk mendukung pengembangan dan pemeliharaan."
+    },
+    "Login": {
+      "title": "Masuk ke SawerSui",
+      "subtitle": "Hubungkan dompet atau masuk dengan Google",
+      "connectWallet": "Hubungkan Dompet",
+      "signInWallet": "Masuk dengan Dompet",
+      "signing": "Menandatangani...",
+      "or": "atau",
+      "googleLogin": "Masuk dengan Google"
+    }
+  },
+  "Overlay": {
+    "newDonation": "Donasi Baru",
+    "topSupporters": "Pendukung Teratas",
+    "noDonations": "Belum ada donasi"
+  }
+}
