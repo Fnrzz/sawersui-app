@@ -1,6 +1,7 @@
 "use client";
 
 import { useZkLogin } from "@/hooks/useZkLogin";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 
 interface LoginWithGoogleButtonProps {
@@ -10,6 +11,7 @@ interface LoginWithGoogleButtonProps {
 export function LoginWithGoogleButton({
   redirectTo,
 }: LoginWithGoogleButtonProps) {
+  const t = useTranslations("Modals.Login");
   const { login, isLoading } = useZkLogin();
 
   return (
@@ -32,7 +34,7 @@ export function LoginWithGoogleButton({
               className="object-contain"
             />
           </div>
-          <span>Login with Google</span>
+          <span>{t("googleLogin")}</span>
         </>
       )}
     </button>

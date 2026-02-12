@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { LoginModal } from "@/components/auth/LoginModal";
 import { AboutModal } from "@/components/home/AboutModal";
+import { useTranslations } from "next-intl";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 import { motion, Variants } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
@@ -51,6 +53,7 @@ const features = [
 ];
 
 export function HomePage() {
+  const t = useTranslations("HomePage");
   const router = useRouter();
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [aboutModalOpen, setAboutModalOpen] = useState(false);
@@ -68,19 +71,40 @@ export function HomePage() {
     checkUser();
   }, [router]);
 
+  const featuresList = [
+    {
+      icon: Shield,
+      title: t("features.easyLogin.title"),
+      desc: t("features.easyLogin.desc"),
+    },
+    {
+      icon: Zap,
+      title: t("features.lowFees.title"),
+      desc: t("features.lowFees.desc"),
+    },
+    {
+      icon: MonitorPlay,
+      title: t("features.instantOverlay.title"),
+      desc: t("features.instantOverlay.desc"),
+    },
+    {
+      icon: Coins,
+      title: t("features.usdcStablecoin.title"),
+      desc: t("features.usdcStablecoin.desc"),
+    },
+  ];
+
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen flex flex-col bg-white overflow-x-hidden relative">
+      <div className="absolute top-4 right-4 z-50">
+        <LanguageSwitcher />
+      </div>
+
       {/* Top Announcement Banner */}
       <div className="sawer-banner text-white py-2 overflow-hidden">
         <div className="animate-scroll-left whitespace-nowrap flex">
-          <span className="text-sm font-medium px-8">
-            🎉 SawerSui — Platform donasi Web3 pertama di Sui Network! Dukung
-            streamer favoritmu dengan USDC. Gas fee disponsori!
-          </span>
-          <span className="text-sm font-medium px-8">
-            🎉 SawerSui — Platform donasi Web3 pertama di Sui Network! Dukung
-            streamer favoritmu dengan USDC. Gas fee disponsori!
-          </span>
+          <span className="text-sm font-medium px-8">{t("banner")}</span>
+          <span className="text-sm font-medium px-8">{t("banner")}</span>
         </div>
       </div>
 
@@ -109,12 +133,11 @@ export function HomePage() {
           className="text-center max-w-2xl space-y-3"
         >
           <h1 className="text-3xl md:text-5xl font-extrabold text-foreground leading-tight tracking-tight">
-            Jembatan interaksi dengan{" "}
-            <span className="text-primary">penontonmu!</span>
+            {t("hero.title")}{" "}
+            <span className="text-primary">{t("hero.subtitle")}</span>
           </h1>
           <p className="text-base md:text-lg text-muted-foreground max-w-lg mx-auto leading-relaxed">
-            Platform donasi Web3 di Sui Network untuk para streamer dan kreator
-            konten Indonesia.
+            {t("hero.description")}
           </p>
         </motion.div>
 
@@ -127,13 +150,13 @@ export function HomePage() {
             onClick={() => setLoginModalOpen(true)}
             className="px-12 py-3.5 text-base font-bold rounded-md bg-[#F5A623] text-[#1a1a1a] border-[3px] border-[#2a2a2a] shadow-[4px_4px_0px_0px_#2a2a2a] hover:shadow-[2px_2px_0px_0px_#2a2a2a] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all"
           >
-            Masuk / Daftar
+            {t("hero.loginButton")}
           </button>
           <button
             onClick={() => setAboutModalOpen(true)}
             className="px-12 py-3.5 text-base font-bold rounded-md bg-white text-[#1a1a1a] border-[3px] border-[#2a2a2a] shadow-[4px_4px_0px_0px_#2a2a2a] hover:shadow-[2px_2px_0px_0px_#2a2a2a] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all"
           >
-            About
+            {t("hero.aboutButton")}
           </button>
         </motion.div>
       </motion.section>
@@ -151,11 +174,12 @@ export function HomePage() {
             variants={itemVariants}
             className="text-2xl md:text-3xl font-extrabold text-center mb-8"
           >
-            Kenapa <span className="text-primary">SawerSui</span>?
+            {t("features.title")}{" "}
+            <span className="text-primary">{t("features.brand")}</span>?
           </motion.h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {features.map((feature, i) => {
+            {featuresList.map((feature, i) => {
               const colors = [
                 "bg-[#FFE8A3]", // Yellow
                 "bg-[#C1E1C1]", // Green

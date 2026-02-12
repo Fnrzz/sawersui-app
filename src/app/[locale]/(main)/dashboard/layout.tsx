@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export default function DashboardLayout({
   children,
@@ -22,6 +23,7 @@ export default function DashboardLayout({
             />
             <span className="font-bold text-lg text-foreground">sawersui</span>
           </Link>
+          <LanguageSwitcher />
         </header>
         <main>{children}</main>
       </div>
