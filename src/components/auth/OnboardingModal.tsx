@@ -65,25 +65,25 @@ export function OnboardingModal({
   return (
     <Dialog open={open} onOpenChange={() => {}}>
       <DialogContent
-        className="w-[calc(100%-32px)] max-w-sm mx-auto border-[3px] border-[#2a2a2a] rounded-xl p-0 overflow-hidden gap-0 bg-white shadow-[4px_4px_0px_0px_#2a2a2a]"
+        className="w-[calc(100%-32px)] max-w-sm mx-auto border-[3px] border-black rounded-lg p-0 overflow-hidden gap-0 bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
         onInteractOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
-        <div className="border-b border-border px-6 py-5 text-center bg-amber-50">
+        <div className="border-b-[3px] border-black px-6 py-5 text-center bg-[#FEFCE8]">
           <DialogHeader>
-            <DialogTitle className="text-base font-extrabold text-foreground">
+            <DialogTitle className="text-xl font-black text-black">
               Selamat Datang! 👋
             </DialogTitle>
-            <DialogDescription className="text-xs mt-1 text-muted-foreground">
+            <DialogDescription className="text-sm font-bold text-black/80 mt-1">
               Buat profil streamer kamu
             </DialogDescription>
           </DialogHeader>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-6 space-y-6">
           <div className="space-y-2">
-            <label className="block text-xs font-bold uppercase text-muted-foreground tracking-wider">
-              Username
+            <label className="block text-sm font-bold text-black">
+              Username <span className="text-red-500">*</span>
             </label>
             <Input
               value={username}
@@ -93,41 +93,42 @@ export function OnboardingModal({
                 )
               }
               placeholder="username"
-              className="rounded-xl h-11 border border-border bg-muted text-foreground focus:ring-2 focus:ring-primary/20"
+              className="w-full py-2 text-lg font-bold bg-transparent border-b-[3px] border-black text-black placeholder:text-black/30 focus:outline-none focus:border-black/60 rounded-none transition-all px-0 shadow-none border-t-0 border-l-0 border-r-0 focus-visible:ring-0"
               required
               minLength={3}
             />
-            <p className="text-[10px] text-muted-foreground">
+            <p className="text-xs font-bold text-black/50">
               Huruf kecil, angka, dan underscore
             </p>
           </div>
 
           <div className="space-y-2">
-            <label className="block text-xs font-bold uppercase text-muted-foreground tracking-wider">
-              Nama Tampilan
+            <label className="block text-sm font-bold text-black">
+              Nama Tampilan <span className="text-red-500">*</span>
             </label>
             <Input
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
               placeholder="Nama tampilan kamu"
-              className="rounded-xl h-11 border border-border bg-muted text-foreground focus:ring-2 focus:ring-primary/20"
+              className="w-full py-2 text-lg font-bold bg-transparent border-b-[3px] border-black text-black placeholder:text-black/30 focus:outline-none focus:border-black/60 rounded-none transition-all px-0 shadow-none border-t-0 border-l-0 border-r-0 focus-visible:ring-0"
               required
             />
           </div>
 
           {error && (
-            <div className="p-3 bg-red-50 border border-red-200 text-red-600 text-xs rounded-xl">
-              {error}
+            <div className="flex items-center gap-2 p-3 rounded-lg bg-red-100 border-2 border-black font-bold">
+              <div className="w-4 h-4 text-red-600 flex-shrink-0" />
+              <p className="text-sm text-red-600">{error}</p>
             </div>
           )}
 
           <Button
             type="submit"
             disabled={loading}
-            className="w-full h-12 rounded-xl font-bold text-sm bg-primary text-white hover:bg-amber-600 transition-colors orange-glow"
+            className="w-full py-6 rounded-lg font-black text-lg bg-[#F59E0B] text-black border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-y-1 hover:shadow-none hover:bg-[#F59E0B]/90 disabled:opacity-50 disabled:pointer-events-none disabled:shadow-none disabled:translate-y-1 disabled:bg-gray-400"
           >
             {loading ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
+              <Loader2 className="w-6 h-6 animate-spin text-black" />
             ) : (
               "Mulai Sekarang 🚀"
             )}
