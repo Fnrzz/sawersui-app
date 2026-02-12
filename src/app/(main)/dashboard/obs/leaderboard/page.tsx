@@ -1,11 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { Trophy, ArrowLeft, Monitor } from "lucide-react";
+import { Trophy, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { headers } from "next/headers";
 import { Metadata } from "next";
 import { UrlCopy } from "@/components/dashboard/UrlCopy";
-import { RealtimeLeaderboard } from "@/components/overlay/RealtimeLeaderboard";
+import { getLeaderboardSettings } from "@/lib/actions/leaderboard-settings";
+import { LeaderboardSettingsForm } from "@/components/dashboard/LeaderboardSettingsForm";
 
 export const metadata: Metadata = {
   title: "Leaderboard Setup | SawerBase Dashboard",
@@ -39,7 +40,8 @@ export default async function LeaderboardPage() {
     );
   }
 
-  // No need to fetch real data for the preview, we use dummy data to show how it looks
+  // Fetch existing settings
+  const settings = await getLeaderboardSettings(user.id);
 
   // Determine host for full URL
   const headersList = await headers();
@@ -86,40 +88,12 @@ export default async function LeaderboardPage() {
         </div>
       </div>
 
-      {/* Design Preview */}
-      <div className="space-y-4">
-        <h3 className="font-black text-lg px-2 flex items-center gap-2 text-black">
-          <Monitor className="w-5 h-5" />
-          Design Preview
-        </h3>
-
-        <div className="bg-zinc-100 border-[3px] border-black rounded-xl p-6 shadow-[6px_6px_0px_0px_#000] flex flex-col items-center justify-center min-h-[300px] relative overflow-hidden">
-          {/* Checkerboard background for transparency simulation */}
-          <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:16px_16px]" />
-
-          <div className="relative z-10 w-full flex justify-center origin-center">
-            <RealtimeLeaderboard
-              initialData={[
-                { rank: 1, donorName: "Sultan Andara", totalAmount: 500 },
-                { rank: 2, donorName: "Crypto Whale", totalAmount: 100 },
-                { rank: 3, donorName: "Anonymous", totalAmount: 50 },
-                { rank: 4, donorName: "Supporter #1", totalAmount: 10 },
-                { rank: 5, donorName: "Fan", totalAmount: 5 },
-              ]}
-              streamerId="preview"
-            />
-          </div>
-          <p className="mt-8 text-xs font-bold text-black/40 font-mono">
-            Actual rendering on stream
-          </p>
-        </div>
-      </div>
+      <LeaderboardSettingsForm initialSettings={settings} />
 
       {/* Instructions */}
-      <div className="space-y-4">
+      <div className="space-y-4 pt-4 border-t-2 border-black/5">
         <h3 className="font-black text-lg px-2 flex items-center gap-2 text-black">
-          <Monitor className="w-5 h-5" />
-          Setup Instructions
+          Instructions
         </h3>
 
         <div className="bg-white border-[3px] border-black rounded-xl p-6 shadow-[6px_6px_0px_0px_#000] space-y-6">
