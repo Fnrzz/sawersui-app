@@ -179,5 +179,8 @@
     "newDonation": "Donasi Baru",
     "topSupporters": "Pendukung Teratas",
     "noDonations": "Belum ada donasi"
+  },
+  "DonationPage": {
+    "defaultDescription": "gue apresiasi banget lu udah ngecek halaman ini, semoga lu semua yang disini makin cepat tercapai apa yang diinginkan 🙏"
   }
 }
