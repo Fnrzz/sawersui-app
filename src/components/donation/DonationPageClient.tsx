@@ -7,6 +7,8 @@ import { useState } from "react";
 import { LoginModal } from "@/components/auth/LoginModal";
 import Image from "next/image";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 interface DonationPageProps {
   streamer: {
@@ -27,6 +29,7 @@ const containerVariants: Variants = {
 };
 
 export function DonationPageClient({ streamer }: DonationPageProps) {
+  const t = useTranslations("DonationPage");
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   if (!streamer) {
@@ -36,8 +39,13 @@ export function DonationPageClient({ streamer }: DonationPageProps) {
   return (
     <>
       <div className="min-h-screen flex flex-col bg-[#FEFCE8] font-sans">
+        {/* Helper Nav specific for donation page */}
+        <div className="absolute top-4 right-4 z-50">
+          <LanguageSwitcher />
+        </div>
+
         {/* Main Content */}
-        <div className="flex-1 flex flex-col items-center justify-start px-4 pb-20 pt-4">
+        <div className="flex-1 flex flex-col items-center justify-start px-4 pb-20 pt-16">
           {/* Profile Section (Outside Card) */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -58,8 +66,7 @@ export function DonationPageClient({ streamer }: DonationPageProps) {
             </h1>
 
             <p className="text-sm font-bold text-black/80 leading-relaxed max-w-md">
-              gue apresiasi banget lu udah ngecek halaman ini, semoga lu semua
-              yang disini makin cepat tercapai apa yang diinginkan 🙏
+              {t("defaultDescription")}
             </p>
           </motion.div>
 

@@ -179,5 +179,8 @@
     "newDonation": "New Donation",
     "topSupporters": "Top Supporters",
     "noDonations": "No donations yet"
+  },
+  "DonationPage": {
+    "defaultDescription": "I really appreciate you checking out this page, hope everyone here achieves what they want soon 🙏"
   }
 }
