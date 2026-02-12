@@ -43,7 +43,7 @@ export function LoginModal({
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
               transition={{ duration: 0.2 }}
-              className="w-full relative overflow-hidden rounded-2xl border bg-white border-border shadow-xl"
+              className="w-full relative overflow-hidden rounded-xl border-[3px] border-[#2a2a2a] bg-white shadow-[4px_4px_0px_0px_#2a2a2a]"
             >
               {/* Header */}
               <div className="p-6 text-center border-b border-border bg-amber-50">

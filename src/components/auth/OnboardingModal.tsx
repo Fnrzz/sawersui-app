@@ -65,7 +65,7 @@ export function OnboardingModal({
   return (
     <Dialog open={open} onOpenChange={() => {}}>
       <DialogContent
-        className="w-[calc(100%-32px)] max-w-sm mx-auto border border-border rounded-2xl p-0 overflow-hidden gap-0 bg-white shadow-xl"
+        className="w-[calc(100%-32px)] max-w-sm mx-auto border-[3px] border-[#2a2a2a] rounded-xl p-0 overflow-hidden gap-0 bg-white shadow-[4px_4px_0px_0px_#2a2a2a]"
         onInteractOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
