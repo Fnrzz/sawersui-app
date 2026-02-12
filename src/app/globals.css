@@ -6,8 +6,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-sans-var);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -44,75 +43,54 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
+  --color-orange: #f59e0b;
+  --color-orange-light: #fbbf24;
+  --color-orange-dark: #d97706;
 }
 
+/* ===== SAWERIA-INSPIRED WARM LIGHT THEME ===== */
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.141 0.005 285.823);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.141 0.005 285.823);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.141 0.005 285.823);
-  --primary: oklch(0.21 0.006 285.885);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.967 0.001 286.375);
-  --secondary-foreground: oklch(0.21 0.006 285.885);
-  --muted: oklch(0.967 0.001 286.375);
-  --muted-foreground: oklch(0.552 0.016 285.938);
-  --accent: oklch(0.967 0.001 286.375);
-  --accent-foreground: oklch(0.21 0.006 285.885);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.92 0.004 286.32);
-  --input: oklch(0.92 0.004 286.32);
-  --ring: oklch(0.705 0.015 286.067);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.141 0.005 285.823);
-  --sidebar-primary: oklch(0.21 0.006 285.885);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.967 0.001 286.375);
-  --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
-  --sidebar-border: oklch(0.92 0.004 286.32);
-  --sidebar-ring: oklch(0.705 0.015 286.067);
-}
-
-.dark {
-  --background: oklch(0.141 0.005 285.823);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.21 0.006 285.885);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.21 0.006 285.885);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.92 0.004 286.32);
-  --primary-foreground: oklch(0.21 0.006 285.885);
-  --secondary: oklch(0.274 0.006 286.033);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.274 0.006 286.033);
-  --muted-foreground: oklch(0.705 0.015 286.067);
-  --accent: oklch(0.274 0.006 286.033);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.552 0.016 285.938);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.21 0.006 285.885);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.274 0.006 286.033);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.552 0.016 285.938);
+  /* Warm white background */
+  --background: #ffffff;
+  --foreground: #1a1a1a;
+  /* Cards */
+  --card: #ffffff;
+  --card-foreground: #1a1a1a;
+  --popover: #ffffff;
+  --popover-foreground: #1a1a1a;
+  /* Primary orange — Saweria signature */
+  --primary: #f59e0b;
+  --primary-foreground: #ffffff;
+  /* Secondary */
+  --secondary: #fef3c7;
+  --secondary-foreground: #92400e;
+  /* Muted neutrals */
+  --muted: #f5f5f4;
+  --muted-foreground: #78716c;
+  /* Accent */
+  --accent: #fffbeb;
+  --accent-foreground: #92400e;
+  --destructive: #ef4444;
+  /* Borders — soft warm gray */
+  --border: #e7e5e4;
+  --input: #e7e5e4;
+  --ring: #f59e0b;
+  /* Charts */
+  --chart-1: #f59e0b;
+  --chart-2: #22c55e;
+  --chart-3: #3b82f6;
+  --chart-4: #a855f7;
+  --chart-5: #ef4444;
+  /* Sidebar — slightly warm off-white */
+  --sidebar: #fafaf9;
+  --sidebar-foreground: #1a1a1a;
+  --sidebar-primary: #f59e0b;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #fef3c7;
+  --sidebar-accent-foreground: #92400e;
+  --sidebar-border: #e7e5e4;
+  --sidebar-ring: #f59e0b;
 }
 
 @layer base {
@@ -124,35 +102,28 @@
   }
 }
 
-/* Mini-App Optimizations */
+/* Responsive Web App */
 @layer base {
   html {
-    /* Prevent pull-to-refresh on mobile */
-    overscroll-behavior: none;
-    /* Use dynamic viewport height for mobile browsers */
-    height: 100dvh;
+    height: 100%;
+    scroll-behavior: smooth;
   }
 
   body {
-    /* Smooth font rendering */
+    min-height: 100%;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    /* Prevent text selection on buttons/interactive elements */
     -webkit-tap-highlight-color: transparent;
-    /* Safe area insets for notched devices */
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
   }
 
-  /* Optimize touch targets */
-  button, a, [role="button"] {
+  button,
+  a,
+  [role="button"] {
     touch-action: manipulation;
   }
 }
 
-/* Custom scrollbar for mini-app feel */
+/* Scrollbar */
 @layer utilities {
   .scrollbar-hide {
     -ms-overflow-style: none;
@@ -163,40 +134,29 @@
   }
 }
 
-
-
-/* Override @mysten/dapp-kit ConnectButton for pixel design */
-.wallet-pixel-button button {
-  width: 100% !important;
-  padding: 0.75rem 1rem !important;
-  font-family: var(--font-pixel) !important;
-  font-size: 9px !important;
-  letter-spacing: 0.05em !important;
-  text-transform: uppercase !important;
-  border: 2px solid !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  transition: all 0.15s ease !important;
+/* Orange/Saweria utilities */
+@layer utilities {
+  .orange-gradient {
+    background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 50%, #f59e0b 100%);
+  }
+  .orange-glow {
+    box-shadow: 0 4px 14px 0 rgba(245, 158, 11, 0.25);
+  }
+  .sawer-banner {
+    background: #f59e0b;
+  }
 }
 
-.wallet-pixel-button.light-mode button {
-  background-color: #f3f4f6 !important;
-  color: #374151 !important;
-  border-color: #d1d5db !important;
+/* Top announcement banner animation */
+@keyframes scroll-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
-.wallet-pixel-button.light-mode button:hover {
-  background-color: #e5e7eb !important;
-  border-color: #9ca3af !important;
-}
-
-.wallet-pixel-button.dark-mode button {
-  background-color: #18181b !important;
-  color: #ffffff !important;
-  border-color: #3f3f46 !important;
-}
-
-.wallet-pixel-button.dark-mode button:hover {
-  background-color: #27272a !important;
-  border-color: #52525b !important;
+.animate-scroll-left {
+  animation: scroll-left 30s linear infinite;
 }

@@ -1,59 +1,48 @@
+"use client";
 
 import Link from "next/link";
 import { ArrowUpRight, Bell, Trophy, ArrowLeft } from "lucide-react";
+import { MenuCard } from "@/components/dashboard/MenuCard";
 
 export default function OBSSettingsPage() {
   return (
-    <div className="p-4 space-y-6">
-       {/* Header */}
-       <div className="flex items-center gap-4 mb-2">
-        <Link 
+    <div className="space-y-6">
+      <div className="flex flex-col gap-4">
+        <Link
           href="/dashboard"
-          className="p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors"
+          className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors w-fit"
         >
-          <ArrowLeft className="w-6 h-6" />
+          <ArrowLeft className="w-4 h-4" />
+          Back to Dashboard
         </Link>
         <div>
-          <h1 className="text-xl font-bold font-[family-name:var(--font-pixel)]">OBS SETTINGS</h1>
+          <h1 className="text-2xl font-extrabold text-foreground">
+            Pengaturan OBS
+          </h1>
+          <p className="text-muted-foreground text-sm mt-1">
+            Konfigurasi overlay untuk streaming kamu
+          </p>
         </div>
       </div>
 
-      <div className="space-y-4">
-         <div className="space-y-3">
-            {[
-              { 
-                title: "Notification Overlay", 
-                desc: "Alert box when donation comes in",
-                icon: Bell,
-                color: "bg-orange-100 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400",
-                href: "/dashboard/obs/overlay"
-              },
-              { 
-                title: "Leaderboard Overlay", 
-                desc: "Top donor leaderboard",
-                icon: Trophy,
-                color: "bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400",
-                href: "/dashboard/obs/leaderboard"
-              }
-            ].map((item, i) => (
-              <Link 
-                key={i} 
-                href={item.href}
-                className="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-gray-100 dark:border-white/5 flex items-center justify-between group cursor-pointer hover:border-gray-200 dark:hover:border-white/10 transition-colors"
-              >
-                 <div className="flex items-center gap-4">
-                   <div className={`w-14 h-14 rounded-full ${item.color} flex items-center justify-center`}>
-                     <item.icon className="w-7 h-7" />
-                   </div>
-                   <div>
-                     <h3 className="font-bold text-base">{item.title}</h3>
-                     <p className="text-xs text-gray-500">{item.desc}</p>
-                   </div>
-                 </div>
-                 <ArrowUpRight className="w-6 h-6 text-gray-300 group-hover:text-gray-500 transition-colors" />
-              </Link>
-            ))}
-         </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Notifikasi Overlay - Cyan */}
+        <MenuCard
+          title="Notifikasi Overlay"
+          description="Alert box real-time saat ada donasi masuk. Wajib dipasang!"
+          icon={Bell}
+          colorClass="bg-[#BAE6FD]" // Cyan-200ish
+          href="/dashboard/obs/overlay"
+        />
+
+        {/* Leaderboard Overlay - Orange */}
+        <MenuCard
+          title="Leaderboard Overlay"
+          description="Tampilkan klasemen pendukung terbanyak di stream kamu."
+          icon={Trophy}
+          colorClass="bg-[#FED7AA]" // Orange-200ish
+          href="/dashboard/obs/leaderboard"
+        />
       </div>
     </div>
   );

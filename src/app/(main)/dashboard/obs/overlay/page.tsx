@@ -59,20 +59,22 @@ export default async function OverlayTutorialPage() {
       </div>
 
       {/* URL Card */}
-      <div className="bg-white dark:bg-zinc-900 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-white/5 space-y-4">
+      <div className="bg-white border-[3px] border-black rounded-xl p-6 shadow-[6px_6px_0px_0px_#000] space-y-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-orange-100 dark:bg-orange-900/20 flex items-center justify-center text-orange-600 dark:text-orange-400">
+          <div className="w-10 h-10 rounded-lg border-2 border-black bg-orange-100 flex items-center justify-center text-black">
             <Bell className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="font-bold text-lg">Notification URL</h2>
-            <p className="text-xs text-gray-500">Copy this link to OBS</p>
+            <h2 className="font-black text-lg text-black">Notification URL</h2>
+            <p className="text-xs font-bold text-black/60">
+              Copy this link to OBS
+            </p>
           </div>
         </div>
 
         <UrlCopy url={overlayUrl} />
 
-        <div className="p-3 bg-red-50 dark:bg-red-900/10 rounded-xl border border-red-100 dark:border-red-900/20 text-xs text-red-600 dark:text-red-400">
+        <div className="p-3 bg-red-100 rounded-lg border-2 border-black text-xs font-bold text-black">
           ⚠️ <strong>Keep this URL private!</strong> Anyone with this link can
           trigger alerts on your stream.
         </div>
@@ -83,12 +85,12 @@ export default async function OverlayTutorialPage() {
 
       {/* Instructions */}
       <div className="space-y-4">
-        <h3 className="font-bold text-lg px-2 flex items-center gap-2">
+        <h3 className="font-black text-lg px-2 flex items-center gap-2 text-black">
           <Monitor className="w-5 h-5" />
           Setup Instructions
         </h3>
 
-        <div className="bg-white dark:bg-zinc-900 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-white/5 space-y-6">
+        <div className="bg-white border-[3px] border-black rounded-xl p-6 shadow-[6px_6px_0px_0px_#000] space-y-6">
           {[
             {
               step: 1,
@@ -112,12 +114,14 @@ export default async function OverlayTutorialPage() {
             },
           ].map((item) => (
             <div key={item.step} className="flex gap-4">
-              <div className="w-8 h-8 rounded-full bg-black dark:bg-white text-white dark:text-black flex items-center justify-center font-bold font-mono text-sm shrink-0">
+              <div className="w-8 h-8 rounded-lg border-2 border-black bg-black text-white flex items-center justify-center font-black font-mono text-sm shrink-0 shadow-[2px_2px_0px_0px_#000]">
                 {item.step}
               </div>
               <div>
-                <h4 className="font-bold text-sm mb-1">{item.title}</h4>
-                <p className="text-xs text-gray-500 leading-relaxed">
+                <h4 className="font-black text-sm mb-1 text-black">
+                  {item.title}
+                </h4>
+                <p className="text-xs font-medium text-black/70 leading-relaxed">
                   {item.desc}
                 </p>
               </div>

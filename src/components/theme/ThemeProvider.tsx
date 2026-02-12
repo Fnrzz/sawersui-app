@@ -1,8 +1,8 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext } from "react";
 
-type Theme = "light" | "dark";
+type Theme = "light";
 
 interface ThemeContextType {
   theme: Theme;
@@ -12,24 +12,8 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("dark");
-
-  useEffect(() => {
-    const stored = localStorage.getItem("theme") as Theme;
-    if (stored) {
-      // eslint-disable-next-line
-      setTheme(stored);
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("theme", theme);
-    document.documentElement.classList.toggle("dark", theme === "dark");
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
-  };
+  const theme: Theme = "light";
+  const toggleTheme = () => {}; // no-op, kept for API compat
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
