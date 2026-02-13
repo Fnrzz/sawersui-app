@@ -57,7 +57,7 @@ function DocsNavContent({ onLinkClick }: DocsNavContentProps) {
       <div className="mb-6 flex items-center justify-between">
         <Link
           href="/"
-          className="flex items-center text-sm font-medium text-[#606770] hover:text-[#410891] transition-colors"
+          className="flex items-center text-sm font-medium text-[#606770] hover:text-primary transition-colors"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
           {t("BackToHome")}
@@ -76,9 +76,9 @@ function DocsNavContent({ onLinkClick }: DocsNavContentProps) {
                 href={item.href}
                 onClick={onLinkClick}
                 className={cn(
-                  "group flex w-full items-center rounded-md border border-transparent px-2 py-1.5 hover:bg-[#EAEAEA] hover:text-[#410891]",
+                  "group flex w-full items-center rounded-md border border-transparent px-2 py-1.5 hover:bg-[#EAEAEA] hover:text-primary",
                   pathname === item.href
-                    ? "font-bold text-[#410891] bg-white border-[#E5E7EB] shadow-sm"
+                    ? "font-bold text-primary bg-white border-[#E5E7EB] shadow-sm"
                     : "text-[#606770]",
                 )}
               >
@@ -114,7 +114,7 @@ export function MobileDocsSidebar() {
       </SheetTrigger>
       <SheetContent side="left" className="w-[300px] sm:w-[400px] p-0">
         <SheetHeader className="px-6 pt-6">
-          <SheetTitle className="text-left text-[#410891] font-extrabold">
+          <SheetTitle className="text-left text-primary font-extrabold">
             {t("title")}
           </SheetTitle>
         </SheetHeader>
