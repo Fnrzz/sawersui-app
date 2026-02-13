@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { LoginModal } from "@/components/auth/LoginModal";
-import { AboutModal } from "@/components/home/AboutModal";
 import { useTranslations } from "next-intl";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 import { motion, Variants } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
+import { Link } from "@/i18n/routing";
 import { useRouter } from "next/navigation";
 import {
   Zap,
@@ -19,6 +19,7 @@ import {
   Flag,
   Gem,
 } from "lucide-react";
+import { Marquee } from "@/components/ui/Marquee";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -41,7 +42,6 @@ export function HomePage() {
   const t = useTranslations("HomePage");
   const router = useRouter();
   const [loginModalOpen, setLoginModalOpen] = useState(false);
-  const [aboutModalOpen, setAboutModalOpen] = useState(false);
 
   useEffect(() => {
     const checkUser = async () => {
@@ -86,12 +86,7 @@ export function HomePage() {
       </div>
 
       {/* Top Announcement Banner */}
-      <div className="sawer-banner text-white py-2 overflow-hidden">
-        <div className="animate-scroll-left whitespace-nowrap flex">
-          <span className="text-sm font-medium px-8">{t("banner")}</span>
-          <span className="text-sm font-medium px-8">{t("banner")}</span>
-        </div>
-      </div>
+      <Marquee />
 
       {/* Hero Section */}
       <motion.section
@@ -137,12 +132,12 @@ export function HomePage() {
           >
             {t("hero.loginButton")}
           </button>
-          <button
-            onClick={() => setAboutModalOpen(true)}
-            className="px-12 py-3.5 text-base font-bold rounded-md bg-white text-[#1a1a1a] border-[3px] border-[#2a2a2a] shadow-[4px_4px_0px_0px_#2a2a2a] hover:shadow-[2px_2px_0px_0px_#2a2a2a] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all"
+          <Link
+            href="/docs"
+            className="px-12 py-3.5 text-base font-bold rounded-md bg-white text-[#1a1a1a] border-[3px] border-[#2a2a2a] shadow-[4px_4px_0px_0px_#2a2a2a] hover:shadow-[2px_2px_0px_0px_#2a2a2a] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all text-center"
           >
-            {t("hero.aboutButton")}
-          </button>
+            {t("hero.docsButton")}
+          </Link>
         </motion.div>
       </motion.section>
 
@@ -260,7 +255,6 @@ export function HomePage() {
       </motion.section>
 
       <LoginModal open={loginModalOpen} onOpenChange={setLoginModalOpen} />
-      <AboutModal open={aboutModalOpen} onOpenChange={setAboutModalOpen} />
     </div>
   );
 }

@@ -6,7 +6,7 @@
       "subtitle": "penontonmu!",
       "description": "Platform donasi Web3 di Sui Network untuk para streamer dan kreator konten Indonesia.",
       "loginButton": "Masuk / Daftar",
-      "aboutButton": "Tentang"
+      "docsButton": "Docs"
     },
     "features": {
       "title": "Kenapa",
@@ -114,7 +114,7 @@
     "placeholderName": "Nama Kamu",
     "placeholderMessage": "Selamat pagi",
     "ageCheck": "Saya berusia 17 tahun atau lebih",
-    "agreedCheck": "Saya memahami dan menyetujui bahwa dukungan ini saya berikan secara sukarela, tidak dapat dikembalikan, bukan transaksi komersial, tidak digunakan untuk aktivitas ilegal, serta telah sesuai dengan syarat dan ketentuan & kebijakan privasi sawersui.co",
+    "agreedCheck": "Saya memahami dan menyetujui bahwa dukungan ini saya berikan secara sukarela, tidak dapat dikembalikan, bukan transaksi komersial, tidak digunakan untuk aktivitas ilegal, serta telah sesuai dengan syarat dan ketentuan & kebijakan privasi sawersui.vercel.app",
     "loginButton": "Login Aja",
     "submitButton": "Kirim Dukungan",
     "balance": "Balance",
@@ -184,7 +184,7 @@
     "notFound": "Profil tidak ditemukan"
   },
   "Modals": {
-    "About": {
+    "Docs": {
       "title": "Tentang SawerSui",
       "subtitle": "Platform Donasi Generasi Baru",
       "desc1": "SawerSui adalah platform donasi livestream terdesentralisasi yang dibangun di <bold>Sui Network</bold>.",
@@ -221,5 +221,308 @@
   },
   "DonationPage": {
     "defaultDescription": "gue apresiasi banget lu udah ngecek halaman ini, semoga lu semua yang disini makin cepat tercapai apa yang diinginkan 🙏"
+  },
+  "DocsPage": {
+    "title": "SawerSui",
+    "subtitle": "Platform Donasi Web3 Pertama di Sui Network. Memberdayakan kreator dengan donasi instan, minim biaya, dan tergamifikasi.",
+    "badges": {
+      "beta": "Beta",
+      "network": "Sui"
+    },
+    "Introduction": {
+      "title": "Pengantar",
+      "p1": "<bold>SawerSui</bold> adalah platform donasi generasi baru yang dirancang khusus untuk streamer dan konten kreator. Ini menjembatani kesenjangan antara monetisasi konten tradisional dan web terdesentralisasi.",
+      "p2": "Dengan memanfaatkan <bold>Sui Network</bold>, SawerSui mengatasi masalah umum platform donasi tradisional — biaya tinggi, waktu penyelesaian lambat, dan kurangnya transparansi — sambil memperkenalkan fitur native Web3 seperti hadiah NFT dan milestone terdesentralisasi.",
+      "quote": "Jembatan interaksi dengan penontonmu."
+    },
+    "Solution": {
+      "title": "Solusi",
+      "Traditional": {
+        "title": "Platform Tradisional",
+        "li1": "<bold>Biaya Tinggi:</bold> Potongan hingga 10-30% dari pendapatan.",
+        "li2": "<bold>Payout Lambat:</bold> Net-30 atau batas penarikan bulanan.",
+        "li3": "<bold>Ribet:</bold> Pendaftaran rumit & syarat rekening bank."
+      },
+      "SawerSui": {
+        "title": "Solusi SawerSui",
+        "li1": "<bold>Biaya Rendah:</bold> 5% fee platform & 0 gas fee.",
+        "li2": "<bold>Settlement Instan:</bold> Langsung masuk ke wallet seketika.",
+        "li3": "<bold>Onboarding Mudah:</bold> Login dengan Google (zkLogin)."
+      }
+    },
+    "Features": {
+      "title": "Fitur Utama",
+      "Overlays": {
+        "title": "Overlay Real-time",
+        "desc": "Terhubung mulus dengan OBS atau Streamlabs. Notifikasi donasi muncul instan di layar, ditenagai oleh indexing blockchain langsung."
+      },
+      "GasFree": {
+        "title": "Donasi Bebas Gas",
+        "desc": "Menggunakan Sponsored Transactions Sui, donatur membayar <bold>0 gas fee</bold>. Kamu menerima 100% dari jumlah donasi yang dimaksud (dikurangi fee platform)."
+      },
+      "zkLogin": {
+        "title": "zkLogin (Google)",
+        "desc": "Tidak perlu private key. Pengguna masuk dengan akun Google mereka yang sudah ada, membuat Web3 tidak terlihat dan dapat diakses oleh semua orang."
+      },
+      "Stablecoin": {
+        "title": "Pendapatan Stabil",
+        "desc": "Terima <bold>USDC</bold> untuk menghindari volatilitas kripto. Jaga pendapatanmu tetap stabil tanpa peduli kondisi pasar."
+      }
+    },
+    "Architecture": {
+      "title": "Arsitektur",
+      "Frontend": {
+        "label": "Frontend:",
+        "val": "Next.js 16 (App Router) & Tailwind CSS v4"
+      },
+      "Blockchain": {
+        "label": "Blockchain:",
+        "val": "Sui Move Smart Contracts"
+      },
+      "Auth": {
+        "label": "Auth:",
+        "val": "Enoki / zkLogin (Google)"
+      },
+      "Backend": {
+        "label": "Backend:",
+        "val": "Supabase (Real-time Events & Indexing)"
+      }
+    },
+    "Roadmap": {
+      "title": "Peta Jalan",
+      "Phase1": {
+        "label": "Fase 1",
+        "title": "Fondasi (Saat Ini)",
+        "desc": "Donasi USDC Dasar, Alert OBS, Leaderboard, Login Google, Milestone."
+      },
+      "Phase2": {
+        "label": "Fase 2",
+        "title": "Engagement",
+        "desc": "\"Mediashare\" (Request video/musik dengan donasi)."
+      },
+      "Phase3": {
+        "label": "Fase 3",
+        "title": "Ekspansi",
+        "desc": "Mobile PWA, Dukungan Multi-chain (Bridge), Alat Kreator."
+      }
+    }
+  },
+  "GettingStartedPage": {
+    "title": "Mulai Sekarang",
+    "subtitle": "Mulai perjalanan kamu dengan SawerSui sebagai Streamer atau Suporter.",
+    "Streamers": {
+      "title": "Untuk Streamer (Kreator)",
+      "Step1": {
+        "title": "1. Masuk & Hubungkan",
+        "desc": "Masuk menggunakan <bold>Google (zkLogin)</bold> untuk pengalaman yang mulus atau hubungkan Dompet Sui kamu. Tidak ada biaya pendaftaran."
+      },
+      "Step2": {
+        "title": "2. Lengkapi Profil",
+        "desc": "Saat login pertama kali, kamu akan diminta untuk mengatur <bold>Username</bold> dan <bold>Nama Tampilan</bold>. Username ini akan menjadi link donasi kamu: `sawersui.vercel.app/username`."
+      },
+      "Step3": {
+        "title": "3. Pasang Overlay OBS",
+        "desc": "Pergi ke menu <bold>Dashboard > Overlay</bold>. Salin Overlay URL unik kamu dan tambahkan sebagai 'Browser Source' di OBS/Streamlabs. (Rekomendasi Ukuran: 500x500)."
+      }
+    },
+    "Supporters": {
+      "title": "Untuk Suporter (Donatur)",
+      "Step1": {
+        "title": "1. Cari Kreator",
+        "desc": "Kunjungi halaman profil streamer favorit kamu (contoh: `sawersui.vercel.app/username`)."
+      },
+      "Step2": {
+        "title": "2. Kirim Dukungan",
+        "desc": "Kamu bisa donasi menggunakan <bold>Sui Wallet</bold> atau login dengan <bold>Google</bold> untuk menggunakan saldo sosialmu. Masukkan jumlah USDC dan pesan."
+      },
+      "Step3": {
+        "title": "3. Tanpa Biaya Gas",
+        "desc": "Nikmati <bold>0 gas fee</bold> saat donasi. Jumlah yang kamu kirim adalah yang diterima kreator (dikurangi fee platform)."
+      }
+    }
+  },
+  "DonationGuidePage": {
+    "title": "Panduan Donasi",
+    "subtitle": "Segala hal yang perlu kamu tahu tentang menerima dan mengirim dukungan di SawerSui.",
+    "Overview": {
+      "title": "Cara Kerja",
+      "p1": "SawerSui memfasilitasi donasi <bold>Peer-to-Peer (P2P)</bold> langsung. Ketika pendukung mengirim dana, dana tersebut langsung masuk dari wallet mereka ke wallet/akun streamer.",
+      "p2": "Saat ini kami mendukung <bold>USDC</bold> (USD Coin) di jaringan Sui untuk memastikan nilai yang stabil bagi kreator."
+    },
+    "Methods": {
+      "title": "Metode Donasi",
+      "Wallet": {
+        "title": "Via Sui Wallet",
+        "desc": "Hubungkan wallet Sui standar (Sui Wallet, Nightly, dll). Ideal untuk pengguna Web3."
+      },
+      "Google": {
+        "title": "Via Google (zkLogin)",
+        "desc": "Donatur bisa login dengan Google. Wallet sementara dibuat untuk sesi tersebut, memudahkan pengguna non-kripto."
+      }
+    },
+    "Fees": {
+      "title": "Biaya & Settlement",
+      "Platform": {
+        "title": "Fee Platform",
+        "val": "5%",
+        "desc": "Dipotong otomatis untuk mendukung pengembangan."
+      },
+      "Gas": {
+        "title": "Gas Fee",
+        "val": "0 (Gratis)",
+        "desc": "Kami mensponsori 100% biaya gas untuk semua donasi."
+      },
+      "Settlement": {
+        "title": "Settlement",
+        "val": "Instan",
+        "desc": "Dana sampai dalam hitungan detik. Tidak ada masa tunggu."
+      }
+    }
+  },
+  "MilestonesGuidePage": {
+    "title": "Milestone",
+    "subtitle": "Tetapkan target, ajak komunitasmu, dan beri mereka hadiah NFT.",
+    "Overview": {
+      "title": "Apa itu Milestone?",
+      "p1": "Milestone adalah target penggalangan dana yang bisa kamu buat (contoh: 'Mikrofon Baru', 'Charity'). Ini muncul sebagai progress bar di overlay.",
+      "p2": "Ketika milestone tercapai, akan ada selebrasi spesial di stream kamu!"
+    },
+    "Setup": {
+      "title": "Cara Mengatur",
+      "Step1": {
+        "title": "1. Buat Milestone",
+        "desc": "Buka <bold>Dashboard > Milestone</bold>. Klik 'Buat Baru' dan isi detail seperti Judul, Target (USDC), dan NFT Reward."
+      },
+      "Step2": {
+        "title": "2. Pasang di Overlay",
+        "desc": "Salin URL Overlay Milestone dan tambahkan sebagai 'Browser Source' di OBS. Kamu bisa letakkan di mana saja."
+      },
+      "Step3": {
+        "title": "3. Promosikan",
+        "desc": "Beritahu penontonmu! Progress bar akan update secara real-time saat donasi masuk."
+      }
+    },
+    "Gamification": {
+      "title": "Gamifikasi & Hadiah",
+      "NFT": {
+        "title": "Hadiah NFT",
+        "desc": "Pendukung yang berkontribusi pada milestone akan menerima <bold>NFT Milestone SawerSui</bold> unik sebagai bukti dukungan saat target tercapai."
+      },
+      "Leaderboard": {
+        "title": "Pendukung Teratas",
+        "desc": "Overlay milestone menyoroti kontributor terbesar, memberikan mereka pengakuan lebih di stream kamu."
+      }
+    }
+  },
+  "LeaderboardGuidePage": {
+    "title": "Leaderboard",
+    "subtitle": "Berikan pengakuan kepada pendukung teratasmu secara real-time.",
+    "Overview": {
+      "title": "Apa itu Leaderboard?",
+      "p1": "Leaderboard adalah widget yang menampilkan donatur teratas kamu. Ini mendorong kompetisi dan memberikan apresiasi kepada pendukung paling setia.",
+      "p2": "Update secara instan setiap ada donasi baru, menjaga stream kamu tetap menarik."
+    },
+    "Setup": {
+      "title": "Cara Mengatur",
+      "Step1": {
+        "title": "1. Akses Pengaturan",
+        "desc": "Buka <bold>Dashboard > OBS > Leaderboard</bold>. Di sini kamu bisa melihat preview tampilan overlay."
+      },
+      "Step2": {
+        "title": "2. Kustomisasi",
+        "desc": "Pilih dan sesuaikan warna agar cocok dengan brand kamu."
+      },
+      "Step3": {
+        "title": "3. Pasang di OBS",
+        "desc": "Salin URL Overlay unik. Di OBS, tambahkan 'Browser Source' baru dan paste URL tersebut. Kami menyarankan layout vertikal."
+      }
+    },
+    "Features": {
+      "title": "Fitur Utama",
+      "Realtime": {
+        "title": "Update Real-time",
+        "desc": "Tidak perlu refresh. Donasi baru langsung muncul di daftar seketika."
+      },
+      "Customizable": {
+        "title": "Kustomisasi Penuh",
+        "desc": "Ubah warna background, teks, dan rank sesuai estetika stream kamu."
+      }
+    }
+  },
+  "FAQPage": {
+    "title": "FAQ",
+    "subtitle": "Pertanyaan umum seputar SawerSui.",
+    "General": {
+      "title": "Umum",
+      "Q1": {
+        "q": "Apa itu SawerSui?",
+        "a": "SawerSui adalah platform donasi untuk streamer di jaringan Sui. Kamu bisa menerima dukungan USDC dengan notifikasi real-time."
+      },
+      "Q2": {
+        "q": "Apakah aman?",
+        "a": "Ya. Kami menggunakan blockchain Sui untuk semua transaksi. Kami tidak menahan dana kamu (non-custodial untuk pengguna wallet). Login Google menggunakan zkLogin untuk keamanan maksimal."
+      }
+    },
+    "Streamers": {
+      "title": "Untuk Streamer",
+      "Q1": {
+        "q": "Berapa biayanya?",
+        "a": "Fee platform 5%. Biaya gas disponsori (gratis untuk kamu dan donatur)."
+      },
+      "Q2": {
+        "q": "Bagaimana cara mencairkan dana?",
+        "a": "Jika pakai wallet, dana sudah ada di walletmu! Jika pakai Google, buka Dashboard dan klik 'Withdraw' untuk kirim USDC ke alamat Sui manapun atau exchange (Indodax/Tokocrypto)."
+      }
+    },
+    "Supporters": {
+      "title": "Untuk Donatur",
+      "Q1": {
+        "q": "Perlu crypto wallet?",
+        "a": "Tidak! Kamu bisa login dengan akun Google. Kamu hanya perlu top-up USDC atau minta teman kirimkan."
+      },
+      "Q2": {
+        "q": "Kenapa Sui Network?",
+        "a": "Sui menawarkan kecepatan instan dan biaya murah, sangat cocok untuk interaksi real-time seperti donasi stream."
+      }
+    }
+  },
+  "TermsPage": {
+    "title": "Syarat & Ketentuan",
+    "subtitle": "Mohon baca syarat ini dengan seksama sebelum menggunakan SawerSui.",
+    "Agreement": {
+      "title": "1. Persetujuan Syarat",
+      "p": "Dengan mengakses atau menggunakan SawerSui, kamu setuju untuk terikat oleh Syarat ini. Jika kamu tidak setuju dengan bagian mana pun, kamu tidak boleh mengakses layanan ini."
+    },
+    "UserObligations": {
+      "title": "2. Kewajiban Pengguna",
+      "p": "Kamu setuju untuk tidak menggunakan platform untuk aktivitas ilegal, termasuk namun tidak terbatas pada pencucian uang, pendanaan terorisme, atau pelecehan. Kamu bertanggung jawab atas keamanan akun Google dan/atau private key kamu."
+    },
+    "Payments": {
+      "title": "3. Pembayaran & Donasi",
+      "p1": "<bold>Tidak Dapat Dibatalkan:</bold> Semua transaksi di blockchain Sui bersifat final dan tidak dapat dibatalkan.",
+      "p2": "<bold>Biaya:</bold> Fee platform sebesar 5% dipotong secara otomatis dari setiap donasi untuk mendukung pengembangan.",
+      "p3": "<bold>Pajak:</bold> Pengguna bertanggung jawab penuh atas pajak yang berlaku untuk transaksi mereka."
+    },
+    "Disclaimer": {
+      "title": "4. Penafian (Disclaimer)",
+      "p": "SawerSui disediakan 'SEBAGAIMANA ADANYA'. Kami tidak bertanggung jawab atas kerugian akibat kegagalan blockchain, kesalahan wallet, atau layanan pihak ketiga."
+    }
+  },
+  "DocsSidebar": {
+    "BackToHome": "Kembali ke Beranda",
+    "Sections": {
+      "Introduction": "Pengenalan",
+      "Platform": "Platform",
+      "Resources": "Sumber Daya"
+    },
+    "Links": {
+      "About": "Tentang SawerSui",
+      "GettingStarted": "Mulai Menggunakan",
+      "Donations": "Donasi",
+      "Milestones": "Milestone",
+      "Leaderboard": "Leaderboard",
+      "FAQ": "FAQ",
+      "Terms": "Syarat & Ketentuan"
+    }
   }
 }
