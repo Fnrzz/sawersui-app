@@ -7,39 +7,29 @@ export function useZkLogin() {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userAddress, setUserAddress] = useState<string | null>(null);
-  const [needsRegistration, setNeedsRegistration] = useState(false);
-  const [isCheckingProfile, setIsCheckingProfile] = useState(false);
   const router = useRouter();
   const mounted = useRef(false);
 
   useEffect(() => {
     mounted.current = true;
-    
+
     const initSession = async () => {
       try {
-        if (window.location.hash.includes("id_token") || window.location.search.includes("id_token")) {
-           await enokiFlow.handleAuthCallback();
-           window.history.replaceState(null, '', window.location.pathname);
+        if (
+          window.location.hash.includes("id_token") ||
+          window.location.search.includes("id_token")
+        ) {
+          await enokiFlow.handleAuthCallback();
+          window.history.replaceState(null, "", window.location.pathname);
         }
 
         const session = await enokiFlow.getSession();
-        
+
         if (session && session.jwt) {
           setIsAuthenticated(true);
-          const keypair = await enokiFlow.getKeypair({ network: 'testnet' });
+          const keypair = await enokiFlow.getKeypair({ network: "testnet" });
           const address = keypair.toSuiAddress();
           setUserAddress(address);
-
-          // Check Profile in DB
-          setIsCheckingProfile(true);
-          
-          import("@/lib/actions/auth").then(async ({ checkProfileByAddress }) => {
-              const { exists } = await checkProfileByAddress(address);
-              if (!exists) {
-                  setNeedsRegistration(true);
-              }
-              if (mounted.current) setIsCheckingProfile(false);
-          });
         }
       } catch (error) {
         console.error("Enoki Session/Callback Error:", error);
@@ -50,16 +40,21 @@ export function useZkLogin() {
 
     initSession();
 
-    return () => { mounted.current = false; };
+    return () => {
+      mounted.current = false;
+    };
   }, []);
 
   const login = async (redirectPath?: string) => {
     try {
       setIsLoading(true);
-      
+
       // Store redirect path for callback
-      if (typeof window !== 'undefined') {
-         sessionStorage.setItem('zk_redirect_path', redirectPath || "/dashboard");
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem(
+          "zk_redirect_path",
+          redirectPath || "/dashboard",
+        );
       }
 
       const url = await enokiFlow.createAuthorizationURL({
@@ -90,36 +85,34 @@ export function useZkLogin() {
   };
 
   const loginToSupabase = async () => {
-      try {
-          const keypair = await enokiFlow.getKeypair({ network: 'testnet' });
-          const address = keypair.toSuiAddress();
-          
-          // Timestamp for nonce
-          const nonce = Date.now().toString();
-          const message = `Login to SawerSui. Nonce: ${nonce}`;
-          const messageBytes = new TextEncoder().encode(message);
-          
-          const { signature } = await keypair.signPersonalMessage(messageBytes);
-          
-          // Dynamically import server action
-          const { verifyWalletLogin } = await import("@/lib/actions/auth");
-          
-          const result = await verifyWalletLogin(address, signature, message);
-          return result;
-      } catch (e) {
-          console.error("Supabase Login Failed:", e);
-          return { success: false, error: "Failed to sign in to Supabase" };
-      }
+    try {
+      const keypair = await enokiFlow.getKeypair({ network: "testnet" });
+      const address = keypair.toSuiAddress();
+
+      // Timestamp for nonce
+      const nonce = Date.now().toString();
+      const message = `Login to SawerSui. Nonce: ${nonce}`;
+      const messageBytes = new TextEncoder().encode(message);
+
+      const { signature } = await keypair.signPersonalMessage(messageBytes);
+
+      // Dynamically import server action
+      const { verifyWalletLogin } = await import("@/lib/actions/auth");
+
+      const result = await verifyWalletLogin(address, signature, message);
+      return result;
+    } catch (e) {
+      console.error("Supabase Login Failed:", e);
+      return { success: false, error: "Failed to sign in to Supabase" };
+    }
   };
 
-  return { 
-    login, 
-    logout, 
+  return {
+    login,
+    logout,
     loginToSupabase,
-    isLoading, 
-    isAuthenticated, 
+    isLoading,
+    isAuthenticated,
     userAddress,
-    needsRegistration,
-    isCheckingProfile
   };
 }
