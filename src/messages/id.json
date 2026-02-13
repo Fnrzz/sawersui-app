@@ -173,6 +173,19 @@
       "signing": "Menandatangani...",
       "or": "atau",
       "googleLogin": "Masuk dengan Google"
+    },
+    "Onboarding": {
+      "title": "Selamat Datang! 👋",
+      "subtitle": "Buat profil streamer kamu",
+      "username": "Username",
+      "usernameHint": "Huruf kecil, angka, dan underscore",
+      "displayName": "Nama Tampilan",
+      "displayNamePlaceholder": "Nama tampilan kamu",
+      "submitButton": "Mulai Sekarang 🚀",
+      "error": {
+        "generic": "Gagal memperbarui profil",
+        "registrationFailed": "Registrasi gagal"
+      }
     }
   },
   "Overlay": {
