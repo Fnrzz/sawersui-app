@@ -26,6 +26,26 @@
       "usdcStablecoin": {
         "title": "USDC Stablecoin",
         "desc": "Donasi pakai USDC — stabil, aman, dan bisa di-withdraw kapan saja."
+      },
+      "platform": {
+        "title": "Segalanya Untukmu",
+        "subtitle": "Fitur Platform",
+        "donation": {
+          "title": "Donasi Stream",
+          "desc": "Terima dukungan dalam SUI & USDC dengan notifikasi real-time."
+        },
+        "leaderboard": {
+          "title": "Live Leaderboard",
+          "desc": "Pamerkan pendukung teratas secara langsung di stream kamu."
+        },
+        "milestone": {
+          "title": "Target Milestone",
+          "desc": "Pasang target donasi dan pantau progres bersama komunitasmu."
+        },
+        "nft": {
+          "title": "Hadiah NFT",
+          "desc": "Minting NFT otomatis untuk pendukung ketikan milestone tercapai."
+        }
       }
     }
   },
@@ -86,6 +106,7 @@
     }
   },
   "DonationForm": {
+    "logout": "Keluar",
     "nominal": "Nominal:",
     "from": "Dari:",
     "message": "Pesan:",
@@ -104,7 +125,8 @@
     "successDesc": "Terima kasih sudah mendukung {name}!",
     "poweredBy": "Powered by <brand>SawerSui</brand> on Sui Network",
     "minDonation": "Minimum donation is $0.50 USDC",
-    "agreementError": "Mohon setujui syarat dan ketentuan."
+    "agreementError": "Mohon setujui syarat dan ketentuan.",
+    "viewTransaction": "Lihat Transaksi"
   },
   "Settings": {
     "livePreview": "Live Preview",
@@ -148,6 +170,10 @@
     "leaderboard": {
       "title": "Leaderboard Overlay",
       "desc": "Tampilkan klasemen pendukung terbanyak di stream kamu."
+    },
+    "milestone": {
+      "title": "Overlay Milestone",
+      "desc": "Buat target donasi dan berikan hadiah untuk pendukung."
     }
   },
   "Profile": {

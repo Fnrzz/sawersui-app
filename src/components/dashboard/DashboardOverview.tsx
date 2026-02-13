@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useDisconnectWallet } from "@mysten/dapp-kit";
@@ -11,16 +11,14 @@ import {
   Share2,
   History,
   User,
-  ExternalLink,
-  Copy,
   Wallet,
   LogOut,
+  Flag,
 } from "lucide-react";
 import { toast } from "sonner";
 import { motion, Variants } from "framer-motion";
 import { MenuCard } from "@/components/dashboard/MenuCard";
 import { WithdrawModal } from "@/components/dashboard/WithdrawModal";
-import { Loader2 } from "lucide-react";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -81,7 +79,7 @@ export function DashboardOverview({
 
       router.push("/");
       toast.success(t("toast.logoutSuccess"));
-    } catch (error) {
+    } catch {
       toast.error("Error logging out");
     }
   };
@@ -177,6 +175,15 @@ export function DashboardOverview({
           icon={History}
           colorClass="bg-[#FED7AA]" // Orange-200ish
           href="/dashboard/history"
+        />
+
+        {/* Milestone List - Purple */}
+        <MenuCard
+          title="Milestone History"
+          description="Manage your past and active milestones."
+          icon={Flag}
+          colorClass="bg-[#E9D5FF]" // Purple-200ish
+          href="/dashboard/milestone"
         />
       </motion.div>
 

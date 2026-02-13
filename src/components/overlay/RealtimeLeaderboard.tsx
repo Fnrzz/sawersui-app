@@ -29,26 +29,11 @@ export function RealtimeLeaderboard({
     previewSettings || null,
   );
 
-  // If previewSettings changes, update state
-  useEffect(() => {
-    if (previewSettings) {
-      setSettings(previewSettings);
-    }
-  }, [previewSettings]);
-
   // Fetch settings on mount if not provided and not preview
   useEffect(() => {
     if (!previewSettings && streamerId !== "preview") {
       fetchSettings(streamerId).then((s) => {
         setSettings(s);
-      });
-    } else if (!previewSettings && streamerId === "preview") {
-      // Default settings for preview if none provided
-      // (Though LeaderboardSettingsForm should provide them)
-      // We can use a partial default here just in case
-      setSettings({
-        user_id: "preview",
-        ...DEFAULT_LEADERBOARD_SETTINGS,
       });
     }
   }, [streamerId, previewSettings]);
@@ -69,10 +54,11 @@ export function RealtimeLeaderboard({
     refreshLeaderboard();
   });
 
-  const effectiveSettings = settings || {
-    user_id: "",
-    ...DEFAULT_LEADERBOARD_SETTINGS,
-  };
+  const effectiveSettings = previewSettings ||
+    settings || {
+      user_id: "",
+      ...DEFAULT_LEADERBOARD_SETTINGS,
+    };
 
   return (
     <div className="w-96 font-sans">

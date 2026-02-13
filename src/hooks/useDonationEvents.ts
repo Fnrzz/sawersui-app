@@ -12,6 +12,7 @@ export interface DonationEvent {
   tx_digest: string;
   created_at: string;
   status: string;
+  sender_address: string | null;
 }
 
 export function useDonationEvents(
@@ -20,14 +21,15 @@ export function useDonationEvents(
 ) {
   // Store callback in a ref so the channel doesn't re-subscribe on every render
   const callbackRef = useRef(onNewDonation);
-  callbackRef.current = onNewDonation;
+
+  useEffect(() => {
+    callbackRef.current = onNewDonation;
+  }, [onNewDonation]);
 
   useEffect(() => {
     if (!streamerId) return;
 
     const supabase = createClient();
-
-    console.log("[useDonationEvents] Subscribing for streamer:", streamerId);
 
     const channel = supabase
       .channel(`realtime-donations-${streamerId}`)
@@ -40,16 +42,12 @@ export function useDonationEvents(
           filter: `streamer_id=eq.${streamerId}`,
         },
         (payload) => {
-          console.log("[useDonationEvents] New Donation Event:", payload);
           callbackRef.current?.(payload.new as DonationEvent);
         },
       )
-      .subscribe((status) => {
-        console.log("[useDonationEvents] Channel status:", status);
-      });
+      .subscribe(() => {});
 
     return () => {
-      console.log("[useDonationEvents] Unsubscribing channel");
       supabase.removeChannel(channel);
     };
   }, [streamerId]); // Only re-subscribe when streamerId changes

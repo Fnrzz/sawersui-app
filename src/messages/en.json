@@ -26,6 +26,26 @@
       "usdcStablecoin": {
         "title": "USDC Stablecoin",
         "desc": "Donate using USDC — stable, secure, and withdrawable anytime."
+      },
+      "platform": {
+        "title": "Everything You Need",
+        "subtitle": "Platform Features",
+        "donation": {
+          "title": "Stream Donations",
+          "desc": "Accept support in SUI & USDC with real-time alerts."
+        },
+        "leaderboard": {
+          "title": "Live Leaderboard",
+          "desc": "Showcase your top supporters in real-time on your stream."
+        },
+        "milestone": {
+          "title": "Milestone Goals",
+          "desc": "Set funding targets and track progress with your community."
+        },
+        "nft": {
+          "title": "NFT Rewards",
+          "desc": "Automated NFT minting for top supporters when milestones are reached."
+        }
       }
     }
   },
@@ -86,6 +106,7 @@
     }
   },
   "DonationForm": {
+    "logout": "Logout",
     "nominal": "Amount:",
     "from": "From:",
     "message": "Message:",
@@ -104,7 +125,8 @@
     "successDesc": "Thank you for supporting {name}!",
     "poweredBy": "Powered by <brand>SawerSui</brand> on Sui Network",
     "minDonation": "Minimum donation is $0.50 USDC",
-    "agreementError": "Please agree to the terms and conditions."
+    "agreementError": "Please agree to the terms and conditions.",
+    "viewTransaction": "View Transaction"
   },
   "Settings": {
     "livePreview": "Live Preview",
@@ -148,6 +170,10 @@
     "leaderboard": {
       "title": "Leaderboard Overlay",
       "desc": "Show top supporters leaderboard on your stream."
+    },
+    "milestone": {
+      "title": "Milestone Overlay",
+      "desc": "Set donation goals and incentivize support with rewards."
     }
   },
   "Profile": {

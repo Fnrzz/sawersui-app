@@ -9,8 +9,16 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { motion, Variants } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
-import { Zap, Shield, MonitorPlay, Coins } from "lucide-react";
+import {
+  Zap,
+  Shield,
+  MonitorPlay,
+  Coins,
+  Heart,
+  Trophy,
+  Flag,
+  Gem,
+} from "lucide-react";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -28,29 +36,6 @@ const itemVariants: Variants = {
     transition: { duration: 0.5, ease: "easeOut" },
   },
 };
-
-const features = [
-  {
-    icon: Shield,
-    title: "Easy Login",
-    desc: "Login dengan Google atau connect wallet. Tanpa install app, tanpa ribet.",
-  },
-  {
-    icon: Zap,
-    title: "Low Fees",
-    desc: "Gas fee disponsori. Donasi sampai ke kreator tanpa potongan besar.",
-  },
-  {
-    icon: MonitorPlay,
-    title: "Instant Overlay",
-    desc: "Notifikasi donasi langsung muncul di OBS kamu secara real-time.",
-  },
-  {
-    icon: Coins,
-    title: "USDC Stablecoin",
-    desc: "Donasi pakai USDC — stabil, aman, dan bisa di-withdraw kapan saja.",
-  },
-];
 
 export function HomePage() {
   const t = useTranslations("HomePage");
@@ -161,22 +146,86 @@ export function HomePage() {
         </motion.div>
       </motion.section>
 
-      {/* Features Section */}
+      {/* Platform Features Section */}
       <motion.section
-        className="px-6 py-10 md:py-12"
+        className="px-6 py-10 md:py-16 bg-white"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-80px" }}
+        variants={containerVariants}
+      >
+        <div className="max-w-6xl mx-auto">
+          <motion.div variants={itemVariants} className="text-center mb-12">
+            <h2 className="text-3xl md:text-5xl font-black text-foreground mb-4 uppercase tracking-tight">
+              {t("features.platform.title")}
+            </h2>
+            <p className="text-xl text-muted-foreground font-bold max-w-2xl mx-auto">
+              {t("features.platform.subtitle")}
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              {
+                icon: Heart,
+                title: t("features.platform.donation.title"),
+                desc: t("features.platform.donation.desc"),
+                color: "bg-[#FFB7B2]", // Red/Pink
+              },
+              {
+                icon: Trophy,
+                title: t("features.platform.leaderboard.title"),
+                desc: t("features.platform.leaderboard.desc"),
+                color: "bg-[#FFE8A3]", // Yellow
+              },
+              {
+                icon: Flag,
+                title: t("features.platform.milestone.title"),
+                desc: t("features.platform.milestone.desc"),
+                color: "bg-[#C1E1C1]", // Green
+              },
+              {
+                icon: Gem,
+                title: t("features.platform.nft.title"),
+                desc: t("features.platform.nft.desc"),
+                color: "bg-[#AAC4FF]", // Blue
+              },
+            ].map((feature, i) => (
+              <motion.div
+                key={i}
+                variants={itemVariants}
+                className={`${feature.color} border-[3px] border-black rounded-xl p-6 shadow-[6px_6px_0px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[3px_3px_0px_0px_#000] transition-all flex flex-col items-center text-center h-full group`}
+              >
+                <div className="w-16 h-16 rounded-full bg-white border-[3px] border-black flex items-center justify-center mb-6 shadow-[3px_3px_0px_0px_#000] group-hover:scale-110 transition-transform">
+                  <feature.icon className="w-8 h-8 text-black" />
+                </div>
+                <h3 className="font-black text-xl text-black mb-3 uppercase tracking-tight leading-tight">
+                  {feature.title}
+                </h3>
+                <p className="text-sm font-bold text-black/70 leading-relaxed">
+                  {feature.desc}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </motion.section>
+
+      {/* Why SawerSui Features Section */}
+      <motion.section
+        className="px-6 py-10 md:py-16 bg-zinc-50 border-t-[3px] border-black"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-80px" }}
         variants={containerVariants}
       >
         <div className="max-w-5xl mx-auto">
-          <motion.h2
-            variants={itemVariants}
-            className="text-2xl md:text-3xl font-extrabold text-center mb-8"
-          >
-            {t("features.title")}{" "}
-            <span className="text-primary">{t("features.brand")}</span>?
-          </motion.h2>
+          <motion.div variants={itemVariants} className="text-center mb-12">
+            <h2 className="text-3xl md:text-5xl font-black text-foreground mb-4 uppercase tracking-tight">
+              {t("features.title")}{" "}
+              <span className="text-primary">{t("features.brand")}</span>?
+            </h2>
+          </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {featuresList.map((feature, i) => {
