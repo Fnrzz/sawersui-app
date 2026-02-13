@@ -63,7 +63,7 @@ export async function getOwnedMilestoneNfts(
 
     let hasNextPage = true;
     let nextCursor: string | null = null;
-    let allNfts: RewardNFT[] = [];
+    const allNfts: RewardNFT[] = [];
 
     while (hasNextPage) {
       const {

@@ -203,6 +203,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                 tx_digest: "0x000",
                 created_at: new Date().toISOString(),
                 status: "completed",
+                sender_address: null,
               }}
               settings={liveSettings}
               preview

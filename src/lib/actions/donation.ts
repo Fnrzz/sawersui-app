@@ -173,11 +173,6 @@ export async function saveDonation({
 
   {
     // debug query: fetch any milestone for this streamer
-    const { data: anyMilestone, error: anyError } = await adminSupabase
-      .from("milestones")
-      .select("id, status")
-      .eq("streamer_id", streamer_id)
-      .limit(1);
 
     const { data: milestone, error: milestoneError } = await adminSupabase
       .from("milestones")

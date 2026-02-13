@@ -75,7 +75,7 @@ export function RealtimeMilestone({
           }
         },
       )
-      .subscribe((status) => {});
+      .subscribe(() => {});
 
     return () => {
       supabase.removeChannel(channel);

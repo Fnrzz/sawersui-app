@@ -45,7 +45,7 @@ export function useDonationEvents(
           callbackRef.current?.(payload.new as DonationEvent);
         },
       )
-      .subscribe((status) => {});
+      .subscribe(() => {});
 
     return () => {
       supabase.removeChannel(channel);
