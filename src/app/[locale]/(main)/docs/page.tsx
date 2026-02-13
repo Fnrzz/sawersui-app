@@ -9,7 +9,7 @@ export default function DocsPage() {
     <div className="max-w-4xl mx-auto space-y-8 md:space-y-12">
       {/* Header Section */}
       <div className="space-y-4 border-b pb-8">
-        <h1 className="text-3xl font-black text-[#410891] sm:text-4xl md:text-6xl tracking-tight break-words">
+        <h1 className="text-3xl font-black text-primary sm:text-4xl md:text-6xl tracking-tight break-words uppercase drop-shadow-[4px_4px_0px_#1C1E21]">
           {t("title")}
         </h1>
         <p className="text-xl sm:text-2xl font-bold text-[#1C1E21]/80 max-w-2xl">
@@ -27,7 +27,7 @@ export default function DocsPage() {
 
       {/* Introduction */}
       <section className="space-y-4">
-        <h2 className="text-3xl font-extrabold text-[#1C1E21] uppercase tracking-tight">
+        <h2 className="text-3xl font-extrabold text-[#1C1E21] uppercase tracking-tight drop-shadow-[2px_2px_0px_rgba(245,158,11,0.5)]">
           {t("Introduction.title")}
         </h2>
         <div className="prose prose-lg prose-gray max-w-none text-[#1C1E21]">
@@ -41,7 +41,7 @@ export default function DocsPage() {
               bold: (chunks) => <strong>{chunks}</strong>,
             })}
           </p>
-          <blockquote className="border-l-4 border-[#410891] pl-4 italic text-xl font-medium text-[#410891]">
+          <blockquote className="border-l-4 border-primary pl-4 italic text-xl font-medium text-primary">
             &quot;{t("Introduction.quote")}&quot;
           </blockquote>
         </div>
@@ -49,7 +49,7 @@ export default function DocsPage() {
 
       {/* The Problem & Solution */}
       <section className="space-y-6">
-        <h2 className="text-3xl font-extrabold text-[#1C1E21] uppercase tracking-tight">
+        <h2 className="text-3xl font-extrabold text-[#1C1E21] uppercase tracking-tight drop-shadow-[2px_2px_0px_rgba(245,158,11,0.5)]">
           {t("Solution.title")}
         </h2>
         <div className="grid md:grid-cols-2 gap-6">
@@ -120,13 +120,13 @@ export default function DocsPage() {
 
       {/* Key Features */}
       <section className="space-y-6">
-        <h2 className="text-3xl font-extrabold text-[#1C1E21] uppercase tracking-tight">
+        <h2 className="text-3xl font-extrabold text-[#1C1E21] uppercase tracking-tight drop-shadow-[2px_2px_0px_rgba(245,158,11,0.5)]">
           {t("Features.title")}
         </h2>
 
         <div className="grid sm:grid-cols-2 gap-6">
           <div className="bg-white border-2 border-[#1C1E21] shadow-[4px_4px_0px_0px_#1C1E21] p-6 rounded-lg hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_#1C1E21] transition-all">
-            <h3 className="text-xl font-black text-[#410891] mb-2">
+            <h3 className="text-xl font-black text-primary mb-2">
               {t("Features.Overlays.title")}
             </h3>
             <p className="text-[#606770] font-medium">
@@ -137,7 +137,7 @@ export default function DocsPage() {
           </div>
 
           <div className="bg-white border-2 border-[#1C1E21] shadow-[4px_4px_0px_0px_#1C1E21] p-6 rounded-lg hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_#1C1E21] transition-all">
-            <h3 className="text-xl font-black text-[#410891] mb-2">
+            <h3 className="text-xl font-black text-primary mb-2">
               {t("Features.GasFree.title")}
             </h3>
             <p className="text-[#606770] font-medium">
@@ -148,7 +148,7 @@ export default function DocsPage() {
           </div>
 
           <div className="bg-white border-2 border-[#1C1E21] shadow-[4px_4px_0px_0px_#1C1E21] p-6 rounded-lg hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_#1C1E21] transition-all">
-            <h3 className="text-xl font-black text-[#410891] mb-2">
+            <h3 className="text-xl font-black text-primary mb-2">
               {t("Features.zkLogin.title")}
             </h3>
             <p className="text-[#606770] font-medium">
@@ -159,7 +159,7 @@ export default function DocsPage() {
           </div>
 
           <div className="bg-white border-2 border-[#1C1E21] shadow-[4px_4px_0px_0px_#1C1E21] p-6 rounded-lg hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_#1C1E21] transition-all">
-            <h3 className="text-xl font-black text-[#410891] mb-2">
+            <h3 className="text-xl font-black text-primary mb-2">
               {t("Features.Stablecoin.title")}
             </h3>
             <p className="text-[#606770] font-medium">
@@ -173,7 +173,7 @@ export default function DocsPage() {
 
       {/* Tech Stack */}
       <section className="space-y-6">
-        <h2 className="text-3xl font-extrabold text-[#1C1E21] uppercase tracking-tight">
+        <h2 className="text-3xl font-extrabold text-[#1C1E21] uppercase tracking-tight drop-shadow-[2px_2px_0px_rgba(245,158,11,0.5)]">
           {t("Architecture.title")}
         </h2>
         <div className="bg-[#F7F7F7] p-8 rounded-xl border border-[#E5E7EB]">
@@ -216,12 +216,12 @@ export default function DocsPage() {
 
       {/* Roadmap */}
       <section className="space-y-6 pb-12">
-        <h2 className="text-3xl font-extrabold text-[#1C1E21] uppercase tracking-tight">
+        <h2 className="text-3xl font-extrabold text-[#1C1E21] uppercase tracking-tight drop-shadow-[2px_2px_0px_rgba(245,158,11,0.5)]">
           {t("Roadmap.title")}
         </h2>
         <div className="space-y-4">
           <div className="flex items-start gap-4">
-            <div className="bg-[#410891] text-white font-bold px-3 py-1 rounded text-sm mt-1">
+            <div className="bg-primary text-white font-bold px-3 py-1 rounded text-sm mt-1">
               {t("Roadmap.Phase1.label")}
             </div>
             <div>
