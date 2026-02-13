@@ -8,6 +8,8 @@ import { OverlaySettings } from "@/lib/overlay-settings";
 interface DonationAlertCardProps {
   data: DonationEvent;
   settings?: OverlaySettings;
+  /** Optional URL for the NFT image reward */
+  nftImage?: string;
   /** When true, renders a plain div (no animation) for instant color reactivity */
   preview?: boolean;
 }
@@ -15,6 +17,7 @@ interface DonationAlertCardProps {
 export function DonationAlertCard({
   data,
   settings,
+  nftImage,
   preview,
 }: DonationAlertCardProps) {
   const t = useTranslations("Overlay");
@@ -34,10 +37,21 @@ export function DonationAlertCard({
 
       {/* Content Body */}
       <div className="p-6 flex flex-col gap-4">
-        {/* ... content ... */}
-        {/* Donor Name */}
+        {/* Donor Name & NFT Badge */}
+        <div className="flex flex-col items-center gap-2">
+          {nftImage && (
+            <div className="relative w-16 h-16 rounded-full border-[3px] border-black overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-white">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={nftImage}
+                alt="Reward NFT"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          )}
+        </div>
         <h2
-          className="text-3xl font-bold font-[family-name:var(--font-pixel-body)] tracking-wide drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
+          className="text-3xl font-bold font-[family-name:var(--font-pixel-body)] tracking-wide drop-shadow-[2px_2px_0px_rgba(0,0,0,1)] break-all"
           style={{ color: senderColor }}
         >
           {data.donor_name}
@@ -46,7 +60,7 @@ export function DonationAlertCard({
         {/* Message */}
         {data.message && (
           <p
-            className="text-xl leading-relaxed font-[family-name:var(--font-pixel-body)]"
+            className="text-xl leading-relaxed font-[family-name:var(--font-pixel-body)] break-words w-full"
             style={{ color: messageColor }}
           >
             {data.message}
@@ -54,7 +68,7 @@ export function DonationAlertCard({
         )}
 
         {/* Amount */}
-        <div className="mt-2">
+        <div className="mt-1">
           <p
             className="text-2xl font-bold font-[family-name:var(--font-pixel)] drop-shadow-[2px_2px_0px_rgba(0,0,0,1)] tracking-widest"
             style={{ color: amountColor }}

@@ -54,11 +54,7 @@ export default async function DashboardPage() {
   // Get recent donations for the activity feed (fetch 50 to get a decent total sum estimate or just for list)
   // Note: ideally we should have a getDonationStats(userId) for total calculation.
   // For now, let's fetch recent 100 to sum up.
-  const { data: recentDonations, total: totalCount } = await getDonations(
-    user.id,
-    1,
-    100,
-  );
+  const { data: recentDonations } = await getDonations(user.id, 1, 100);
 
   const displayName = onboardingStatus.profile?.display_name || "Player";
   const username = onboardingStatus.profile?.username || "";
