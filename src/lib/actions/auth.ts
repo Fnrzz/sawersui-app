@@ -41,51 +41,60 @@ export async function verifyWalletLogin(
         password,
       });
 
+    let userId: string | undefined;
+
     if (!signInError && signInData.session) {
-      return { success: true, userId: signInData.user.id };
-    }
+      userId = signInData.user.id;
+    } else {
+      // 4. If Login Failed, Attempt Sign Up
+      console.log("Login failed, attempting signup for:", email);
 
-    // 4. If Login Failed, Attempt Sign Up
-    console.log("Login failed, attempting signup for:", email);
-
-    // For Wallet Login, we still allow auto-signup or we should align it?
-    // The requirement specified "zkLogin... do NOT auto-register".
-    // I will leave Wallet Login as is for now unless I see a reason to change it,
-    // to minimize regression risk on pure wallet users.
-    const { data: signUpData, error: signUpError } = await supabase.auth.signUp(
-      {
-        email,
-        password,
-        options: {
-          data: {
-            username: `Wallet User ${address.slice(0, 4)}`,
-            wallet_address: address,
+      const { data: signUpData, error: signUpError } =
+        await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              username: `Wallet User ${address.slice(0, 4)}`,
+              wallet_address: address,
+            },
           },
-        },
-      },
-    );
+        });
 
-    if (signUpError) {
-      throw new Error(`Signup failed: ${signUpError.message}`);
-    }
-
-    if (signUpData.session) {
-      // 5. Create Profile Entry (email is in auth.users, not duplicated here)
-      const { error: profileError } = await supabase.from("profiles").upsert(
-        {
-          id: signUpData.user?.id,
-          username: null, // Trigger onboarding
-          display_name: null,
-          wallet_address: address,
-        },
-        { onConflict: "id" },
-      );
-
-      if (profileError) {
-        console.error("Profile creation error:", profileError);
+      if (signUpError) {
+        throw new Error(`Signup failed: ${signUpError.message}`);
       }
 
-      return { success: true, userId: signUpData.user?.id };
+      if (signUpData.session) {
+        userId = signUpData.user?.id;
+        // 5. Create Profile Entry (if new user)
+        const { error: profileError } = await supabase.from("profiles").upsert(
+          {
+            id: userId,
+            username: null, // Trigger onboarding
+            display_name: null,
+            wallet_address: address,
+          },
+          { onConflict: "id" },
+        );
+
+        if (profileError) {
+          console.error("Profile creation error:", profileError);
+        }
+      }
+    }
+
+    if (userId) {
+      // Check if onboarding is needed
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("username, display_name")
+        .eq("id", userId)
+        .single();
+
+      const needsOnboarding = !profile?.username || !profile?.display_name;
+
+      return { success: true, userId, needsOnboarding };
     }
 
     return { success: false, error: "Authentication failed" };
