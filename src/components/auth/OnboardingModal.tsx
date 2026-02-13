@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface OnboardingModalProps {
   open: boolean;
@@ -34,6 +35,7 @@ export function OnboardingModal({
   const [displayName, setDisplayName] = useState(
     initialData?.display_name || "",
   );
+  const t = useTranslations("Modals.Onboarding");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
@@ -47,7 +49,7 @@ export function OnboardingModal({
       if (address) {
         const result = await registerEnokiUser(address, username, displayName);
         if (!result.success) {
-          throw new Error(result.error || "Registration failed");
+          throw new Error(result.error || t("error.registrationFailed"));
         }
         if (onSuccess) onSuccess();
       } else {
@@ -55,8 +57,9 @@ export function OnboardingModal({
       }
 
       router.refresh();
+      router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Gagal memperbarui profil");
+      setError(err instanceof Error ? err.message : t("error.generic"));
     } finally {
       setLoading(false);
     }
@@ -72,10 +75,10 @@ export function OnboardingModal({
         <div className="border-b-[3px] border-black px-6 py-5 text-center bg-[#FEFCE8]">
           <DialogHeader>
             <DialogTitle className="text-xl font-black text-black">
-              Selamat Datang! 👋
+              {t("title")}
             </DialogTitle>
             <DialogDescription className="text-sm font-bold text-black/80 mt-1">
-              Buat profil streamer kamu
+              {t("subtitle")}
             </DialogDescription>
           </DialogHeader>
         </div>
@@ -83,7 +86,7 @@ export function OnboardingModal({
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           <div className="space-y-2">
             <label className="block text-sm font-bold text-black">
-              Username <span className="text-red-500">*</span>
+              {t("username")} <span className="text-red-500">*</span>
             </label>
             <Input
               value={username}
@@ -98,18 +101,18 @@ export function OnboardingModal({
               minLength={3}
             />
             <p className="text-xs font-bold text-black/50">
-              Huruf kecil, angka, dan underscore
+              {t("usernameHint")}
             </p>
           </div>
 
           <div className="space-y-2">
             <label className="block text-sm font-bold text-black">
-              Nama Tampilan <span className="text-red-500">*</span>
+              {t("displayName")} <span className="text-red-500">*</span>
             </label>
             <Input
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
-              placeholder="Nama tampilan kamu"
+              placeholder={t("displayNamePlaceholder")}
               className="w-full py-2 text-lg font-bold bg-transparent border-b-[3px] border-black text-black placeholder:text-black/30 focus:outline-none focus:border-black/60 rounded-none transition-all px-0 shadow-none border-t-0 border-l-0 border-r-0 focus-visible:ring-0"
               required
             />
@@ -130,7 +133,7 @@ export function OnboardingModal({
             {loading ? (
               <Loader2 className="w-6 h-6 animate-spin text-black" />
             ) : (
-              "Mulai Sekarang 🚀"
+              t("submitButton")
             )}
           </Button>
         </form>
