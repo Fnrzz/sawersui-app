@@ -3,10 +3,8 @@ import { useCurrentAccount, useDisconnectWallet } from "@mysten/dapp-kit";
 import { useTranslations } from "next-intl";
 import {
   Loader2,
-  Send,
   CheckCircle,
   AlertCircle,
-  Heart,
   Check,
   LogOut,
   Wallet,

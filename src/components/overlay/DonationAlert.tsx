@@ -5,6 +5,7 @@ import { useDonationEvents, DonationEvent } from "@/hooks/useDonationEvents";
 import { AnimatePresence } from "framer-motion";
 import { DonationAlertCard } from "./DonationAlertCard";
 import { OverlaySettings } from "@/lib/overlay-settings";
+import { getLatestMilestoneNft } from "@/lib/nft";
 
 interface DonationAlertProps {
   streamerId: string;
@@ -14,6 +15,9 @@ interface DonationAlertProps {
 export function DonationAlert({ streamerId, settings }: DonationAlertProps) {
   const [queue, setQueue] = useState<DonationEvent[]>([]);
   const [currentAlert, setCurrentAlert] = useState<DonationEvent | null>(null);
+  const [currentNftImage, setCurrentNftImage] = useState<string | undefined>(
+    undefined,
+  );
   const [isShowing, setIsShowing] = useState(false);
 
   // Ref to track processing state without triggering rerenders
@@ -21,11 +25,6 @@ export function DonationAlert({ streamerId, settings }: DonationAlertProps) {
 
   // Stable callback for new donations
   const handleNewDonation = useCallback((newDonation: DonationEvent) => {
-    console.log(
-      "[DonationAlert] Queuing donation:",
-      newDonation.donor_name,
-      newDonation.amount_net,
-    );
     setQueue((prev) => [...prev, newDonation]);
   }, []);
 
@@ -47,22 +46,26 @@ export function DonationAlert({ streamerId, settings }: DonationAlertProps) {
       const minAmount = settings?.min_amount ?? 0;
       const minAmountNet = minAmount * 0.95;
       if (minAmountNet > 0 && nextDonation.amount_net < minAmountNet) {
-        console.log(
-          "[DonationAlert] Skipping donation below min_amount:",
-          nextDonation.amount_net,
-          "<",
-          minAmountNet,
-        );
         isProcessing.current = false;
         return;
       }
 
-      console.log(
-        "[DonationAlert] Showing alert for:",
-        nextDonation.donor_name,
-      );
+      // Fetch NFT if sender_address exists
+      let nftUrl: string | undefined;
+      if (nextDonation.sender_address) {
+        try {
+          const nft = await getLatestMilestoneNft(nextDonation.sender_address);
+          if (nft) {
+            nftUrl = nft.imageUrl;
+            // console.log("[DonationAlert] Found Reward NFT:", nftUrl);
+          }
+        } catch (error) {
+          console.error("[DonationAlert] Error fetching NFT:", error);
+        }
+      }
 
       // Show Alert
+      setCurrentNftImage(nftUrl);
       setCurrentAlert(nextDonation);
       setIsShowing(true);
 
@@ -82,6 +85,7 @@ export function DonationAlert({ streamerId, settings }: DonationAlertProps) {
         // Wait for exit animation (500ms) before processing next
         setTimeout(() => {
           setCurrentAlert(null);
+          setCurrentNftImage(undefined);
           isProcessing.current = false;
         }, 500);
       }, 10000);
@@ -94,7 +98,11 @@ export function DonationAlert({ streamerId, settings }: DonationAlertProps) {
     <div className="w-full h-screen flex items-center justify-center pb-20 p-4">
       <AnimatePresence>
         {isShowing && currentAlert && (
-          <DonationAlertCard data={currentAlert} settings={settings} />
+          <DonationAlertCard
+            data={currentAlert}
+            settings={settings}
+            nftImage={currentNftImage}
+          />
         )}
       </AnimatePresence>
     </div>

@@ -34,7 +34,7 @@ export default async function HistoryPage({ searchParams }: HistoryPageProps) {
       <div className="flex flex-col gap-4">
         <Link
           href="/dashboard"
-          className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors w-fit"
+          className="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors w-fit border-b-2 border-transparent hover:border-black"
         >
           <ArrowLeft className="w-4 h-4" />
           {tAction("backToDashboard")}

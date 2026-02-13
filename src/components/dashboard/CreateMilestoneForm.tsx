@@ -1,0 +1,261 @@
+"use client";
+
+import { useState, useTransition, useCallback, useEffect } from "react";
+import { uploadImage } from "@/lib/actions/upload";
+import { createMilestone } from "@/lib/actions/milestone";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "sonner";
+import { Loader2, Upload, X } from "lucide-react";
+import { useDropzone } from "react-dropzone";
+import Image from "next/image";
+
+export default function CreateMilestoneForm() {
+  const [isPending, startTransition] = useTransition();
+  const [title, setTitle] = useState("");
+  const [targetAmount, setTargetAmount] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    const selectedFile = acceptedFiles[0];
+    if (selectedFile) {
+      setFile(selectedFile);
+      setPreview(URL.createObjectURL(selectedFile));
+    }
+  }, []);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      "image/*": [".png", ".jpg", ".jpeg", ".gif", ".webp"],
+    },
+    maxFiles: 1,
+    disabled: isPending,
+  });
+
+  const removeFile = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setFile(null);
+    if (preview) URL.revokeObjectURL(preview);
+    setPreview(null);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!file) {
+      toast.error("Please select an image file");
+      return;
+    }
+
+    startTransition(async () => {
+      try {
+        // 1. Upload to Walrus via Server Action
+        toast.info("Uploading image to Walrus...");
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const uploadResult = await uploadImage(formData);
+
+        if (uploadResult.error || !uploadResult.data) {
+          throw new Error(uploadResult.error || "Upload failed");
+        }
+
+        const { blobId, url: walrusUrl } = uploadResult.data;
+        toast.success("Image uploaded to Walrus!");
+
+        // 2. Call Server Action
+        const result = await createMilestone({
+          title,
+          target_amount: parseFloat(targetAmount),
+          image_blob_id: blobId, // Passing required blobId
+          walrus_url: walrusUrl,
+        });
+
+        if (result.error) {
+          throw new Error(result.error);
+        }
+
+        toast.success("Milestone created successfully!");
+
+        // Reset form
+        setTitle("");
+        setTargetAmount("");
+        setFile(null);
+        setPreview(null);
+
+        // Refresh page to update list and lock form
+        window.location.reload();
+      } catch (error: unknown) {
+        console.error("Error creating milestone:", error);
+        const message =
+          error instanceof Error ? error.message : "Failed to create milestone";
+        toast.error(message);
+      }
+    });
+  };
+
+  // Check for active milestone to disable form
+  // We can't easily fetch here without converting to async component or adding useEffect fetch
+  // but we can rely on the server validation for safety, and for UX let's add a simple fetch
+  const [hasActiveMilestone, setHasActiveMilestone] = useState(false);
+  const [isLoadingCheck, setIsLoadingCheck] = useState(true);
+
+  // We need to import getMilestones or similar, but getting server data in client component requires a prop or fetch
+  // Let's use a quick effect to check via server action wrapper
+  useEffect(() => {
+    const checkStatus = async () => {
+      try {
+        const { getMilestones } = await import("@/lib/actions/milestone");
+        const milestones = await getMilestones();
+        const activeOrCompleted = milestones.find(
+          (m) => m.status === "active" || m.status === "completed",
+        );
+        if (activeOrCompleted) setHasActiveMilestone(true);
+      } catch (e) {
+        console.error("Failed to check milestone status", e);
+      } finally {
+        setIsLoadingCheck(false);
+      }
+    };
+    checkStatus();
+  }, []);
+
+  if (isLoadingCheck) {
+    return (
+      <Card className="w-full border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-white text-black p-8 flex justify-center">
+        <Loader2 className="animate-spin w-8 h-8" />
+      </Card>
+    );
+  }
+
+  if (hasActiveMilestone) {
+    return (
+      <Card className="w-full border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-zinc-100 text-black">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold text-zinc-500">
+            Create New Milestone
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col items-center justify-center py-8 text-center space-y-4">
+          <div className="bg-yellow-100 border-2 border-black p-4 rounded-lg">
+            <h3 className="font-bold text-lg">Active Milestone Detected</h3>
+            <p className="text-sm">
+              You already have an active or completed milestone. <br />
+              Please cancel it or wait for it to be minted before creating a new
+              one.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="w-full border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-white text-black">
+      <CardHeader>
+        <CardTitle className="text-2xl font-bold">
+          Create New Milestone
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <label htmlFor="title" className="text-sm font-bold">
+              Title
+            </label>
+            <Input
+              id="title"
+              placeholder="e.g. 24h Stream Marathon"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+              disabled={isPending}
+              className="border-2 border-black rounded-none focus-visible:ring-0 focus-visible:ring-offset-0 focus:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label htmlFor="targetAmount" className="text-sm font-bold">
+              Target Amount (USDC)
+            </label>
+            <Input
+              id="targetAmount"
+              type="number"
+              step="0.01"
+              min="0.5"
+              placeholder="e.g. 100.00"
+              value={targetAmount}
+              onChange={(e) => setTargetAmount(e.target.value)}
+              required
+              disabled={isPending}
+              className="border-2 border-black rounded-none focus-visible:ring-0 focus-visible:ring-offset-0 focus:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-bold">Reward Image</label>
+
+            <div
+              {...getRootProps()}
+              className={`border-2 border-dashed border-black p-6 text-center cursor-pointer transition-colors relative
+                ${isDragActive ? "bg-black/5" : "bg-white"}
+                ${isPending ? "opacity-50 cursor-not-allowed" : "hover:bg-zinc-50"}
+              `}
+            >
+              <input {...getInputProps()} />
+
+              {file && preview ? (
+                <div className="relative w-full aspect-video group">
+                  <Image
+                    src={preview}
+                    alt="Preview"
+                    fill
+                    className="object-cover border-2 border-black"
+                  />
+                  <button
+                    type="button"
+                    onClick={removeFile}
+                    className="absolute top-2 right-2 p-1 bg-red-500 border border-black text-white hover:bg-red-600 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center gap-2 py-4">
+                  <Upload className="w-8 h-8 text-black/50" />
+                  <div className="text-sm font-bold">
+                    {isDragActive
+                      ? "Drop the image here"
+                      : "Drag & drop image here, or click to select"}
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    Supports: PNG, JPG, GIF, WEBP
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <Button
+            type="submit"
+            disabled={isPending}
+            className="w-full bg-black text-white hover:bg-gray-800 border-2 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,0.5)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all font-bold"
+          >
+            {isPending ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Creating...
+              </>
+            ) : (
+              "Create Milestone"
+            )}
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
+  );
+}

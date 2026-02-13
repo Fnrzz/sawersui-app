@@ -5,8 +5,6 @@ import { DonationForm } from "@/components/donation/DonationForm";
 import { motion, Variants } from "framer-motion";
 import { useState } from "react";
 import { LoginModal } from "@/components/auth/LoginModal";
-import Image from "next/image";
-import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
