@@ -173,6 +173,19 @@
       "signing": "Signing...",
       "or": "or",
       "googleLogin": "Login with Google"
+    },
+    "Onboarding": {
+      "title": "Welcome! 👋",
+      "subtitle": "Create your streamer profile",
+      "username": "Username",
+      "usernameHint": "Lowercase, numbers, and underscores",
+      "displayName": "Display Name",
+      "displayNamePlaceholder": "Your display name",
+      "submitButton": "Start Now 🚀",
+      "error": {
+        "generic": "Failed to update profile",
+        "registrationFailed": "Registration failed"
+      }
     }
   },
   "Overlay": {
