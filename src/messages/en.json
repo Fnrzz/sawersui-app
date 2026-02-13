@@ -6,7 +6,7 @@
       "subtitle": "your audience!",
       "description": "Web3 donation platform on Sui Network for Indonesian streamers and content creators.",
       "loginButton": "Login / Sign Up",
-      "aboutButton": "About"
+      "docsButton": "Docs"
     },
     "features": {
       "title": "Why",
@@ -114,7 +114,7 @@
     "placeholderName": "Your Name",
     "placeholderMessage": "Good morning",
     "ageCheck": "I am 17 years of age or older",
-    "agreedCheck": "I understand and agree that this support is voluntary, non-refundable, not for commercial transaction, not available for illegal activities, and complies with sawersui.co terms & privacy policy.",
+    "agreedCheck": "I understand and agree that this support is voluntary, non-refundable, not for commercial transaction, not available for illegal activities, and complies with sawersui.vercel.app terms & privacy policy.",
     "loginButton": "Login First",
     "submitButton": "Send Support",
     "balance": "Balance",
@@ -184,7 +184,7 @@
     "notFound": "Profile not found"
   },
   "Modals": {
-    "About": {
+    "Docs": {
       "title": "About SawerSui",
       "subtitle": "Next Gen Donation Platform",
       "desc1": "SawerSui is a decentralized livestream donation platform built on the <bold>Sui Network</bold>.",
@@ -221,5 +221,309 @@
   },
   "DonationPage": {
     "defaultDescription": "I really appreciate you checking out this page, hope everyone here achieves what they want soon 🙏"
+  },
+  "DocsPage": {
+    "title": "SawerSui",
+    "subtitle": "The First Web3 Donation Platform on Sui Network. Empowering creators with instant, low-fee, and gamified donations.",
+    "badges": {
+      "beta": "Beta",
+      "network": "Sui",
+      "license": "MIT License"
+    },
+    "Introduction": {
+      "title": "Introduction",
+      "p1": "<bold>SawerSui</bold> is a next-generation donation platform designed specifically for streamers and content creators. It bridges the gap between traditional content monetization and the decentralized web.",
+      "p2": "By leveraging the <bold>Sui Network</bold>, SawerSui solves the common pain points of traditional donation platforms — high fees, slow settlement times, and lack of transparency — while introducing Web3 native features like NFT rewards and decentralized milestones.",
+      "quote": "Bridge interactions with your audience."
+    },
+    "Solution": {
+      "title": "The Solution",
+      "Traditional": {
+        "title": "Traditional Platforms",
+        "li1": "<bold>High Fees:</bold> Up to 10-30% cuts from earnings.",
+        "li2": "<bold>Delayed Payouts:</bold> Net-30 or monthly limits.",
+        "li3": "<bold>Friction:</bold> Complex sign-ups & bank requirements."
+      },
+      "SawerSui": {
+        "title": "SawerSui Solution",
+        "li1": "<bold>Low Fees:</bold> 5% platform fee & 0 gas fees.",
+        "li2": "<bold>Instant Settlement:</bold> Direct to wallet immediately.",
+        "li3": "<bold>Seamless Onboarding:</bold> Login with Google (zkLogin)."
+      }
+    },
+    "Features": {
+      "title": "Key Features",
+      "Overlays": {
+        "title": "Real-time Overlays",
+        "desc": "Connect seamlessly with OBS or Streamlabs. Alerts appear instantly on-screen when a donation is made, powered by direct blockchain indexing."
+      },
+      "GasFree": {
+        "title": "Gas-Free Donations",
+        "desc": "Utilizing Sui's Sponsored Transactions, donors pay <bold>0 gas fees</bold>. You receive 100% of the intended donation amount (minus platform fee)."
+      },
+      "zkLogin": {
+        "title": "zkLogin (Google)",
+        "desc": "No private keys needed. Users sign in with their existing Google accounts, making Web3 invisible and accessible to everyone."
+      },
+      "Stablecoin": {
+        "title": "Stable Income",
+        "desc": "Accept <bold>USDC</bold> to avoid crypto volatility. Keep your earnings stable regardless of market conditions."
+      }
+    },
+    "Architecture": {
+      "title": "Architecture",
+      "Frontend": {
+        "label": "Frontend:",
+        "val": "Next.js 16 (App Router) & Tailwind CSS v4"
+      },
+      "Blockchain": {
+        "label": "Blockchain:",
+        "val": "Sui Move Smart Contracts"
+      },
+      "Auth": {
+        "label": "Auth:",
+        "val": "Enoki / zkLogin (Google)"
+      },
+      "Backend": {
+        "label": "Backend:",
+        "val": "Supabase (Real-time Events & Indexing)"
+      }
+    },
+    "Roadmap": {
+      "title": "Roadmap",
+      "Phase1": {
+        "label": "Phase 1",
+        "title": "Foundation (Current)",
+        "desc": "Basic USDC Donation, OBS Alerts, Leaderboards, Google Login, Milestones."
+      },
+      "Phase2": {
+        "label": "Phase 2",
+        "title": "Engagement",
+        "desc": "\"Mediashare\" (Request video/music with donation)."
+      },
+      "Phase3": {
+        "label": "Phase 3",
+        "title": "Expansion",
+        "desc": "Mobile PWA, Multi-chain support (Bridge), Creator Tools."
+      }
+    }
+  },
+  "GettingStartedPage": {
+    "title": "Getting Started",
+    "subtitle": "Begin your journey with SawerSui as a Streamer or Supporter.",
+    "Streamers": {
+      "title": "For Streamers (Creators)",
+      "Step1": {
+        "title": "1. Login & Connect",
+        "desc": "Sign in using <bold>Google (zkLogin)</bold> for a seamless experience or connect your Sui Wallet. No registration fee required."
+      },
+      "Step2": {
+        "title": "2. Complete Profile",
+        "desc": "Upon first login, you will be prompted to set your <bold>Username</bold> and <bold>Display Name</bold>. This username will be part of your donation link: `sawersui.vercel.app/username`."
+      },
+      "Step3": {
+        "title": "3. Setup OBS Overlay",
+        "desc": "Go to the <bold>Dashboard > Overlay</bold> menu. Copy your unique Overlay URL and add it as a 'Browser Source' in OBS/Streamlabs. (Recommended Size: 500x500)."
+      }
+    },
+    "Supporters": {
+      "title": "For Supporters (Donors)",
+      "Step1": {
+        "title": "1. Find a Creator",
+        "desc": "Visit your favorite streamer's profile page (e.g., `sawersui.vercel.app/username`)."
+      },
+      "Step2": {
+        "title": "2. Send Support",
+        "desc": "You can donate using <bold>Sui Wallet</bold> or login with <bold>Google</bold> to use your social balance. Enter the amount in USDC and a message."
+      },
+      "Step3": {
+        "title": "3. Zero Gas Fees",
+        "desc": "Enjoy <bold>0 gas fees</bold> on your donation. The exact amount you send is what the creator receives (minus platform fee)."
+      }
+    }
+  },
+  "DonationGuidePage": {
+    "title": "Donation Guide",
+    "subtitle": "Everything you need to know about receiving and sending support on SawerSui.",
+    "Overview": {
+      "title": "How It Works",
+      "p1": "SawerSui facilitates direct <bold>Peer-to-Peer (P2P)</bold> donations. When a supporter sends funds, they go directly from their wallet to the streamer's wallet/account.",
+      "p2": "We currently support <bold>USDC</bold> (USD Coin) on the Sui Network to ensure stable value for creators."
+    },
+    "Methods": {
+      "title": "Donation Methods",
+      "Wallet": {
+        "title": "Via Sui Wallet",
+        "desc": "Connect any standard Sui wallet (Sui Wallet, Nightly, etc.). ideal for Web3 natives."
+      },
+      "Google": {
+        "title": "Via Google (zkLogin)",
+        "desc": "Donors can login with Google. A temporary wallet is created for the session, making it easy for non-crypto users."
+      }
+    },
+    "Fees": {
+      "title": "Fees & Settlement",
+      "Platform": {
+        "title": "Platform Fee",
+        "val": "5%",
+        "desc": "Deducted automatically to support development."
+      },
+      "Gas": {
+        "title": "Gas Fees",
+        "val": "0 (Free)",
+        "desc": "We sponsor 100% of gas fees for all donations."
+      },
+      "Settlement": {
+        "title": "Settlement",
+        "val": "Instant",
+        "desc": "Funds arrive in seconds. No holding period."
+      }
+    }
+  },
+  "MilestonesGuidePage": {
+    "title": "Milestones",
+    "subtitle": "Set goals, rally your community, and reward them with NFTs.",
+    "Overview": {
+      "title": "What are Milestones?",
+      "p1": "Milestones are fundraising goals you can set for your stream (e.g., 'New Camera', 'Charity Stream'). They appear as a progress bar on your overlay.",
+      "p2": "When a milestone is reached, it triggers a special celebration on your stream!"
+    },
+    "Setup": {
+      "title": "How to Setup",
+      "Step1": {
+        "title": "1. Create Milestone",
+        "desc": "Go to <bold>Dashboard > Milestone</bold>. Click 'Create New' and enter details like Title, Target Amount (USDC), and NFT Reward."
+      },
+      "Step2": {
+        "title": "2. Add to Overlay",
+        "desc": "Copy the Milestone Overlay URL and add it as a 'Browser Source' in OBS. You can position it anywhere on your screen."
+      },
+      "Step3": {
+        "title": "3. Promote",
+        "desc": "Tell your viewers about the goal! The progress bar updates in real-time as donations come in."
+      }
+    },
+    "Gamification": {
+      "title": "Gamification & Rewards",
+      "NFT": {
+        "title": "NFT Rewards",
+        "desc": "Supporters who contribute to a milestone will receive a unique <bold>SawerSui Milestone NFT</bold> as a proof of support when the goal is met."
+      },
+      "Leaderboard": {
+        "title": "Top Supporters",
+        "desc": "The milestone overlay highlights the top contributors, giving them extra recognition on your stream."
+      }
+    }
+  },
+  "LeaderboardGuidePage": {
+    "title": "Leaderboard",
+    "subtitle": "Recognize your top supporters in real-time.",
+    "Overview": {
+      "title": "What is the Leaderboard?",
+      "p1": "The Leaderboard is a widget that displays your top donors. It encourages competition and gives recognition to your most loyal supporters.",
+      "p2": "It updates instantly as new donations come in, keeping your stream engaging."
+    },
+    "Setup": {
+      "title": "How to Setup",
+      "Step1": {
+        "title": "1. Access Settings",
+        "desc": "Go to <bold>Dashboard > OBS > Leaderboard</bold>. Here you can preview what the overlay will look like."
+      },
+      "Step2": {
+        "title": "2. Customize",
+        "desc": "Choose your preferred customize the colors to match your brand."
+      },
+      "Step3": {
+        "title": "3. Add to OBS",
+        "desc": "Copy the unique Overlay URL. In OBS, add a new 'Browser Source' and paste the URL. We recommend a vertical layout for the best look."
+      }
+    },
+    "Features": {
+      "title": "Key Features",
+      "Realtime": {
+        "title": "Real-time Updates",
+        "desc": "No need to refresh. New donations appear on the list instantly."
+      },
+      "Customizable": {
+        "title": "Fully Customizable",
+        "desc": "Change background, text, and rank colors to fit your stream's aesthetic."
+      }
+    }
+  },
+  "FAQPage": {
+    "title": "FAQ",
+    "subtitle": "Common questions about SawerSui.",
+    "General": {
+      "title": "General",
+      "Q1": {
+        "q": "What is SawerSui?",
+        "a": "SawerSui is a donation platform for streamers on the Sui Network. It allows you to receive support in USDC with real-time alerts."
+      },
+      "Q2": {
+        "q": "Is it safe?",
+        "a": "Yes. We use the Sui blockchain for all transactions. We don't hold your funds (non-custodial for wallet users). Google logins use zkLogin for secure, non-custodial account creation."
+      }
+    },
+    "Streamers": {
+      "title": "For Streamers",
+      "Q1": {
+        "q": "What are the fees?",
+        "a": "Platform fee is 5%. Gas fees are sponsored (free for you and donors)."
+      },
+      "Q2": {
+        "q": "How do I withdraw?",
+        "a": "If you use a wallet, funds are already in your wallet! If you use Google login, go to Dashboard and click 'Withdraw' to send USDC to any Sui address or exchange."
+      }
+    },
+    "Supporters": {
+      "title": "For Donors",
+      "Q1": {
+        "q": "Do I need a crypto wallet?",
+        "a": "No! You can login with your Google account to send support. You will need to top-up USDC or ask a friend to send you some."
+      },
+      "Q2": {
+        "q": "Why Sui Network?",
+        "a": "Sui offers instant speed and low costs, making it perfect for real-time interactions like stream donations."
+      }
+    }
+  },
+  "TermsPage": {
+    "title": "Terms of Service",
+    "subtitle": "Please read these terms carefully before using SawerSui.",
+    "Agreement": {
+      "title": "1. Agreement to Terms",
+      "p": "By accessing or using SawerSui, you agree to be bound by these Terms. If you disagree with any part of the terms, you may not access the service."
+    },
+    "UserObligations": {
+      "title": "2. User Obligations",
+      "p": "You agree not to use the platform for any illegal activities, including but not limited to money laundering, financing terrorism, or harassment. You are responsible for maintaining the security of your Google account and/or private keys."
+    },
+    "Payments": {
+      "title": "3. Payments & Donations",
+      "p1": "<bold>Irreversible:</bold> All transactions on the Sui blockchain are final and cannot be reversed.",
+      "p2": "<bold>Fees:</bold> A 5% platform fee is automatically deducted from every donation to support development.",
+      "p3": "<bold>Taxes:</bold> Users are solely responsible for determining whatever taxes apply to their transactions."
+    },
+    "Disclaimer": {
+      "title": "4. Disclaimer",
+      "p": "SawerSui is provided on an 'AS IS' basis. We are not responsible for any losses due to blockchain failures, wallet errors, or third-party services."
+    }
+  },
+  "DocsSidebar": {
+    "BackToHome": "Back to Home",
+    "Sections": {
+      "Introduction": "Introduction",
+      "Platform": "Platform",
+      "Resources": "Resources"
+    },
+    "Links": {
+      "About": "About SawerSui",
+      "GettingStarted": "Getting Started",
+      "Donations": "Donations",
+      "Milestones": "Milestones",
+      "Leaderboard": "Leaderboard",
+      "FAQ": "FAQ",
+      "Terms": "Terms of Service"
+    }
   }
 }

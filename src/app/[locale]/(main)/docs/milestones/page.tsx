@@ -1,0 +1,108 @@
+"use client";
+
+import { useTranslations } from "next-intl";
+
+export default function MilestonesPage() {
+  const t = useTranslations("MilestonesGuidePage");
+
+  return (
+    <div className="max-w-4xl mx-auto space-y-12">
+      <div className="border-b pb-8">
+        <h1 className="text-3xl font-black text-[#410891] sm:text-5xl mb-4 tracking-tight">
+          {t("title")}
+        </h1>
+        <p className="text-xl sm:text-2xl text-[#1C1E21]/80 font-bold max-w-2xl">
+          {t("subtitle")}
+        </p>
+      </div>
+
+      <div className="grid gap-12">
+        {/* Overview Section */}
+        <section className="space-y-6">
+          <div className="bg-[#F7F7F7] border border-[#E5E7EB] p-6 rounded-xl">
+            <h2 className="text-2xl font-extrabold text-[#1C1E21] mb-4 uppercase tracking-tight">
+              {t("Overview.title")}
+            </h2>
+            <div className="prose prose-lg prose-gray max-w-none text-[#1C1E21]">
+              <p>{t("Overview.p1")}</p>
+              <p className="mt-2">{t("Overview.p2")}</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Setup Section */}
+        <section className="space-y-6">
+          <h2 className="text-3xl font-extrabold text-[#1C1E21] uppercase tracking-tight flex items-center gap-3">
+            <span>🛠️</span> {t("Setup.title")}
+          </h2>
+          <div className="grid gap-6">
+            {/* Step 1 */}
+            <div className="bg-white border-2 border-[#1C1E21] shadow-[4px_4px_0px_0px_#1C1E21] p-6 rounded-lg hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_#1C1E21] transition-all">
+              <h3 className="text-xl font-black text-[#410891] mb-2">
+                {t("Setup.Step1.title")}
+              </h3>
+              <p className="text-[#606770] font-medium text-lg">
+                {t.rich("Setup.Step1.desc", {
+                  bold: (chunks) => <strong>{chunks}</strong>,
+                })}
+              </p>
+            </div>
+            {/* Step 2 */}
+            <div className="bg-white border-2 border-[#1C1E21] shadow-[4px_4px_0px_0px_#1C1E21] p-6 rounded-lg hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_#1C1E21] transition-all">
+              <h3 className="text-xl font-black text-[#410891] mb-2">
+                {t("Setup.Step2.title")}
+              </h3>
+              <p className="text-[#606770] font-medium text-lg">
+                {t.rich("Setup.Step2.desc", {
+                  bold: (chunks) => <strong>{chunks}</strong>,
+                })}
+              </p>
+            </div>
+            {/* Step 3 */}
+            <div className="bg-white border-2 border-[#1C1E21] shadow-[4px_4px_0px_0px_#1C1E21] p-6 rounded-lg hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_#1C1E21] transition-all">
+              <h3 className="text-xl font-black text-[#410891] mb-2">
+                {t("Setup.Step3.title")}
+              </h3>
+              <p className="text-[#606770] font-medium text-lg">
+                {t("Setup.Step3.desc")}
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Gamification Section */}
+        <section className="space-y-6">
+          <h2 className="text-3xl font-extrabold text-[#1C1E21] uppercase tracking-tight flex items-center gap-3">
+            <span>🎮</span> {t("Gamification.title")}
+          </h2>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* NFT Rewards */}
+            <div className="bg-[#410891] p-6 rounded-lg border-2 border-[#1C1E21] shadow-[4px_4px_0px_0px_#1C1E21] text-white">
+              <h3 className="text-xl font-black mb-2 flex items-center gap-2">
+                <span>🏆</span> {t("Gamification.NFT.title")}
+              </h3>
+              <p className="font-medium text-lg text-white/90">
+                {t.rich("Gamification.NFT.desc", {
+                  bold: (chunks) => (
+                    <strong className="text-[#4DA2FF]">{chunks}</strong>
+                  ),
+                })}
+              </p>
+            </div>
+
+            {/* Leaderboard */}
+            <div className="bg-white border-2 border-[#1C1E21] shadow-[4px_4px_0px_0px_#1C1E21] p-6 rounded-lg">
+              <h3 className="text-xl font-black text-[#1C1E21] mb-2 flex items-center gap-2">
+                <span>📊</span> {t("Gamification.Leaderboard.title")}
+              </h3>
+              <p className="text-[#606770] font-medium text-lg">
+                {t("Gamification.Leaderboard.desc")}
+              </p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+}
