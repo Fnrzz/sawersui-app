@@ -174,9 +174,24 @@ export function LeaderboardSettingsForm({
           <div className="relative z-10 w-full flex justify-center origin-center">
             <RealtimeLeaderboard
               initialData={[
-                { rank: 1, donorName: "Sultan Andara", totalAmount: 500 },
-                { rank: 2, donorName: "Crypto Whale", totalAmount: 100 },
-                { rank: 3, donorName: "Supporter #1", totalAmount: 50 },
+                {
+                  rank: 1,
+                  donorName: "Sultan Andara",
+                  totalAmount: 500,
+                  coinType: "USDC",
+                },
+                {
+                  rank: 2,
+                  donorName: "Crypto Whale",
+                  totalAmount: 100,
+                  coinType: "SUI",
+                },
+                {
+                  rank: 3,
+                  donorName: "Supporter #1",
+                  totalAmount: 50,
+                  coinType: "USDC",
+                },
               ]}
               streamerId="preview"
               previewSettings={liveSettings}

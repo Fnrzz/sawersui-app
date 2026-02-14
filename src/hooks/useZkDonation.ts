@@ -9,83 +9,93 @@ interface UseZkDonationParams {
   streamerId: string;
 }
 
+// ... imports
+
 interface DonateParams {
-  amountUsdc: number;
-  donorName: string; // Kept for interface compatibility, though might be unused in tx
+  amount: number;
+  coinType: "USDC" | "SUI";
+  donorName: string;
   message: string;
 }
 
 const USDC_DECIMALS = 6;
+const SUI_DECIMALS = 9;
 const USDC_TYPE = CONFIG.SUI.ADDRESS.USDC_TYPE;
+const SUI_TYPE = "0x2::sui::SUI";
 
 export function useZkDonation({ streamerAddress }: UseZkDonationParams) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   const suiClient = useSuiClient();
 
-  const donateUSDC = useCallback(async (params: DonateParams): Promise<string> => {
-    const { amountUsdc } = params;
-    setIsLoading(true);
-    setError(null);
+  const donate = useCallback(
+    async (params: DonateParams): Promise<string> => {
+      const { amount, coinType } = params;
+      setIsLoading(true);
+      setError(null);
 
-    try {
-      // 1. Get Session & Signer
-      const session = await enokiFlow.getSession();
-      if (!session || !session.jwt) throw new Error("No active Enoki session found");
+      try {
+        // 1. Get Session & Signer
+        const session = await enokiFlow.getSession();
+        if (!session || !session.jwt)
+          throw new Error("No active Enoki session found");
 
-      const signer = await enokiFlow.getKeypair({ network: 'testnet' });
-      const userAddress = signer.toSuiAddress();
+        const signer = await enokiFlow.getKeypair({ network: "testnet" });
+        const userAddress = signer.toSuiAddress();
 
-      // 2. Check Balance
-      const amountMicro = BigInt(Math.floor(amountUsdc * 10 ** USDC_DECIMALS));
-      
-      const { data: coins } = await suiClient.getCoins({
-        owner: userAddress,
-        coinType: USDC_TYPE,
-      });
+        // 2. Check Balance
+        const decimals = coinType === "SUI" ? SUI_DECIMALS : USDC_DECIMALS;
+        const targetCoinType = coinType === "SUI" ? SUI_TYPE : USDC_TYPE;
+        const amountMicro = BigInt(Math.floor(amount * 10 ** decimals));
 
-      if (!coins || coins.length === 0) {
-        throw new Error("No USDC coins found in zkLogin wallet");
-      }
+        const { data: coins } = await suiClient.getCoins({
+          owner: userAddress,
+          coinType: targetCoinType,
+        });
 
-      const totalBalance = coins.reduce(
-        (sum, coin) => sum + BigInt(coin.balance),
-        BigInt(0)
-      );
+        if (!coins || coins.length === 0) {
+          throw new Error(`No ${coinType} coins found in zkLogin wallet`);
+        }
 
-      if (totalBalance < amountMicro) {
-        const required = Number(amountMicro) / 10 ** USDC_DECIMALS;
-        const available = Number(totalBalance) / 10 ** USDC_DECIMALS;
-        throw new Error(
-          `Insufficient USDC balance. Required: ${required}, Available: ${available.toFixed(2)}`
+        const totalBalance = coins.reduce(
+          (sum, coin) => sum + BigInt(coin.balance),
+          BigInt(0),
         );
+
+        if (totalBalance < amountMicro) {
+          const required = Number(amountMicro) / 10 ** decimals;
+          const available = Number(totalBalance) / 10 ** decimals;
+          throw new Error(
+            `Insufficient ${coinType} balance. Required: ${required}, Available: ${available.toFixed(2)}`,
+          );
+        }
+
+        // 3. Execute Donation
+        const digest = await executeEnokiDonation({
+          userAddress,
+          recipientAddress: streamerAddress,
+          amount: amount,
+          coinType,
+          suiClient,
+        });
+
+        return digest;
+      } catch (err) {
+        console.error("[ZkDonate Error]", err);
+        const msg = err instanceof Error ? err.message : "Donation failed";
+        setError(msg);
+        throw err;
+      } finally {
+        setIsLoading(false);
       }
-
-      // 3. Execute Donation
-      const digest = await executeEnokiDonation({
-        userAddress,
-        recipientAddress: streamerAddress,
-        amount: amountUsdc,
-        suiClient,
-      });
-
-      return digest;
-
-    } catch (err) {
-      console.error("[ZkDonate Error]", err);
-      const msg = err instanceof Error ? err.message : "Donation failed";
-      setError(msg);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [suiClient, streamerAddress]);
+    },
+    [suiClient, streamerAddress],
+  );
 
   return {
-    donateUSDC,
+    donate,
     isLoading,
-    error
+    error,
   };
 }
-

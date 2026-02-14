@@ -8,6 +8,7 @@ export interface CreateMilestoneData {
   target_amount: number;
   image_blob_id: string;
   walrus_url: string;
+  coin_type: "USDC" | "SUI";
 }
 
 export async function createMilestone(data: CreateMilestoneData) {
@@ -28,7 +29,8 @@ export async function createMilestone(data: CreateMilestoneData) {
     !data.title ||
     !data.target_amount ||
     !data.image_blob_id ||
-    !data.walrus_url
+    !data.walrus_url ||
+    !data.coin_type
   ) {
     return { error: "Missing required fields" };
   }
@@ -48,6 +50,11 @@ export async function createMilestone(data: CreateMilestoneData) {
     };
   }
 
+  // Map simple Coin Type to Full Type
+  const { CONFIG } = await import("@/lib/config");
+  const fullCoinType =
+    data.coin_type === "USDC" ? CONFIG.SUI.ADDRESS.USDC_TYPE : "0x2::sui::SUI";
+
   // 3. Insert into DB
   const { error } = await supabase.from("milestones").insert({
     streamer_id: user.id,
@@ -57,6 +64,7 @@ export async function createMilestone(data: CreateMilestoneData) {
     image_blob_id: data.image_blob_id,
     walrus_url: data.walrus_url,
     status: "active",
+    coin_type: fullCoinType,
   });
 
   if (error) {

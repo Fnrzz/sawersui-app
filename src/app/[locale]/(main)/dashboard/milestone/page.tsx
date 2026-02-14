@@ -6,6 +6,7 @@ import { MilestoneList } from "@/components/dashboard/MilestoneList";
 export default async function MilestoneListPage() {
   // const t = await getTranslations("OBS.milestone_list");
   const tAction = await getTranslations("Action");
+  const t = await getTranslations("Milestone.history");
 
   return (
     <div className="space-y-6">
@@ -20,11 +21,9 @@ export default async function MilestoneListPage() {
         <div>
           <h1 className="text-2xl font-extrabold text-foreground flex items-center gap-2">
             <History className="w-8 h-8" />
-            Milestone History
+            {t("title")}
           </h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            Manage your past and active milestones.
-          </p>
+          <p className="text-muted-foreground text-sm mt-1">{t("subtitle")}</p>
         </div>
       </div>
 
