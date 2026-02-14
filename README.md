@@ -16,7 +16,7 @@
 
   <div align="center">
     <img src="https://img.shields.io/badge/Status-Beta-blue?style=for-the-badge" alt="Status">
-    <img src="https://img.shields.io/badge/Network-Sui_Mainnet-4DA2FF?style=for-the-badge&logo=sui" alt="Sui Network">
+    <img src="https://img.shields.io/badge/Network-Sui_Testnet-4DA2FF?style=for-the-badge&logo=sui" alt="Sui Network">
     <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License">
   </div>
 </div>
@@ -40,7 +40,7 @@ By leveraging the **Sui Network**, SawerSui solves the common pain points of tra
 | **High Fees:** Up to 10-30% cuts from creator earnings.    | **Low Fees:** Minimal platform fee (5%) with gas-sponsored transactions.       |
 | **Delayed Payouts:** Net-30 or monthly withdrawal limits.  | **Instant Settlement:** Funds go directly to the creator's wallet immediately. |
 | **Friction:** Requires bank accounts and complex sign-ups. | **Seamless Onboarding:** Login with Google (zkLogin) or connect a Sui Wallet.  |
-| **Static:** Just money transfer.                           | **Gamified:** NFT rewards for milestones and on-chain leaderboards.            |
+| **Static:** Just money transfer.                           | **Gamified:** NFT rewards for milestones.                                      |
 
 ---
 
@@ -53,11 +53,12 @@ By leveraging the **Sui Network**, SawerSui solves the common pain points of tra
 - **Milestone System:** Set funding goals (e.g., "New Camera Fund"). When reached, the system triggers celebrations.
 - **Stable Income:** Accept **USDC** to avoid crypto volatility.
 - **Dashboard Analytics:** Track donation history and active balances in a unified dashboard.
+- **Neo-Brutalist Design:** A bold, high-contrast interface that stands out.
 
 ### 👤 For Supporters (Donors)
 
 - **Gas-Free Donations:** Utilizing Sui's Sponsored Transactions, donors pay **0 gas fees**. 100% of the intended amount (minus platform fee) goes to the creator.
-- **Easy Login (zkLogin):** No need to manage private keys. Users can sign in using their existing Google accounts.
+- **Easy Login (zkLogin):** No need to manage private keys. Users can sign in using their existing Google accounts via **Enoki**.
 - **NFT Rewards:** Participate in milestones and automatically receive unique NFTs as proof of support.
 - **On-Chain Recognition:** Your support is immutably recorded on the blockchain.
 
@@ -70,30 +71,30 @@ SawerSui is built as a hybrid decentralized application (dApp) ensuring speed, s
 ### **The Stack**
 
 - **Frontend Framework:** [Next.js 16 (App Router)](https://nextjs.org/) — For server-side rendering and high performance.
-- **Styling:** [Tailwind CSS v4](https://tailwindcss.com/) — For a modern, responsive, and beautiful UI.
-- **Blockchain Interaction:** \* **Sui Move:** Smart contracts for donation logic and NFT minting.
+- **Styling:** [Tailwind CSS v4](https://tailwindcss.com/) — Implements the **Neo-Brutalist** design system with high-contrast colors and bold typography.
+- **Blockchain Interaction:**
+  - **Sui Move:** Smart contracts for donation logic and NFT minting.
   - **@mysten/dapp-kit:** Wallet connection and transaction management.
   - **Enoki / zkLogin:** Social login provider for Web3 abstraction.
-- **Backend & Data:** \* **Supabase:** Handling off-chain user metadata, real-time websocket events for OBS, and historical indexing.
-- **Media Storage:** **Walrus** (Planned) & Supabase Storage.
+- **Backend & Data:**
+  - **Supabase:** Handling off-chain user metadata, real-time websocket events for OBS, and historical indexing.
+- **Media Storage:** Walrus & Supabase Storage.
 
 ### **System Flow**
 
-1.  **Auth:** User logs in via Google (zkLogin).
+1.  **Auth:** User logs in via Google (zkLogin) or Sui Wallet.
 2.  **Action:** User sends USDC to Creator.
 3.  **Sponsor:** The platform sponsors the gas fee.
 4.  **Chain:** Transaction is executed on Sui Network.
 5.  **Event:** Supabase listens to the on-chain event.
 6.  **Display:** The Overlay frontend receives a websocket signal and plays the alert on the Streamer's OBS.
 
----
-
 ## 🗺 Roadmap & Vision
 
 - **Phase 1: Foundation (Current)**
-  - Basic USDC Donation.
+  - Basic USDC & SUI Donation.
   - OBS Alert & Leaderboard Widgets.
-  - Google Login Integration.
+  - Google Login Integration (zkLogin).
   - Milestone feature with automated NFT Minting.
 - **Phase 2: Engagement**
   - "Mediashare" (Request video/music with donation).
