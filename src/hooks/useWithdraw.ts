@@ -3,23 +3,38 @@ import { getSuiClient } from "@/lib/sui-client";
 import { CONFIG } from "@/lib/config";
 import { jwtDecode } from "jwt-decode";
 
+interface EnokiJwtPayload {
+  iss?: string;
+  sub?: string;
+  aud?: string | string[];
+  exp?: number;
+  nbf?: number;
+  iat?: number;
+  jti?: string;
+  email?: string;
+  name?: string;
+  picture?: string;
+}
+
+interface EnokiSession {
+  jwt: string;
+  userAddress: string;
+}
+
 interface WithdrawParams {
   amount: number;
   recipientAddress: string;
+  coinType: "USDC" | "SUI";
 }
 
-interface EnokiJwtPayload {
-  iss: string;
-}
-
-// Custom type for Enoki session to avoid 'any'
-interface EnokiSession {
-  jwt: string;
-  address: string;
-}
+// ... existing interfaces
 
 export function useWithdraw() {
-  const withdraw = async ({ amount, recipientAddress }: WithdrawParams) => {
+  const withdraw = async ({
+    amount,
+    recipientAddress,
+    coinType,
+  }: WithdrawParams) => {
     // 1. Pre-flight Check
     const session = await enokiFlow.getSession();
     if (!session) {
@@ -27,8 +42,11 @@ export function useWithdraw() {
     }
 
     // 2. Validation
-    if (amount < 0.5) {
-      throw new Error("Minimum withdrawal amount is 0.5 USDC");
+    const isSui = coinType === "SUI";
+    const minAmount = isSui ? 0.1 : 0.5; // Approx min amounts
+
+    if (amount < minAmount) {
+      throw new Error(`Minimum withdrawal amount is ${minAmount} ${coinType}`);
     }
 
     // Use type assertion for session to access jwt safely
@@ -37,7 +55,7 @@ export function useWithdraw() {
       throw new Error("Unauthorized: Invalid Session (No JWT)");
     }
 
-    // Security Check: Verify Google Login
+    // ... Security Check (JWT) ... (unchanged)
     try {
       const decoded = jwtDecode<EnokiJwtPayload>(sessionData.jwt);
       if (decoded.iss !== "https://accounts.google.com") {
@@ -56,19 +74,23 @@ export function useWithdraw() {
     const userAddress = keypair.toSuiAddress();
 
     const client = getSuiClient();
+    const targetCoinType = isSui
+      ? "0x2::sui::SUI"
+      : CONFIG.SUI.ADDRESS.USDC_TYPE;
 
-    // Fetch USDC coins check
+    // Fetch coins check
     const { data: coins } = await client.getCoins({
       owner: userAddress,
-      coinType: CONFIG.SUI.ADDRESS.USDC_TYPE,
+      coinType: targetCoinType,
     });
 
     if (coins.length === 0) {
-      throw new Error("No USDC balance found");
+      throw new Error(`No ${coinType} balance found`);
     }
 
-    // Convert amount to MIST (USDC has 6 decimals)
-    const amountMist = Math.floor(amount * 1_000_000);
+    // Convert amount to MIST
+    const decimals = isSui ? 9 : 6;
+    const amountMist = Math.floor(amount * 10 ** decimals);
 
     // 4. Request Sponsored Transaction from Server
     // We send intent, server builds the "Gas Station" transaction for us
@@ -79,6 +101,7 @@ export function useWithdraw() {
         sender: userAddress,
         recipientAddress: recipientAddress,
         amountMist: amountMist,
+        coinType: targetCoinType,
         isWithdrawal: true, // Flag to distinguish logic on server
       }),
     });

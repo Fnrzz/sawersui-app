@@ -17,16 +17,19 @@ interface WithdrawModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   usdcBalance: string;
+  suiBalance: string;
 }
 
 export function WithdrawModal({
   open,
   onOpenChange,
   usdcBalance,
+  suiBalance,
 }: WithdrawModalProps) {
   const t = useTranslations("Dashboard");
   const [amount, setAmount] = useState("");
   const [recipient, setRecipient] = useState("");
+  const [coinType, setCoinType] = useState<"USDC" | "SUI">("USDC");
   const [isLoading, setIsLoading] = useState(false);
   const { withdraw } = useWithdraw();
 
@@ -34,8 +37,12 @@ export function WithdrawModal({
     try {
       setIsLoading(true);
       const val = parseFloat(amount);
-      if (isNaN(val) || val < 0.5) {
-        toast.error(t("withdraw.minAmount"));
+      const minAmount = coinType === "SUI" ? 0.1 : 0.5;
+
+      if (isNaN(val) || val < minAmount) {
+        toast.error(
+          t("withdraw.minAmountError", { amount: minAmount, coin: coinType }),
+        );
         setIsLoading(false);
         return;
       }
@@ -45,7 +52,7 @@ export function WithdrawModal({
         return;
       }
 
-      await withdraw({ amount: val, recipientAddress: recipient });
+      await withdraw({ amount: val, recipientAddress: recipient, coinType });
       toast.success(t("withdraw.success"));
       onOpenChange(false);
       setAmount("");
@@ -60,10 +67,15 @@ export function WithdrawModal({
   };
 
   const handleMaxClick = () => {
-    // Ideally subtract a small amount for gas if it were native token,
-    // but for USDC withdrawal we usually just withdraw the amount.
-    // Assuming usdcBalance is the string representation of the full balance.
-    setAmount(usdcBalance);
+    if (coinType === "USDC") {
+      setAmount(usdcBalance);
+    } else {
+      // For SUI, we might want to subtract gas? NO, it's sponsored.
+      // But we should leave dust? Sponsored tx doesn't use user balance for gas.
+      // So detailed behavior: user pays split amount. Gas paid by sponsor.
+      // Theoretically can withdraw max.
+      setAmount(suiBalance);
+    }
   };
 
   return (
@@ -82,6 +94,41 @@ export function WithdrawModal({
         </div>
 
         <div className="p-6 space-y-6">
+          {/* Coin Selector */}
+          <div className="space-y-2">
+            <label className="text-sm font-bold text-black uppercase tracking-wider">
+              {t("withdraw.coinType")}
+            </label>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setCoinType("USDC")}
+                className={`flex-1 py-2 font-bold border-2 border-black transition-all
+                    ${
+                      coinType === "USDC"
+                        ? "bg-black text-white"
+                        : "bg-white text-black hover:bg-gray-100"
+                    }
+                  `}
+              >
+                USDC
+              </button>
+              <button
+                type="button"
+                onClick={() => setCoinType("SUI")}
+                className={`flex-1 py-2 font-bold border-2 border-black transition-all
+                    ${
+                      coinType === "SUI"
+                        ? "bg-black text-white"
+                        : "bg-white text-black hover:bg-gray-100"
+                    }
+                  `}
+              >
+                SUI
+              </button>
+            </div>
+          </div>
+
           {/* Amount Input */}
           <div className="space-y-2">
             <label className="text-sm font-bold text-black uppercase tracking-wider">
@@ -89,14 +136,14 @@ export function WithdrawModal({
             </label>
             <div className="relative">
               <span className="absolute left-0 top-1/2 -translate-y-1/2 text-black font-bold text-lg">
-                $
+                {coinType === "USDC" ? "$" : "SUI"}
               </span>
               <input
                 type="number"
                 placeholder="0.00"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="w-full pl-6 pr-16 py-2 text-lg font-bold bg-transparent border-b-[3px] border-black text-black placeholder:text-black/30 focus:outline-none focus:border-black/60 rounded-none transition-all"
+                className="w-full pl-10 pr-16 py-2 text-lg font-bold bg-transparent border-b-[3px] border-black text-black placeholder:text-black/30 focus:outline-none focus:border-black/60 rounded-none transition-all"
               />
               <button
                 type="button"
@@ -107,7 +154,10 @@ export function WithdrawModal({
               </button>
             </div>
             <p className="text-xs text-black/50 font-medium text-right">
-              Balance: ${usdcBalance}
+              {t("withdraw.balance", {
+                amount: coinType === "USDC" ? usdcBalance : suiBalance,
+                coin: coinType === "USDC" ? "$" : "SUI",
+              })}
             </p>
           </div>
 

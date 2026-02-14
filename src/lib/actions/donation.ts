@@ -104,12 +104,14 @@ async function verifyTransaction(
 function verifyDonationAmount(
   txBlock: TransactionBlockResponse,
   streamerAddress: string,
-): number {
+): { amount: number; coinType: string } {
   if (txBlock.effects?.status.status !== "success") {
     throw new Error("Transaction execution failed on-chain.");
   }
 
   const balanceChanges = txBlock.balanceChanges || [];
+
+  // Check for USDC (6 decimals)
   const usdcChange = balanceChanges.find(
     (c) =>
       c.coinType.includes(CONFIG.SUI.ADDRESS.USDC_TYPE) &&
@@ -122,11 +124,34 @@ function verifyDonationAmount(
             streamerAddress)),
   );
 
-  if (!usdcChange) {
-    throw new Error("No USDC transfer to streamer found in transaction.");
+  if (usdcChange) {
+    return {
+      amount: Number(usdcChange.amount) / 1_000_000,
+      coinType: "USDC",
+    };
   }
 
-  return Number(usdcChange.amount) / 1_000_000;
+  // Check for SUI (9 decimals)
+  const suiChange = balanceChanges.find(
+    (c) =>
+      c.coinType.includes("0x2::sui::SUI") &&
+      BigInt(c.amount) > 0 &&
+      (c.owner === streamerAddress ||
+        (typeof c.owner === "object" &&
+          c.owner !== null &&
+          "AddressOwner" in c.owner &&
+          (c.owner as { AddressOwner: string }).AddressOwner ===
+            streamerAddress)),
+  );
+
+  if (suiChange) {
+    return {
+      amount: Number(suiChange.amount) / 1_000_000_000,
+      coinType: "SUI",
+    };
+  }
+
+  throw new Error("No USDC or SUI transfer to streamer found in transaction.");
 }
 
 // --- Main Action ---
@@ -158,7 +183,10 @@ export async function saveDonation({
 
   // 2. Verify Transaction & Amount
   const txBlock = await verifyTransaction(tx_digest);
-  const verifiedAmount = verifyDonationAmount(txBlock, profile.wallet_address);
+  const { amount: verifiedAmount, coinType } = verifyDonationAmount(
+    txBlock,
+    profile.wallet_address,
+  );
 
   // 3. Optional: Check amount match
   if (Math.abs(verifiedAmount - amount_net) > 0.05) {
@@ -172,13 +200,13 @@ export async function saveDonation({
   let milestoneId: string | undefined;
 
   {
-    // debug query: fetch any milestone for this streamer
-
+    // debug query: fetch active milestone matching coin_type
     const { data: milestone, error: milestoneError } = await adminSupabase
       .from("milestones")
       .select("id, status, title")
       .eq("streamer_id", streamer_id)
       .eq("status", "active")
+      .eq("coin_type", coinType) // <-- MATCH COIN TYPE
       .limit(1)
       .maybeSingle();
 
@@ -206,6 +234,7 @@ export async function saveDonation({
     tx_digest,
     sender_address: senderAddress, // Save immediately
     milestone_id: milestoneId, // Save immediately
+    coin_type: coinType, // Save Coin Type
   };
 
   const { error: insertError } = await adminSupabase

@@ -13,6 +13,7 @@ export interface DonationEvent {
   created_at: string;
   status: string;
   sender_address: string | null;
+  coin_type: string | null;
 }
 
 export function useDonationEvents(

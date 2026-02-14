@@ -3,14 +3,13 @@
 import { useState, useCallback } from "react";
 import { Transaction } from "@mysten/sui/transactions";
 import { fromBase64 } from "@mysten/sui/utils";
-import { 
-  useSuiClient, 
-  useCurrentAccount, 
+import {
+  useSuiClient,
+  useCurrentAccount,
   useSignTransaction,
 } from "@mysten/dapp-kit";
 import { CONFIG } from "@/lib/config";
 // Removed unused sponsor actions imports
-
 
 // ============================================================
 // TYPES
@@ -22,7 +21,8 @@ interface UseDonateParams {
 }
 
 interface DonateParams {
-  amountUsdc: number;
+  amount: number; // Renamed from amountUsdc to be generic
+  coinType: "USDC" | "SUI";
   donorName: string;
   message: string;
 }
@@ -38,125 +38,143 @@ interface UseDonateResult {
 // ============================================================
 
 const USDC_DECIMALS = 6;
+const SUI_DECIMALS = 9;
 const USDC_TYPE = CONFIG.SUI.ADDRESS.USDC_TYPE;
+const SUI_TYPE = "0x2::sui::SUI";
 
-export function useDonate({ streamerAddress }: UseDonateParams): UseDonateResult {
+export function useDonate({
+  streamerAddress,
+  //   streamerId, // Unused
+}: UseDonateParams): UseDonateResult {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   const suiClient = useSuiClient();
   const currentAccount = useCurrentAccount();
-  const { mutateAsync: signTransaction } = useSignTransaction(); 
+  const { mutateAsync: signTransaction } = useSignTransaction();
 
-  const donate = useCallback(async (params: DonateParams): Promise<string> => {
-    const { amountUsdc } = params;
+  const donate = useCallback(
+    async (params: DonateParams): Promise<string> => {
+      const { amount, coinType, donorName, message } = params;
 
-    if (!currentAccount?.address) {
-      throw new Error("Wallet not connected");
-    }
-
-    if (amountUsdc <= 0) {
-      throw new Error("Amount must be greater than 0");
-    }
-
-    setIsLoading(true);
-    setError(null);
-
-    // Fetch coins once to reuse
-    let coins;
-    let amountMicro: bigint;
-
-
-    try {
-      amountMicro = BigInt(Math.floor(amountUsdc * 10 ** USDC_DECIMALS));
-
-      // Step 1: Fetch user's USDC coins
-      const { data } = await suiClient.getCoins({
-        owner: currentAccount.address,
-        coinType: USDC_TYPE,
-      });
-      coins = data;
-
-      if (!coins || coins.length === 0) {
-        throw new Error("No USDC coins found in wallet");
+      if (!currentAccount?.address) {
+        throw new Error("Wallet not connected");
       }
 
-      const totalBalance = coins.reduce(
-        (sum, coin) => sum + BigInt(coin.balance),
-        BigInt(0)
-      );
-
-      if (totalBalance < amountMicro) {
-        const required = Number(amountMicro) / 10 ** USDC_DECIMALS;
-        const available = Number(totalBalance) / 10 ** USDC_DECIMALS;
-        throw new Error(
-          `Insufficient USDC balance. Required: ${required}, Available: ${available.toFixed(2)}`
-        );
+      if (amount <= 0) {
+        throw new Error("Amount must be greater than 0");
       }
 
-      // ---------------------------------------------------------
-      // SPONSORED TRANSACTION
-      // ---------------------------------------------------------
+      setIsLoading(true);
+      setError(null);
+
       try {
-        const payload = {
-             sender: currentAccount.address,
-             streamerAddress,
-             amountMist: amountMicro.toString()
-        };
+        const decimals = coinType === "SUI" ? SUI_DECIMALS : USDC_DECIMALS;
+        const targetCoinType = coinType === "SUI" ? SUI_TYPE : USDC_TYPE;
+        const amountMist = BigInt(Math.floor(amount * 10 ** decimals));
 
-        const response = await fetch("/api/sponsor", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
+        // Step 1: Client-side Balance Check
+        const { data: coins } = await suiClient.getCoins({
+          owner: currentAccount.address,
+          coinType: targetCoinType,
         });
 
-        if (!response.ok) {
-           const errData = await response.json();
-           throw new Error(errData.error || "Server failed to sponsor transaction");
+        if (!coins || coins.length === 0) {
+          throw new Error(`No ${coinType} coins found in wallet`);
         }
 
-        const { sponsoredTransactionBytes, sponsorSignature } = await response.json();
+        const totalBalance = coins.reduce(
+          (sum, coin) => sum + BigInt(coin.balance),
+          BigInt(0),
+        );
 
-        // Deserialize to Transaction object
-        const txObject = Transaction.from(fromBase64(sponsoredTransactionBytes));
+        if (totalBalance < amountMist) {
+          const required = Number(amountMist) / 10 ** decimals;
+          const available = Number(totalBalance) / 10 ** decimals;
+          throw new Error(
+            `Insufficient ${coinType} balance. Required: ${required}, Available: ${available.toFixed(2)}`,
+          );
+        }
 
-        // Sign with User Wallet
-        const { signature: userSignature } = await signTransaction({
-          transaction: txObject, 
-          account: currentAccount,
-        });
+        // ---------------------------------------------------------
+        // SPONSORED TRANSACTION
+        // ---------------------------------------------------------
+        try {
+          const payload = {
+            sender: currentAccount.address,
+            streamerAddress,
+            amountMist: amountMist.toString(),
+            coinType: targetCoinType,
+            // Meta info (optional, but good for tracking if backend logs it)
+            donorName,
+            message,
+          };
 
-        // Execute with both signatures
-        const result = await suiClient.executeTransactionBlock({
+          const response = await fetch("/api/sponsor", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+
+          if (!response.ok) {
+            const errData = await response.json();
+            throw new Error(
+              errData.error || "Server failed to sponsor transaction",
+            );
+          }
+
+          const { sponsoredTransactionBytes, sponsorSignature } =
+            await response.json();
+
+          // Deserialize to Transaction object
+          const txObject = Transaction.from(
+            fromBase64(sponsoredTransactionBytes),
+          );
+
+          // Sign with User Wallet
+          const { signature: userSignature } = await signTransaction({
+            transaction: txObject,
+            account: currentAccount,
+            chain: "sui:testnet", // Ensure chain match
+          });
+
+          // Execute with both signatures
+          const result = await suiClient.executeTransactionBlock({
             transactionBlock: fromBase64(sponsoredTransactionBytes),
             signature: [userSignature, sponsorSignature],
-            requestType: 'WaitForLocalExecution',
+            requestType: "WaitForLocalExecution",
             options: {
               showEffects: true,
-              showEvents: true
-            }
-        });
+              showEvents: true,
+              showBalanceChanges: true, // Helpful for verification
+            },
+          });
 
-        if (result.effects?.status.status !== 'success') {
-            throw new Error(`Transaction failed on-chain: ${result.effects?.status.error || 'Unknown error'}`);
-        }
-        
-        return result.digest;
+          if (result.effects?.status.status !== "success") {
+            throw new Error(
+              `Transaction failed on-chain: ${result.effects?.status.error || "Unknown error"}`,
+            );
+          }
 
-      } catch (sponsorErr) {
+          return result.digest;
+        } catch (sponsorErr) {
           console.error("[Donate] Sponsorship attempt failed:", sponsorErr);
-        throw sponsorErr;
+          throw sponsorErr;
+        }
+      } catch (err: unknown) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Transaction failed";
+        // setError(errorMessage); // Don't set error state here, let UI handle it via promise rejection or set it if UI relies on it.
+        // Actually adhering to existing pattern:
+        setError(errorMessage);
+        console.error("[Donate Error]", err);
+        throw err;
+      } finally {
+        setIsLoading(false);
       }
-
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Transaction failed";
-      setError(errorMessage);
-      console.error("[Donate Error]", err);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [currentAccount, suiClient, signTransaction, streamerAddress]);
+    },
+    [currentAccount, suiClient, signTransaction, streamerAddress],
+  );
 
   return {
     donate,

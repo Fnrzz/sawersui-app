@@ -109,7 +109,7 @@ export function RealtimeLeaderboard({
                   style={{ color: effectiveSettings.text_color }}
                 >
                   {entry.totalAmount.toLocaleString()}{" "}
-                  <span className="text-sm opacity-60">USDC</span>
+                  <span className="text-sm opacity-60">{entry.coinType}</span>
                 </div>
               </motion.div>
             ))}

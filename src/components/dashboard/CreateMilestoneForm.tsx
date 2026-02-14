@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition, useCallback, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { uploadImage } from "@/lib/actions/upload";
 import { createMilestone } from "@/lib/actions/milestone";
 import { Button } from "@/components/ui/button";
@@ -12,9 +13,11 @@ import { useDropzone } from "react-dropzone";
 import Image from "next/image";
 
 export default function CreateMilestoneForm() {
+  const t = useTranslations("Milestone.create");
   const [isPending, startTransition] = useTransition();
   const [title, setTitle] = useState("");
   const [targetAmount, setTargetAmount] = useState("");
+  const [coinType, setCoinType] = useState<"USDC" | "SUI">("USDC");
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
 
@@ -46,14 +49,14 @@ export default function CreateMilestoneForm() {
     e.preventDefault();
 
     if (!file) {
-      toast.error("Please select an image file");
+      toast.error(t("toast.selectImage"));
       return;
     }
 
     startTransition(async () => {
       try {
         // 1. Upload to Walrus via Server Action
-        toast.info("Uploading image to Walrus...");
+        toast.info(t("toast.uploading"));
 
         const formData = new FormData();
         formData.append("file", file);
@@ -65,7 +68,7 @@ export default function CreateMilestoneForm() {
         }
 
         const { blobId, url: walrusUrl } = uploadResult.data;
-        toast.success("Image uploaded to Walrus!");
+        toast.success(t("toast.uploaded"));
 
         // 2. Call Server Action
         const result = await createMilestone({
@@ -73,26 +76,28 @@ export default function CreateMilestoneForm() {
           target_amount: parseFloat(targetAmount),
           image_blob_id: blobId, // Passing required blobId
           walrus_url: walrusUrl,
+          coin_type: coinType,
         });
 
         if (result.error) {
           throw new Error(result.error);
         }
 
-        toast.success("Milestone created successfully!");
+        toast.success(t("toast.success"));
 
         // Reset form
         setTitle("");
         setTargetAmount("");
+        setCoinType("USDC");
         setFile(null);
         setPreview(null);
 
-        // Refresh page to update list and lock form
+        // Refresh page
         window.location.reload();
       } catch (error: unknown) {
         console.error("Error creating milestone:", error);
         const message =
-          error instanceof Error ? error.message : "Failed to create milestone";
+          error instanceof Error ? error.message : t("toast.error");
         toast.error(message);
       }
     });
@@ -137,17 +142,13 @@ export default function CreateMilestoneForm() {
       <Card className="w-full border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-zinc-100 text-black">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-zinc-500">
-            Create New Milestone
+            {t("activeTitle")}
           </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col items-center justify-center py-8 text-center space-y-4">
           <div className="bg-yellow-100 border-2 border-black p-4 rounded-lg">
-            <h3 className="font-bold text-lg">Active Milestone Detected</h3>
-            <p className="text-sm">
-              You already have an active or completed milestone. <br />
-              Please cancel it or wait for it to be minted before creating a new
-              one.
-            </p>
+            <h3 className="font-bold text-lg">{t("activeTitle")}</h3>
+            <p className="text-sm">{t("activeDesc")}</p>
           </div>
         </CardContent>
       </Card>
@@ -165,11 +166,11 @@ export default function CreateMilestoneForm() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <label htmlFor="title" className="text-sm font-bold">
-              Title
+              {t("labels.title")}
             </label>
             <Input
               id="title"
-              placeholder="e.g. 24h Stream Marathon"
+              placeholder={t("labels.titlePlaceholder")}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
@@ -179,15 +180,55 @@ export default function CreateMilestoneForm() {
           </div>
 
           <div className="space-y-2">
+            <label className="text-sm font-bold block">
+              {t("labels.coinType")}
+            </label>
+            <div className="flex gap-4">
+              <button
+                type="button"
+                onClick={() => setCoinType("USDC")}
+                className={`flex-1 py-2 px-3 rounded text-sm font-bold border-2 border-black transition-all flex items-center justify-center gap-2
+                  ${
+                    coinType === "USDC"
+                      ? "bg-blue-100 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                      : "bg-white hover:bg-zinc-50"
+                  }
+                `}
+              >
+                <div
+                  className={`w-3 h-3 rounded-full border border-black ${coinType === "USDC" ? "bg-blue-500" : "bg-white"}`}
+                />
+                USDC
+              </button>
+              <button
+                type="button"
+                onClick={() => setCoinType("SUI")}
+                className={`flex-1 py-2 px-3 rounded text-sm font-bold border-2 border-black transition-all flex items-center justify-center gap-2
+                  ${
+                    coinType === "SUI"
+                      ? "bg-blue-100 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                      : "bg-white hover:bg-zinc-50"
+                  }
+                `}
+              >
+                <div
+                  className={`w-3 h-3 rounded-full border border-black ${coinType === "SUI" ? "bg-blue-500" : "bg-white"}`}
+                />
+                SUI
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-2">
             <label htmlFor="targetAmount" className="text-sm font-bold">
-              Target Amount (USDC)
+              {t("labels.targetAmount", { coin: coinType })}
             </label>
             <Input
               id="targetAmount"
               type="number"
               step="0.01"
               min="0.5"
-              placeholder="e.g. 100.00"
+              placeholder={t("labels.targetPlaceholder")}
               value={targetAmount}
               onChange={(e) => setTargetAmount(e.target.value)}
               required
@@ -197,7 +238,9 @@ export default function CreateMilestoneForm() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-bold">Reward Image</label>
+            <label className="text-sm font-bold">
+              {t("labels.rewardImage")}
+            </label>
 
             <div
               {...getRootProps()}
@@ -227,11 +270,7 @@ export default function CreateMilestoneForm() {
               ) : (
                 <div className="flex flex-col items-center gap-2 py-4">
                   <Upload className="w-8 h-8 text-black/50" />
-                  <div className="text-sm font-bold">
-                    {isDragActive
-                      ? "Drop the image here"
-                      : "Drag & drop image here, or click to select"}
-                  </div>
+                  <div className="text-sm font-bold">{t("labels.upload")}</div>
                   <p className="text-xs text-gray-500">
                     Supports: PNG, JPG, GIF, WEBP
                   </p>
@@ -248,10 +287,10 @@ export default function CreateMilestoneForm() {
             {isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Creating...
+                {t("button.loading")}
               </>
             ) : (
-              "Create Milestone"
+              t("button.idle")
             )}
           </Button>
         </form>

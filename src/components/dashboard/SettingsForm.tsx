@@ -204,6 +204,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                 created_at: new Date().toISOString(),
                 status: "completed",
                 sender_address: null,
+                coin_type: "0x2::sui::SUI",
               }}
               settings={liveSettings}
               preview
@@ -266,7 +267,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
           <label className="flex flex-col items-center justify-center gap-2 p-6 border-2 border-dashed border-black/30 rounded-xl cursor-pointer hover:border-black hover:bg-gray-50 transition-all">
             <Upload className="w-8 h-8 text-black/40" />
             <span className="text-sm font-bold text-black/60">
-              {tAction("upload") || "Upload MP3, WAV, or OGG (max 2MB)"}
+              {tAction("upload") || "Upload MP3, WAV, or OGG (max 500KB)"}
             </span>
             <input
               type="file"
@@ -274,7 +275,13 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
               className="hidden"
               onChange={(e) => {
                 const file = e.target.files?.[0];
-                if (file) setSoundFile(file);
+                if (file) {
+                  if (file.size > 500 * 1024) {
+                    toast.error("File size exceeds 500KB");
+                    return;
+                  }
+                  setSoundFile(file);
+                }
               }}
             />
           </label>

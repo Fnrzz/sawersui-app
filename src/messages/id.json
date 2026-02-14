@@ -83,6 +83,10 @@
       "history": {
         "title": "Riwayat Donasi",
         "desc": "Lihat riwayat donasi lengkap yang masuk."
+      },
+      "milestone": {
+        "title": "Milestone",
+        "desc": "Buat dan kelola target penggalangan dana Anda."
       }
     },
     "withdraw": {
@@ -95,7 +99,10 @@
       "invalidAddress": "Format alamat tidak valid",
       "success": "Penarikan berhasil!",
       "error": "Penarikan gagal",
-      "loginRequired": "Withdraw hanya untuk akun Google Login. Wallet user sudah memiliki kendali penuh atas dananya."
+      "loginRequired": "Withdraw hanya untuk akun Google Login. Wallet user sudah memiliki kendali penuh atas dananya.",
+      "coinType": "Tipe Koin",
+      "balance": "Saldo: {amount} {coin}",
+      "minAmountError": "Jumlah minimum adalah {amount} {coin}"
     },
     "toast": {
       "logoutSuccess": "Berhasil keluar",
@@ -107,6 +114,8 @@
   },
   "DonationForm": {
     "logout": "Keluar",
+    "selectCoin": "Pilih Koin",
+    "minDonationError": "Donasi minimum adalah {amount} {coin}",
     "nominal": "Nominal:",
     "from": "Dari:",
     "message": "Pesan:",
@@ -146,6 +155,41 @@
       "rankColor": "Warna Badge Rank"
     }
   },
+  "Milestone": {
+    "create": {
+      "title": "Buat Milestone Baru",
+      "activeTitle": "Milestone Aktif Terdeteksi",
+      "activeDesc": "Kamu sudah memiliki milestone aktif atau selesai. Mohon batalkan atau tunggu sampai di-mint sebelum membuat yang baru.",
+      "labels": {
+        "title": "Judul",
+        "titlePlaceholder": "cth. Marathon Stream 24 Jam",
+        "coinType": "Tipe Koin",
+        "targetAmount": "Target Jumlah ({coin})",
+        "targetPlaceholder": "cth. 100.00",
+        "rewardImage": "Gambar Hadiah",
+        "upload": "Unggah Gambar"
+      },
+      "toast": {
+        "uploading": "Mengunggah gambar...",
+        "uploaded": "Gambar terunggah!",
+        "success": "Milestone berhasil dibuat!",
+        "error": "Gagal membuat milestone",
+        "selectImage": "Mohon pilih file gambar"
+      },
+      "button": {
+        "idle": "Buat Milestone",
+        "loading": "Memproses..."
+      }
+    },
+    "history": {
+      "title": "Riwayat Milestone",
+      "subtitle": "Kelola milestone aktif dan lama kamu.",
+      "yourMilestones": "Milestone Kamu",
+      "empty": "Belum ada milestone.",
+      "cancelConfirm": "Kamu yakin ingin membatalkan milestone ini?",
+      "cancelSuccess": "Milestone dibatalkan"
+    }
+  },
   "LeaderboardSettings": {
     "customize": "Kustomisasi Warna",
     "previewDesc": "Ini tampilan yang akan muncul di stream kamu.\nWarna berubah secara instan!"
@@ -174,6 +218,12 @@
     "milestone": {
       "title": "Overlay Milestone",
       "desc": "Buat target donasi dan berikan hadiah untuk pendukung."
+    },
+    "Dashboard": {
+      "toast": {
+        "settingsSaved": "Pengaturan berhasil disimpan",
+        "settingsFailed": "Gagal menyimpan pengaturan"
+      }
     }
   },
   "Profile": {
@@ -215,7 +265,6 @@
     }
   },
   "Overlay": {
-    "newDonation": "Donasi Baru",
     "topSupporters": "Pendukung Teratas",
     "noDonations": "Belum ada donasi"
   },
