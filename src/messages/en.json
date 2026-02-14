@@ -83,6 +83,10 @@
       "history": {
         "title": "Donation History",
         "desc": "View complete history of incoming donations."
+      },
+      "milestone": {
+        "title": "Milestones",
+        "desc": "Create and manage your fundraising goals."
       }
     },
     "withdraw": {
@@ -95,7 +99,10 @@
       "invalidAddress": "Invalid address format",
       "success": "Withdrawal successful!",
       "error": "Withdrawal failed",
-      "loginRequired": "Withdrawal only for Google Login accounts. Wallet users already have full control over their funds."
+      "loginRequired": "Withdrawal only for Google Login accounts. Wallet users already have full control over their funds.",
+      "coinType": "Coin Type",
+      "balance": "Balance: {amount} {coin}",
+      "minAmountError": "Minimum amount is {amount} {coin}"
     },
     "toast": {
       "logoutSuccess": "Logged out successfully",
@@ -107,6 +114,8 @@
   },
   "DonationForm": {
     "logout": "Logout",
+    "selectCoin": "Select Coin",
+    "minDonationError": "Minimum donation is {amount} {coin}",
     "nominal": "Amount:",
     "from": "From:",
     "message": "Message:",
@@ -146,6 +155,41 @@
       "rankColor": "Rank Badge Color"
     }
   },
+  "Milestone": {
+    "create": {
+      "title": "Create New Milestone",
+      "activeTitle": "Active Milestone Detected",
+      "activeDesc": "You already have an active or completed milestone. Please cancel it or wait for it to be minted before creating a new one.",
+      "labels": {
+        "title": "Title",
+        "titlePlaceholder": "e.g. 24h Stream Marathon",
+        "coinType": "Coin Type",
+        "targetAmount": "Target Amount ({coin})",
+        "targetPlaceholder": "e.g. 100.00",
+        "rewardImage": "Reward Image",
+        "upload": "Upload Image"
+      },
+      "toast": {
+        "uploading": "Uploading image...",
+        "uploaded": "Image uploaded!",
+        "success": "Milestone created successfully!",
+        "error": "Failed to create milestone",
+        "selectImage": "Please select an image file"
+      },
+      "button": {
+        "idle": "Create Milestone",
+        "loading": "Creating..."
+      }
+    },
+    "history": {
+      "title": "Milestone History",
+      "subtitle": "Manage your past and active milestones.",
+      "yourMilestones": "Your Milestones",
+      "empty": "No milestones found.",
+      "cancelConfirm": "Are you sure you want to cancel this milestone?",
+      "cancelSuccess": "Milestone cancelled"
+    }
+  },
   "LeaderboardSettings": {
     "customize": "Customize Colors",
     "previewDesc": "This is how it will look on your stream.\nColors update instantly!"
@@ -174,6 +218,12 @@
     "milestone": {
       "title": "Milestone Overlay",
       "desc": "Set donation goals and incentivize support with rewards."
+    },
+    "Dashboard": {
+      "toast": {
+        "settingsSaved": "Settings saved successfully",
+        "settingsFailed": "Failed to save settings"
+      }
     }
   },
   "Profile": {
@@ -215,7 +265,6 @@
     }
   },
   "Overlay": {
-    "newDonation": "New Donation",
     "topSupporters": "Top Supporters",
     "noDonations": "No donations yet"
   },

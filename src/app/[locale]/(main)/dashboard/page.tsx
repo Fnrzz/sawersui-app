@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { checkUserOnboarding, getWalletBalance } from "@/lib/actions/auth";
+import { checkUserOnboarding, getWalletBalances } from "@/lib/actions/auth";
 import { getDonations } from "@/lib/actions/donation";
 import { OnboardingModal } from "@/components/auth/OnboardingModal";
 import { DashboardOverview } from "@/components/dashboard/DashboardOverview";
@@ -17,6 +17,7 @@ export default async function DashboardPage() {
 
   let walletAddress: string | null = null;
   let usdcBalance = "0.00";
+  let suiBalance = "0.00";
   let onboardingStatus: {
     needsOnboarding: boolean;
     profile?: { display_name?: string; username?: string };
@@ -33,7 +34,9 @@ export default async function DashboardPage() {
       walletAddress = profile.wallet_address;
 
       if (walletAddress) {
-        usdcBalance = await getWalletBalance(walletAddress);
+        const balances = await getWalletBalances(walletAddress);
+        usdcBalance = balances.usdc;
+        suiBalance = balances.sui;
       }
 
       onboardingStatus = {
@@ -72,6 +75,7 @@ export default async function DashboardPage() {
         displayName={displayName}
         username={username}
         usdcBalance={usdcBalance}
+        suiBalance={suiBalance}
         totalDonations={totalDonations} // This might be under-reporting if > 100 donations.
         lastDonation={lastDonation}
         recentDonations={recentDonations.slice(0, 5)}

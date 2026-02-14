@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCurrentAccount, useDisconnectWallet } from "@mysten/dapp-kit";
 import { useTranslations } from "next-intl";
 import {
@@ -15,7 +15,7 @@ import { saveDonation, StreamerProfile } from "@/lib/actions/donation";
 import { motion, AnimatePresence, Variants } from "framer-motion";
 import { toast } from "sonner";
 import { useZkLogin } from "@/hooks/useZkLogin";
-import { useUsdcBalance } from "@/hooks/useUsdcBalance";
+import { useBalances } from "@/hooks/useBalances";
 import { signOut } from "@/lib/actions/auth";
 
 interface DonationFormProps {
@@ -25,7 +25,8 @@ interface DonationFormProps {
 
 type DonationStatus = "idle" | "signing" | "confirming" | "success" | "error";
 
-const AMOUNT_PRESETS = [1, 5, 10, 25, 50, 100];
+const AMOUNT_PRESETS_USDC = [1, 5, 10, 25, 50, 100];
+const AMOUNT_PRESETS_SUI = [1, 5, 10, 20, 50, 100];
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -57,9 +58,9 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
   const isConnected = !!currentAccount || isZkAuthenticated;
   const userAddress = currentAccount?.address || zkAddress;
 
-  const { balance: usdcBalance, isLoading: isBalanceLoading } =
-    useUsdcBalance(userAddress);
+  const { balances, isLoading: isBalanceLoading } = useBalances(userAddress);
 
+  const [coinType, setCoinType] = useState<"USDC" | "SUI">("USDC");
   const [amount, setAmount] = useState<number>(5);
   const [customAmount, setCustomAmount] = useState<string>("");
   const [isCustom, setIsCustom] = useState(false);
@@ -79,7 +80,7 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
     streamerId: streamer.id,
   });
 
-  const { donateUSDC, isLoading: isZkLoading } = useZkDonation({
+  const { donate: zkDonate, isLoading: isZkLoading } = useZkDonation({
     streamerAddress: streamer.wallet_address,
     streamerId: streamer.id,
   });
@@ -110,6 +111,8 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
     setCustomAmount("");
   };
 
+  const currentBalance = coinType === "USDC" ? balances.usdc : balances.sui;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -119,8 +122,12 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
     }
 
     const donationAmount = getAmount();
-    if (donationAmount < 0.5) {
-      setErrorMessage(t("minDonation"));
+    const minAmount = coinType === "SUI" ? 0.1 : 0.5;
+
+    if (donationAmount < minAmount) {
+      setErrorMessage(
+        t("minDonationError", { amount: minAmount, coin: coinType }),
+      );
       return;
     }
 
@@ -133,14 +140,16 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
       let digest: string;
 
       if (isZkAuthenticated) {
-        digest = await donateUSDC({
-          amountUsdc: donationAmount,
+        digest = await zkDonate({
+          amount: donationAmount,
+          coinType,
           donorName: donorName || "Anonim",
           message,
         });
       } else {
         digest = await donate({
-          amountUsdc: donationAmount,
+          amount: donationAmount,
+          coinType,
           donorName: donorName || "Anonim",
           message,
         });
@@ -149,6 +158,13 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
       setStatus("confirming");
       setTxDigest(digest);
 
+      // Save donation logic is handled server-side mostly, but we call saveDonation to index it basically
+      // The amount_net calculation here is just for optimistic UI or backend record, actual net is on chain
+      // SUI has no fee deduction logic on client side here shown, but let's just save raw amount for now or keeping 0.95 factor?
+      // Assuming 100% sponsored, net = gross for user?
+      // Wait, 100% sponsored means user doesn't pay GAS. Platform fee might still exist.
+      // previous code: const netAmount = donationAmount * 0.95;
+      // Let's keep it consistent.
       const netAmount = donationAmount * 0.95;
 
       await saveDonation({
@@ -157,6 +173,8 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
         message,
         amount_net: netAmount,
         tx_digest: digest,
+        // coin_type is determined by server from tx, so we don't strictly need to pass it if saveDonation verifies tx
+        // but verifyDonationAmount extracts it.
       });
 
       setStatus("success");
@@ -173,8 +191,6 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
         setMessage("");
         setStatus("idle");
         setTxDigest(null);
-        // Do not reset checkboxes to force re-read? Or reset them?
-        // Typically better to leave them or reset. I'll reset them.
         setIsAgeChecked(false);
         setIsAgreedChecked(false);
       }, 5000);
@@ -187,8 +203,13 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
     }
   };
 
-  // Success State
+  const activePresets =
+    coinType === "USDC" ? AMOUNT_PRESETS_USDC : AMOUNT_PRESETS_SUI;
+
+  // ... (Success State is same, omitting for brevity in replacement if possible, but safer to include full render)
+
   if (status === "success") {
+    // ... same code ...
     return (
       <motion.div
         className="flex flex-col items-center justify-center py-12 space-y-4"
@@ -247,7 +268,9 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
                 {t("balance")}
               </span>
               <span className="text-sm font-black text-black leading-tight">
-                {isBalanceLoading ? "..." : `$${usdcBalance.toFixed(2)}`}
+                {isBalanceLoading
+                  ? "..."
+                  : `${currentBalance.toFixed(coinType === "USDC" ? 2 : 4)} ${coinType}`}
               </span>
             </div>
           </div>
@@ -263,6 +286,47 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
         </motion.div>
       )}
 
+      {/* Coin Selector */}
+      <motion.div variants={itemVariants} className="mb-6">
+        <label className="text-sm font-bold text-black mb-1 block">
+          {t("selectCoin")}
+        </label>
+        <div className="flex gap-4">
+          <button
+            type="button"
+            onClick={() => {
+              setCoinType("USDC");
+              // Reset custom amount checks or presets if needed?
+              // Just keep amount, user can adjust.
+            }}
+            className={`flex-1 py-3 px-4 rounded-lg font-bold border-2 border-black transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center gap-2
+              ${
+                coinType === "USDC"
+                  ? "bg-blue-100 text-black"
+                  : "bg-white text-black hover:bg-gray-50"
+              }
+            `}
+          >
+            <span className="bg-blue-500 w-3 h-3 rounded-full border border-black"></span>
+            USDC
+          </button>
+          <button
+            type="button"
+            onClick={() => setCoinType("SUI")}
+            className={`flex-1 py-3 px-4 rounded-lg font-bold border-2 border-black transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center gap-2
+              ${
+                coinType === "SUI"
+                  ? "bg-blue-100 text-black"
+                  : "bg-white text-black hover:bg-gray-50"
+              }
+            `}
+          >
+            <span className="bg-blue-500 w-3 h-3 rounded-full border border-black"></span>
+            SUI
+          </button>
+        </div>
+      </motion.div>
+
       {/* Jumlah */}
       <motion.div variants={itemVariants} className="mb-6">
         <label className="text-sm font-bold text-black mb-1 block">
@@ -272,7 +336,7 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
         {/* Underlined Input with Prefix */}
         <div className="relative mb-4">
           <span className="absolute left-0 top-1/2 -translate-y-1/2 text-black font-bold text-lg">
-            $
+            {coinType === "USDC" ? "$" : "SUI"}
           </span>
           <input
             type="text"
@@ -292,14 +356,14 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
               }
             }}
             placeholder={t("placeholderAmount")}
-            className="w-full pl-8 py-2 text-lg font-bold bg-transparent border-b-[3px] border-black text-black placeholder:text-black/30 focus:outline-none focus:border-black/60 rounded-none transition-all"
+            className="w-full pl-12 py-2 text-lg font-bold bg-transparent border-b-[3px] border-black text-black placeholder:text-black/30 focus:outline-none focus:border-black/60 rounded-none transition-all"
           />
         </div>
 
         {/* Quick Presets - Colored Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-1">
-          {AMOUNT_PRESETS.slice(0, 4).map((preset, idx) => {
-            // Cyclical colors: Teal, Blue, Orange, Purple
+          {activePresets.slice(0, 4).map((preset, idx) => {
+            // Cyclical colors
             const colors = [
               "bg-[#99F6E4]", // Teal
               "bg-[#3B82F6]", // Blue
@@ -315,7 +379,8 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
                 onClick={() => handlePresetClick(preset)}
                 className={`py-3 rounded-lg text-sm font-black border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-y-1 hover:shadow-none active:translate-y-1 active:shadow-none ${colorClass} text-black`}
               >
-                ${preset}
+                {coinType === "USDC" ? "$" : ""}
+                {preset} {coinType === "SUI" ? "SUI" : ""}
               </button>
             );
           })}
@@ -336,9 +401,6 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
           className="w-full py-2 text-lg font-bold bg-transparent border-b-[3px] border-black text-black placeholder:text-black/30 focus:outline-none focus:border-black/60 rounded-none transition-all px-0"
         />
       </motion.div>
-
-      {/* Email (Visual Only for now to match ref, or map to contact field if exists, otherwise skip or make decorative) */}
-      {/* Skipping Email to keep logic simple, adding Pesan */}
 
       {/* Pesan */}
       <motion.div className="mb-8" variants={itemVariants}>
@@ -404,7 +466,7 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
         )}
       </AnimatePresence>
 
-      {/* CTA Area - Split Layout */}
+      {/* CTA Area */}
       <motion.div
         className="flex flex-col md:flex-row items-stretch justify-between gap-4 -mx-6 -mb-6 p-6 md:-mx-8 md:-mb-8 md:p-6 border-t-[3px] border-black rounded-b-lg"
         variants={itemVariants}
@@ -415,7 +477,7 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
           </p>
           <p className="text-xs text-black/60">{t("fee")}</p>
           <p className="text-3xl font-black text-black mt-1">
-            {t("total")} ${getAmount()} USDC
+            {t("total")} {getAmount()} {coinType}
           </p>
         </div>
 
@@ -454,6 +516,8 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
       <motion.p
         variants={itemVariants}
         className="text-center text-xs text-muted-foreground/60 mt-6 pt-4"
+        initial="hidden"
+        animate="visible"
       >
         {t.rich("poweredBy", {
           brand: (chunks) => (

@@ -80,7 +80,7 @@ export default async function HistoryPage({ searchParams }: HistoryPageProps) {
                 >
                   <div className="space-y-4">
                     {/* Header: Name & Time */}
-                    <div className="flex justify-between items-start">
+                    <div className="space-y-2">
                       <div className="bg-white/50 px-3 py-1 rounded-lg border-2 border-black inline-block">
                         <span className="font-black text-black text-sm">
                           {donation.donor_name || "Anonim"}
@@ -117,7 +117,13 @@ export default async function HistoryPage({ searchParams }: HistoryPageProps) {
                         {t("amount")}
                       </p>
                       <p className="text-2xl font-black text-black">
-                        ${donation.amount_net.toFixed(2)}
+                        {donation.amount_net.toFixed(2)}{" "}
+                        <span className="text-lg">
+                          {donation.coin_type === "SUI" ||
+                          donation.coin_type?.includes("sui")
+                            ? "SUI"
+                            : "USDC"}
+                        </span>
                       </p>
                     </div>
                     <a

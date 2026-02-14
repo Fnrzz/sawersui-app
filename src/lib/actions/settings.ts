@@ -88,9 +88,9 @@ export async function saveOverlaySettings(
       };
     }
 
-    // Validate file size (max 2MB)
-    if (soundFile.size > 2 * 1024 * 1024) {
-      return { success: false, error: "File too large. Maximum 2MB." };
+    // Validate file size (max 500KB)
+    if (soundFile.size > 500 * 1024) {
+      return { success: false, error: "File too large. Maximum 500KB." };
     }
 
     const fileExt = soundFile.name.split(".").pop();

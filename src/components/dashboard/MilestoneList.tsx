@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Trash2, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 interface Milestone {
   id: string;
@@ -17,9 +18,11 @@ interface Milestone {
   status: string;
   created_at: string;
   walrus_url: string;
+  coin_type?: string;
 }
 
 export function MilestoneList() {
+  const t = useTranslations("Milestone.history");
   const [milestones, setMilestones] = useState<Milestone[]>([]);
   const [isPending, startTransition] = useTransition();
 
@@ -38,12 +41,12 @@ export function MilestoneList() {
   }, []);
 
   const handleCancel = (id: string) => {
-    if (!confirm("Are you sure you want to cancel this milestone?")) return;
+    if (!confirm(t("cancelConfirm"))) return;
 
     startTransition(async () => {
       const result = await cancelMilestone(id);
       if (result.success) {
-        toast.success("Milestone cancelled");
+        toast.success(t("cancelSuccess"));
         fetchMilestones(); // Refresh list
       } else {
         toast.error(result.error);
@@ -68,12 +71,12 @@ export function MilestoneList() {
 
   return (
     <div className="space-y-6">
-      <h3 className="text-xl font-bold">Your Milestones</h3>
+      <h3 className="text-xl font-bold">{t("yourMilestones")}</h3>
 
       <div className="grid gap-4">
         <AnimatePresence>
           {milestones.length === 0 ? (
-            <p className="text-gray-500 italic">No milestones found.</p>
+            <p className="text-gray-500 italic">{t("empty")}</p>
           ) : (
             milestones.map((milestone) => (
               <motion.div
@@ -110,7 +113,10 @@ export function MilestoneList() {
                         </div>
                         <div className="text-sm font-mono mt-1 text-gray-600">
                           {milestone.current_amount.toFixed(2)} /{" "}
-                          {milestone.target_amount.toFixed(2)} USDC
+                          {milestone.target_amount.toFixed(2)}{" "}
+                          {milestone.coin_type?.includes("sui")
+                            ? "SUI"
+                            : "USDC"}
                         </div>
                       </div>
                     </div>

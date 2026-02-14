@@ -142,28 +142,44 @@ export async function checkProfileByAddress(address: string) {
 // WALLET BALANCE
 // ============================================================
 
-export async function getWalletBalance(address: string) {
+// ============================================================
+// WALLET BALANCE
+// ============================================================
+
+export async function getWalletBalances(address: string) {
   try {
     const client = getSuiClient();
 
-    const coinType = CONFIG.SUI.ADDRESS.USDC_TYPE;
-    if (!coinType) {
+    const usdcType = CONFIG.SUI.ADDRESS.USDC_TYPE;
+    const suiType = "0x2::sui::SUI";
+
+    if (!usdcType) {
       console.warn("USDC Coin Address not configured");
-      return "0.00";
+      return { usdc: "0.00", sui: "0.00" };
     }
 
-    const balance = await client.getBalance({
-      owner: address,
-      coinType: coinType,
-    });
+    // Parallel fetch
+    const [usdcBalance, suiBalance] = await Promise.all([
+      client.getBalance({
+        owner: address,
+        coinType: usdcType,
+      }),
+      client.getBalance({
+        owner: address,
+        coinType: suiType,
+      }),
+    ]);
 
-    const rawBalance = parseInt(balance.totalBalance);
-    const formatted = (rawBalance / 1_000_000).toFixed(2);
+    const usdcRaw = parseInt(usdcBalance.totalBalance);
+    const suiRaw = parseInt(suiBalance.totalBalance);
 
-    return formatted;
+    return {
+      usdc: (usdcRaw / 1_000_000).toFixed(2),
+      sui: (suiRaw / 1_000_000_000).toFixed(4), // SUI has 9 decimals, show 4
+    };
   } catch (error) {
     console.error("Failed to fetch balance:", error);
-    return "0.00";
+    return { usdc: "0.00", sui: "0.00" };
   }
 }
 

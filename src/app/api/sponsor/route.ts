@@ -34,7 +34,7 @@ export async function POST(req: Request) {
     // NEW FLOW: Server-Side Sponsored Withdrawal
     // =================================================================
     if (body.isWithdrawal) {
-      const { sender, recipientAddress, amountMist } = body;
+      const { sender, recipientAddress, amountMist, coinType } = body;
 
       if (!sender || !recipientAddress || !amountMist) {
         return NextResponse.json(
@@ -43,12 +43,18 @@ export async function POST(req: Request) {
         );
       }
 
-      // Security Check: Value >= 0.5 USDC
-      // 500,000 using BigInt constructor for compatibility
-      const MIN_AMOUNT_MIST = BigInt("500000");
-      if (BigInt(amountMist) < MIN_AMOUNT_MIST) {
+      const targetCoinType = coinType || CONFIG.SUI.ADDRESS.USDC_TYPE;
+      const isSui = targetCoinType === "0x2::sui::SUI";
+
+      // Security Check: Value >= 0.5 USDC / 0.1 SUI (approx)
+      let minAmountMist = BigInt("500000"); // 0.5 USDC
+      if (isSui) {
+        minAmountMist = BigInt("100000000"); // 0.1 SUI (just a sane default for gas/dust)
+      }
+
+      if (BigInt(amountMist) < minAmountMist) {
         return NextResponse.json(
-          { error: "Amount below minimum (0.50 USDC)" },
+          { error: "Amount below minimum limit" },
           { status: 400 },
         );
       }
@@ -86,10 +92,11 @@ export async function POST(req: Request) {
       const rgp = await client.getReferenceGasPrice();
       tx.setGasPrice(rgp);
 
-      // 3. User Coin Logic (Fetch USDC)
+      // 3. User Coin Logic (Fetch USDC or SUI)
+      // CRITICAL: Even for SUI, we fetch user's coin objects. We do NOT use tx.gas.
       const { data: userCoins } = await client.getCoins({
         owner: sender,
-        coinType: CONFIG.SUI.ADDRESS.USDC_TYPE,
+        coinType: targetCoinType,
       });
 
       if (!userCoins || userCoins.length === 0) {

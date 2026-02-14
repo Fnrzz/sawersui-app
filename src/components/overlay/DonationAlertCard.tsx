@@ -27,31 +27,12 @@ export function DonationAlertCard({
   const messageColor = settings?.message_color ?? "#ffffff";
 
   const content = (
-    <>
-      {/* Header Bar */}
-      <div className="bg-black/20 p-4 border-b-[3px] border-black flex items-center justify-center">
-        <h3 className="font-[family-name:var(--font-pixel)] text-lg text-white uppercase tracking-widest text-center pt-1 drop-shadow-md">
-          {t("newDonation")}
-        </h3>
-      </div>
-
-      {/* Content Body */}
-      <div className="p-6 flex flex-col gap-4">
-        {/* Donor Name & NFT Badge */}
-        <div className="flex flex-col items-center gap-2">
-          {nftImage && (
-            <div className="relative w-16 h-16 rounded-full border-[3px] border-black overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-white">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={nftImage}
-                alt="Reward NFT"
-                className="w-full h-full object-cover"
-              />
-            </div>
-          )}
-        </div>
+    <div className="p-8 flex items-center justify-between gap-8 h-full min-h-[200px]">
+      {/* Left Content */}
+      <div className="flex-1 flex flex-col gap-2">
+        {/* Name */}
         <h2
-          className="text-3xl font-bold font-[family-name:var(--font-pixel-body)] tracking-wide drop-shadow-[2px_2px_0px_rgba(0,0,0,1)] break-all"
+          className="text-4xl font-bold font-[family-name:var(--font-pixel-body)] tracking-wide drop-shadow-[2px_2px_0px_rgba(0,0,0,1)] break-all leading-tight"
           style={{ color: senderColor }}
         >
           {data.donor_name}
@@ -60,7 +41,7 @@ export function DonationAlertCard({
         {/* Message */}
         {data.message && (
           <p
-            className="text-xl leading-relaxed font-[family-name:var(--font-pixel-body)] break-words w-full"
+            className="text-2xl leading-relaxed font-[family-name:var(--font-pixel-body)] break-words w-full my-1 font-bold"
             style={{ color: messageColor }}
           >
             {data.message}
@@ -68,20 +49,37 @@ export function DonationAlertCard({
         )}
 
         {/* Amount */}
-        <div className="mt-1">
-          <p
-            className="text-2xl font-bold font-[family-name:var(--font-pixel)] drop-shadow-[2px_2px_0px_rgba(0,0,0,1)] tracking-widest"
-            style={{ color: amountColor }}
-          >
-            {data.amount_net.toLocaleString()} USDC
-          </p>
-        </div>
+        <p
+          className="text-3xl font-bold font-[family-name:var(--font-pixel)] drop-shadow-[2px_2px_0px_rgba(0,0,0,1)] tracking-widest mt-2"
+          style={{ color: amountColor }}
+        >
+          {data.amount_net.toLocaleString()}{" "}
+          {data.coin_type?.includes("0x2::sui::SUI") ? "SUI" : "USDC"}
+        </p>
       </div>
-    </>
+
+      {/* Right Content: Image */}
+      {nftImage && (
+        <div className="w-48 h-48 shrink-0 relative">
+          <div className="absolute inset-0 bg-white border-[4px] border-black rounded-full shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={nftImage}
+              alt="Reward NFT"
+              className="w-full h-full object-cover"
+            />
+          </div>
+          {/* Decorative Bubble */}
+          <div className="absolute -top-4 -right-2 bg-white border-[3px] border-black px-3 py-1 rounded-full shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] animate-bounce font-[family-name:var(--font-pixel)] text-xs font-bold">
+            ❤️
+          </div>
+        </div>
+      )}
+    </div>
   );
 
   const sharedClassName =
-    "w-full max-w-md overflow-hidden border-[3px] border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-xl";
+    "w-full max-w-3xl overflow-hidden border-[4px] border-black shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] rounded-2xl";
 
   // Preview mode: plain div for instant reactivity (no framer-motion caching)
   if (preview) {
@@ -97,8 +95,8 @@ export function DonationAlertCard({
     <motion.div
       initial={{ y: 50, opacity: 0, scale: 0.9 }}
       animate={{ y: 0, opacity: 1, scale: 1 }}
-      exit={{ y: 20, opacity: 0, scale: 0.95 }}
-      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+      exit={{ y: -50, opacity: 0, scale: 0.9 }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
       className={sharedClassName}
       style={{ backgroundColor: bgColor }}
     >

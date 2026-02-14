@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import { motion, Variants } from "framer-motion";
 import { MenuCard } from "@/components/dashboard/MenuCard";
 import { WithdrawModal } from "@/components/dashboard/WithdrawModal";
+import { useBalances } from "@/hooks/useBalances";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -50,6 +51,7 @@ interface DashboardOverviewProps {
   displayName: string;
   username: string;
   usdcBalance: string;
+  suiBalance: string;
   totalDonations: number;
   lastDonation: Donation | null;
   recentDonations: Donation[];
@@ -59,7 +61,9 @@ interface DashboardOverviewProps {
 export function DashboardOverview({
   displayName,
   username,
-  usdcBalance,
+  usdcBalance: initialUsdcBalance,
+  suiBalance: initialSuiBalance,
+  walletAddress,
 }: DashboardOverviewProps) {
   const t = useTranslations("Dashboard");
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
@@ -67,6 +71,15 @@ export function DashboardOverview({
   const supabase = createClient();
   const { mutate: disconnect } = useDisconnectWallet();
   const { logout: zkLogout, isAuthenticated } = useZkLogin();
+
+  // Real-time balance updates
+  const { balances } = useBalances(walletAddress);
+
+  // Use live balances if available (and non-zero/loaded), else initial
+  const displayUsdc =
+    balances.usdc > 0 ? balances.usdc.toFixed(2) : initialUsdcBalance;
+  const displaySui =
+    balances.sui > 0 ? balances.sui.toFixed(4) : initialSuiBalance;
 
   const handleLogout = async () => {
     try {
@@ -155,7 +168,8 @@ export function DashboardOverview({
         {/* Dukungan Masuk & Cashout - Purple */}
         <MenuCard
           title={t("menu.balance.title")}
-          description={t("menu.balance.desc", { balance: usdcBalance })}
+          // description={t("menu.balance.desc", { balance: usdcBalance })} // Old
+          description={`${displayUsdc} USDC | ${displaySui} SUI`} // Custom display overriding locale for now or could update locale
           icon={Wallet}
           colorClass="bg-[#DDD6FE]" // Violet-200ish
           onClick={() => {
@@ -168,21 +182,21 @@ export function DashboardOverview({
           actionLabel={t("menu.balance.action")}
         />
 
-        {/* Riwayat Donasi - Orange */}
+        {/* Riwayat / History - Yellow */}
         <MenuCard
           title={t("menu.history.title")}
           description={t("menu.history.desc")}
           icon={History}
-          colorClass="bg-[#FED7AA]" // Orange-200ish
+          colorClass="bg-[#FDE68A]" // Amber-200ish
           href="/dashboard/history"
         />
 
-        {/* Milestone List - Purple */}
+        {/* Milestones - Green */}
         <MenuCard
-          title="Milestone History"
-          description="Manage your past and active milestones."
+          title={t("menu.milestone.title")}
+          description={t("menu.milestone.desc")}
           icon={Flag}
-          colorClass="bg-[#E9D5FF]" // Purple-200ish
+          colorClass="bg-[#C1E1C1]" // Green-200ish
           href="/dashboard/milestone"
         />
       </motion.div>
@@ -191,7 +205,8 @@ export function DashboardOverview({
       <WithdrawModal
         open={isWithdrawOpen}
         onOpenChange={setIsWithdrawOpen}
-        usdcBalance={usdcBalance}
+        usdcBalance={displayUsdc}
+        suiBalance={displaySui}
       />
     </motion.div>
   );
