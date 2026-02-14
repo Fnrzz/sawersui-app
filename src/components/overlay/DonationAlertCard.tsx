@@ -27,7 +27,7 @@ export function DonationAlertCard({
   const messageColor = settings?.message_color ?? "#ffffff";
 
   const content = (
-    <div className="p-8 flex items-center justify-between gap-8 h-full min-h-[200px]">
+    <div className="p-8 flex items-center justify-between gap-8 h-full min-h-[200px] max-w-2xl">
       {/* Left Content */}
       <div className="flex-1 flex flex-col gap-2">
         {/* Name */}
@@ -60,7 +60,7 @@ export function DonationAlertCard({
 
       {/* Right Content: Image */}
       {nftImage && (
-        <div className="w-48 h-48 shrink-0 relative">
+        <div className="w-40 h-40 shrink-0 relative">
           <div className="absolute inset-0 bg-white border-[4px] border-black rounded-full shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
