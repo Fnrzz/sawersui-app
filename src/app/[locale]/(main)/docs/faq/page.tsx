@@ -91,6 +91,31 @@ export default function FAQPage() {
             </div>
           </div>
         </section>
+
+        {/* Technical Section */}
+        <section className="space-y-6">
+          <h2 className="text-3xl font-extrabold text-[#1C1E21] uppercase tracking-tight flex items-center gap-3 drop-shadow-[2px_2px_0px_rgba(245,158,11,0.5)]">
+            <span>⚙️</span> {t("Technical.title")}
+          </h2>
+          <div className="grid gap-6">
+            <div className="bg-white border-2 border-[#1C1E21] shadow-[4px_4px_0px_0px_#1C1E21] p-6 rounded-lg hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_#1C1E21] transition-all">
+              <h3 className="text-xl font-black text-primary mb-2">
+                {t("Technical.Q1.q")}
+              </h3>
+              <p className="text-[#606770] font-medium text-lg">
+                {t("Technical.Q1.a")}
+              </p>
+            </div>
+            <div className="bg-white border-2 border-[#1C1E21] shadow-[4px_4px_0px_0px_#1C1E21] p-6 rounded-lg hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_#1C1E21] transition-all">
+              <h3 className="text-xl font-black text-primary mb-2">
+                {t("Technical.Q2.q")}
+              </h3>
+              <p className="text-[#606770] font-medium text-lg">
+                {t("Technical.Q2.a")}
+              </p>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   );
