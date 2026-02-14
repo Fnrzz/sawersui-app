@@ -24,8 +24,8 @@
         "desc": "Notifikasi donasi langsung muncul di OBS kamu secara real-time."
       },
       "usdcStablecoin": {
-        "title": "USDC Stablecoin",
-        "desc": "Donasi pakai USDC — stabil, aman, dan bisa di-withdraw kapan saja."
+        "title": "Multi-Currency",
+        "desc": "Donasi menggunakan <bold>SUI</bold> atau <bold>USDC</bold>. Memberikan fleksibilitas untuk mendukung kreator dengan cara kamu."
       },
       "platform": {
         "title": "Segalanya Untukmu",
@@ -280,7 +280,7 @@
     },
     "Introduction": {
       "title": "Pengantar",
-      "p1": "<bold>SawerSui</bold> adalah platform donasi generasi baru yang dirancang khusus untuk streamer dan konten kreator. Ini menjembatani kesenjangan antara monetisasi konten tradisional dan web terdesentralisasi.",
+      "p1": "<bold>SawerSui</bold> adalah platform donasi generasi baru yang dirancang khusus untuk streamer dan konten kreator. Dibangun dengan identitas desain <bold>Neo-Brutalist</bold> yang berani, ini menjembatani kesenjangan antara monetisasi konten tradisional dan web terdesentralisasi.",
       "p2": "Dengan memanfaatkan <bold>Sui Network</bold>, SawerSui mengatasi masalah umum platform donasi tradisional — biaya tinggi, waktu penyelesaian lambat, dan kurangnya transparansi — sambil memperkenalkan fitur native Web3 seperti hadiah NFT dan milestone terdesentralisasi.",
       "quote": "Jembatan interaksi dengan penontonmu."
     },
@@ -294,9 +294,9 @@
       },
       "SawerSui": {
         "title": "Solusi SawerSui",
-        "li1": "<bold>Biaya Rendah:</bold> 5% fee platform & 0 gas fee.",
+        "li1": "<bold>Biaya Rendah:</bold> 5% fee platform & 0 gas fee (Disponsori).",
         "li2": "<bold>Settlement Instan:</bold> Langsung masuk ke wallet seketika.",
-        "li3": "<bold>Onboarding Mudah:</bold> Login dengan Google (zkLogin)."
+        "li3": "<bold>Onboarding Mudah:</bold> Login dengan Google (zkLogin) atau Wallet."
       }
     },
     "Features": {
@@ -315,7 +315,7 @@
       },
       "Stablecoin": {
         "title": "Pendapatan Stabil",
-        "desc": "Terima <bold>USDC</bold> untuk menghindari volatilitas kripto. Jaga pendapatanmu tetap stabil tanpa peduli kondisi pasar."
+        "desc": "Terima <bold>SUI</bold> atau <bold>USDC</bold>. Pilih antara token asli jaringan atau stablecoin untuk menghindari volatilitas."
       }
     },
     "Architecture": {
@@ -371,7 +371,7 @@
       },
       "Step3": {
         "title": "3. Pasang Overlay OBS",
-        "desc": "Pergi ke menu <bold>Dashboard > Overlay</bold>. Salin Overlay URL unik kamu dan tambahkan sebagai 'Browser Source' di OBS/Streamlabs. (Rekomendasi Ukuran: 500x500)."
+        "desc": "Pergi ke menu <bold>Dashboard > Overlay</bold>. Salin Overlay URL unik kamu dan tambahkan sebagai 'Browser Source' di OBS/Streamlabs. <bold>Rekomendasi Ukuran: 500x500px</bold> untuk visibilitas terbaik."
       }
     },
     "Supporters": {
@@ -382,7 +382,7 @@
       },
       "Step2": {
         "title": "2. Kirim Dukungan",
-        "desc": "Kamu bisa donasi menggunakan <bold>Sui Wallet</bold> atau login dengan <bold>Google</bold> untuk menggunakan saldo sosialmu. Masukkan jumlah USDC dan pesan."
+        "desc": "Kamu bisa donasi menggunakan <bold>SUI</bold> atau <bold>USDC</bold>. Login dengan <bold>Google</bold> atau hubungkan dompet. Masukkan jumlah dan pesan."
       },
       "Step3": {
         "title": "3. Tanpa Biaya Gas",
@@ -395,8 +395,8 @@
     "subtitle": "Segala hal yang perlu kamu tahu tentang menerima dan mengirim dukungan di SawerSui.",
     "Overview": {
       "title": "Cara Kerja",
-      "p1": "SawerSui memfasilitasi donasi <bold>Peer-to-Peer (P2P)</bold> langsung. Ketika pendukung mengirim dana, dana tersebut langsung masuk dari wallet mereka ke wallet/akun streamer.",
-      "p2": "Saat ini kami mendukung <bold>USDC</bold> (USD Coin) di jaringan Sui untuk memastikan nilai yang stabil bagi kreator."
+      "p1": "SawerSui memfasilitasi donasi <bold>Peer-to-Peer (P2P)</bold> langsung. Ketika pendukung mengirim dana, dana tersebut langsung masuk dari wallet mereka ke wallet/akun streamer—tanpa perantara yang menahan danamu.",
+      "p2": "Kami mendukung <bold>SUI</bold> dan <bold>USDC</bold> di jaringan Sui, memberikan kamu pilihan dan fleksibilitas."
     },
     "Methods": {
       "title": "Metode Donasi",
@@ -505,7 +505,7 @@
       "title": "Umum",
       "Q1": {
         "q": "Apa itu SawerSui?",
-        "a": "SawerSui adalah platform donasi untuk streamer di jaringan Sui. Kamu bisa menerima dukungan USDC dengan notifikasi real-time."
+        "a": "SawerSui adalah platform donasi untuk streamer di jaringan Sui. Kamu bisa menerima dukungan SUI atau USDC dengan notifikasi real-time."
       },
       "Q2": {
         "q": "Apakah aman?",
@@ -527,11 +527,22 @@
       "title": "Untuk Donatur",
       "Q1": {
         "q": "Perlu crypto wallet?",
-        "a": "Tidak! Kamu bisa login dengan akun Google. Kamu hanya perlu top-up USDC atau minta teman kirimkan."
+        "a": "Tidak! Kamu bisa login dengan akun Google. Kamu hanya perlu top-up SUI atau USDC, atau minta teman kirimkan."
       },
       "Q2": {
         "q": "Kenapa Sui Network?",
         "a": "Sui menawarkan kecepatan instan dan biaya murah, sangat cocok untuk interaksi real-time seperti donasi stream."
+      }
+    },
+    "Technical": {
+      "title": "Teknis",
+      "Q1": {
+        "q": "Seberapa cepat settlement?",
+        "a": "Settlement praktis instan (<1 detik finalitas) di Jaringan Sui."
+      },
+      "Q2": {
+        "q": "Wallet apa yang saya butuhkan?",
+        "a": "Tidak perlu jika menggunakan Login Google! Namun jika kamu lebih suka self-custody, kami mendukung semua wallet Sui utama (Sui Wallet, Nightly, dll)."
       }
     }
   },
