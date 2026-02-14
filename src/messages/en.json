@@ -24,8 +24,8 @@
         "desc": "Donation notifications appear instantly on your OBS in real-time."
       },
       "usdcStablecoin": {
-        "title": "USDC Stablecoin",
-        "desc": "Donate using USDC — stable, secure, and withdrawable anytime."
+        "title": "Multi-Currency",
+        "desc": "Donate using <bold>SUI</bold> or <bold>USDC</bold>. Giving you flexibility to support creators your way."
       },
       "platform": {
         "title": "Everything You Need",
@@ -281,7 +281,7 @@
     },
     "Introduction": {
       "title": "Introduction",
-      "p1": "<bold>SawerSui</bold> is a next-generation donation platform designed specifically for streamers and content creators. It bridges the gap between traditional content monetization and the decentralized web.",
+      "p1": "<bold>SawerSui</bold> is a next-generation donation platform designed specifically for streamers and content creators. Built with a bold <bold>Neo-Brutalist</bold> design identity, it bridges the gap between traditional content monetization and the decentralized web.",
       "p2": "By leveraging the <bold>Sui Network</bold>, SawerSui solves the common pain points of traditional donation platforms — high fees, slow settlement times, and lack of transparency — while introducing Web3 native features like NFT rewards and decentralized milestones.",
       "quote": "Bridge interactions with your audience."
     },
@@ -295,9 +295,9 @@
       },
       "SawerSui": {
         "title": "SawerSui Solution",
-        "li1": "<bold>Low Fees:</bold> 5% platform fee & 0 gas fees.",
+        "li1": "<bold>Low Fees:</bold> 5% platform fee & 0 gas fees (Sponsored).",
         "li2": "<bold>Instant Settlement:</bold> Direct to wallet immediately.",
-        "li3": "<bold>Seamless Onboarding:</bold> Login with Google (zkLogin)."
+        "li3": "<bold>Seamless Onboarding:</bold> Login with Google (zkLogin) or Wallet."
       }
     },
     "Features": {
@@ -316,7 +316,7 @@
       },
       "Stablecoin": {
         "title": "Stable Income",
-        "desc": "Accept <bold>USDC</bold> to avoid crypto volatility. Keep your earnings stable regardless of market conditions."
+        "desc": "Accept <bold>SUI</bold> or <bold>USDC</bold>. Choose between the native token of the network or a stablecoin to avoid volatility."
       }
     },
     "Architecture": {
@@ -372,7 +372,7 @@
       },
       "Step3": {
         "title": "3. Setup OBS Overlay",
-        "desc": "Go to the <bold>Dashboard > Overlay</bold> menu. Copy your unique Overlay URL and add it as a 'Browser Source' in OBS/Streamlabs. (Recommended Size: 500x500)."
+        "desc": "Go to the <bold>Dashboard > Overlay</bold> menu. Copy your unique Overlay URL and add it as a 'Browser Source' in OBS/Streamlabs. <bold>Recommended Size: 500x500px</bold> for best visibility."
       }
     },
     "Supporters": {
@@ -383,7 +383,7 @@
       },
       "Step2": {
         "title": "2. Send Support",
-        "desc": "You can donate using <bold>Sui Wallet</bold> or login with <bold>Google</bold> to use your social balance. Enter the amount in USDC and a message."
+        "desc": "You can donate using <bold>SUI</bold> or <bold>USDC</bold>. Login with <bold>Google</bold> or connect your wallet. Enter the amount and a message."
       },
       "Step3": {
         "title": "3. Zero Gas Fees",
@@ -396,8 +396,8 @@
     "subtitle": "Everything you need to know about receiving and sending support on SawerSui.",
     "Overview": {
       "title": "How It Works",
-      "p1": "SawerSui facilitates direct <bold>Peer-to-Peer (P2P)</bold> donations. When a supporter sends funds, they go directly from their wallet to the streamer's wallet/account.",
-      "p2": "We currently support <bold>USDC</bold> (USD Coin) on the Sui Network to ensure stable value for creators."
+      "p1": "SawerSui facilitates direct <bold>Peer-to-Peer (P2P)</bold> donations. When a supporter sends funds, they go directly from their wallet/account to the streamer's wallet—no intermediaries holding your funds.",
+      "p2": "We support both <bold>SUI</bold> and <bold>USDC</bold> on the Sui Network, giving you choice and flexibility."
     },
     "Methods": {
       "title": "Donation Methods",
@@ -506,7 +506,7 @@
       "title": "General",
       "Q1": {
         "q": "What is SawerSui?",
-        "a": "SawerSui is a donation platform for streamers on the Sui Network. It allows you to receive support in USDC with real-time alerts."
+        "a": "SawerSui is a donation platform for streamers on the Sui Network. It allows you to receive support in SUI or USDC with real-time alerts."
       },
       "Q2": {
         "q": "Is it safe?",
@@ -528,11 +528,22 @@
       "title": "For Donors",
       "Q1": {
         "q": "Do I need a crypto wallet?",
-        "a": "No! You can login with your Google account to send support. You will need to top-up USDC or ask a friend to send you some."
+        "a": "No! You can login with your Google account. You will need to top-up SUI or USDC, or ask a friend to send you some."
       },
       "Q2": {
         "q": "Why Sui Network?",
         "a": "Sui offers instant speed and low costs, making it perfect for real-time interactions like stream donations."
+      }
+    },
+    "Technical": {
+      "title": "Technical",
+      "Q1": {
+        "q": "How fast is settlement?",
+        "a": "Settlement is practically instant (<1s finality) on the Sui Network."
+      },
+      "Q2": {
+        "q": "What wallet do I need?",
+        "a": "None if you use Google Login! But if you prefer self-custody, we support all major Sui wallets (Sui Wallet, Nightly, etc)."
       }
     }
   },

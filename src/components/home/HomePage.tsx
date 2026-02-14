@@ -60,22 +60,38 @@ export function HomePage() {
     {
       icon: Shield,
       title: t("features.easyLogin.title"),
-      desc: t("features.easyLogin.desc"),
+      desc: t.rich("features.easyLogin.desc", {
+        bold: (chunks) => (
+          <span className="font-bold text-foreground">{chunks}</span>
+        ),
+      }),
     },
     {
       icon: Zap,
       title: t("features.lowFees.title"),
-      desc: t("features.lowFees.desc"),
+      desc: t.rich("features.lowFees.desc", {
+        bold: (chunks) => (
+          <span className="font-bold text-foreground">{chunks}</span>
+        ),
+      }),
     },
     {
       icon: MonitorPlay,
       title: t("features.instantOverlay.title"),
-      desc: t("features.instantOverlay.desc"),
+      desc: t.rich("features.instantOverlay.desc", {
+        bold: (chunks) => (
+          <span className="font-bold text-foreground">{chunks}</span>
+        ),
+      }),
     },
     {
       icon: Coins,
       title: t("features.usdcStablecoin.title"),
-      desc: t("features.usdcStablecoin.desc"),
+      desc: t.rich("features.usdcStablecoin.desc", {
+        bold: (chunks) => (
+          <span className="font-bold text-foreground">{chunks}</span>
+        ),
+      }),
     },
   ];
 
@@ -164,25 +180,41 @@ export function HomePage() {
               {
                 icon: Heart,
                 title: t("features.platform.donation.title"),
-                desc: t("features.platform.donation.desc"),
+                desc: t.rich("features.platform.donation.desc", {
+                  bold: (chunks) => (
+                    <span className="font-black">{chunks}</span>
+                  ),
+                }),
                 color: "bg-[#FFB7B2]", // Red/Pink
               },
               {
                 icon: Trophy,
                 title: t("features.platform.leaderboard.title"),
-                desc: t("features.platform.leaderboard.desc"),
+                desc: t.rich("features.platform.leaderboard.desc", {
+                  bold: (chunks) => (
+                    <span className="font-black">{chunks}</span>
+                  ),
+                }),
                 color: "bg-[#FFE8A3]", // Yellow
               },
               {
                 icon: Flag,
                 title: t("features.platform.milestone.title"),
-                desc: t("features.platform.milestone.desc"),
+                desc: t.rich("features.platform.milestone.desc", {
+                  bold: (chunks) => (
+                    <span className="font-black">{chunks}</span>
+                  ),
+                }),
                 color: "bg-[#C1E1C1]", // Green
               },
               {
                 icon: Gem,
                 title: t("features.platform.nft.title"),
-                desc: t("features.platform.nft.desc"),
+                desc: t.rich("features.platform.nft.desc", {
+                  bold: (chunks) => (
+                    <span className="font-black">{chunks}</span>
+                  ),
+                }),
                 color: "bg-[#AAC4FF]", // Blue
               },
             ].map((feature, i) => (
