@@ -217,7 +217,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                 created_at: new Date().toISOString(),
                 status: "completed",
                 sender_address: null,
-                coin_type: "0x2::sui::SUI",
+                coin_type: "SUI",
               }}
               settings={liveSettings}
               preview
