@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { getMilestones, cancelMilestone } from "@/lib/actions/milestone";
+import { MilestoneDetailModal } from "@/components/dashboard/MilestoneDetailModal";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,7 +19,10 @@ interface Milestone {
   status: string;
   created_at: string;
   walrus_url: string;
+  image_blob_id: string;
   coin_type?: string;
+  expiration_epoch?: number;
+  expires_at?: string;
 }
 
 export function MilestoneList() {
@@ -118,6 +122,23 @@ export function MilestoneList() {
                             ? "SUI"
                             : "USDC"}
                         </div>
+                        {milestone.expires_at ? (
+                          <div className="text-xs text-gray-500 mt-1">
+                            Expires:{" "}
+                            {new Date(milestone.expires_at).toLocaleDateString(
+                              undefined,
+                              {
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                              },
+                            )}
+                          </div>
+                        ) : milestone.expiration_epoch ? (
+                          <div className="text-xs text-gray-500 mt-1">
+                            Expires: Epoch {milestone.expiration_epoch}
+                          </div>
+                        ) : null}
                       </div>
                     </div>
 
@@ -131,6 +152,18 @@ export function MilestoneList() {
                           <ExternalLink className="w-4 h-4" />
                         </Button>
                       </a>
+                      <MilestoneDetailModal
+                        milestone={milestone}
+                        trigger={
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            title="View Details"
+                          >
+                            Details
+                          </Button>
+                        }
+                      />
                       {milestone.status === "active" && (
                         <Button
                           variant="destructive"

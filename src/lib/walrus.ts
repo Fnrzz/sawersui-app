@@ -35,12 +35,18 @@ export interface WalrusUploadResponse {
 
 export async function uploadToWalrus(
   file: File,
-): Promise<{ blobId: string; url: string }> {
+  epochs: number = 53, // Default to MAX allowed epochs
+): Promise<{
+  blobId: string;
+  url: string;
+  expirationEpoch: number;
+  expiresAt: string;
+}> {
   try {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    const response = await fetch(`${WALRUS_PUBLISHER_URL}?epochs=1`, {
+    const response = await fetch(`${WALRUS_PUBLISHER_URL}?epochs=${epochs}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/octet-stream",
@@ -58,8 +64,20 @@ export async function uploadToWalrus(
     const data: WalrusUploadResponse = await response.json();
 
     // Check if newlyCreated or alreadyCertified
-    const blobId =
-      data.newlyCreated?.blobObject.blobId || data.alreadyCertified?.blobId;
+    const blobObject = data.newlyCreated?.blobObject || data.alreadyCertified;
+
+    const blobId = blobObject?.blobId || data.alreadyCertified?.blobId;
+    // Walrus response structure for alreadyCertified might be slightly different or same,
+    // but based on type def:
+    // newlyCreated.blobObject.storage.endEpoch
+    // alreadyCertified.endEpoch
+
+    let expirationEpoch = 0;
+    if (data.newlyCreated) {
+      expirationEpoch = data.newlyCreated.blobObject.storage.endEpoch;
+    } else if (data.alreadyCertified) {
+      expirationEpoch = data.alreadyCertified.endEpoch;
+    }
 
     if (!blobId) {
       throw new Error("No blobId returned from Walrus");
@@ -68,6 +86,10 @@ export async function uploadToWalrus(
     return {
       blobId,
       url: `${WALRUS_AGGREGATOR_URL}${blobId}`,
+      expirationEpoch,
+      expiresAt: new Date(
+        Date.now() + epochs * 24 * 60 * 60 * 1000,
+      ).toISOString(),
     };
   } catch (error) {
     console.error("Error uploading to Walrus:", error);
