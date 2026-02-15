@@ -50,24 +50,24 @@ export function MilestoneDetailModal({
   return (
     <Dialog>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="w-full p-0 overflow-hidden border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] sm:rounded-xl">
-        <DialogHeader className="p-6 pb-2">
-          <div className="flex justify-between items-start pr-8">
-            <DialogTitle className="text-2xl font-black uppercase tracking-tight flex items-center gap-3">
+      <DialogContent className="w-[95vw] max-w-2xl p-0 overflow-hidden border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] sm:rounded-xl">
+        <DialogHeader className="p-4 sm:p-6 pb-2">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pr-8">
+            <DialogTitle className="text-xl sm:text-2xl font-black uppercase tracking-tight flex items-center gap-3">
               Milestone Details
             </DialogTitle>
             <Badge
               variant="outline"
               className={`border-2 ${getStatusColor(
                 milestone.status,
-              )} uppercase font-bold px-3 py-1 text-xs`}
+              )} uppercase font-bold px-3 py-1 text-[10px] sm:text-xs`}
             >
               {milestone.status}
             </Badge>
           </div>
         </DialogHeader>
 
-        <div className="p-6 pt-2 grid md:grid-cols-12 gap-8">
+        <div className="p-4 sm:p-6 pt-2 grid grid-cols-1 md:grid-cols-12 gap-6 sm:gap-8 max-h-[80vh] overflow-y-auto">
           {/* Left Column: Image (5 cols) */}
           <div className="md:col-span-5 space-y-4">
             <div className="relative aspect-square w-full rounded-xl border-2 border-black overflow-hidden bg-gray-100 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)]">
@@ -97,7 +97,7 @@ export function MilestoneDetailModal({
                 <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">
                   Title
                 </p>
-                <h2 className="text-2xl font-bold leading-tight text-black mt-1">
+                <h2 className="text-xl sm:text-2xl font-bold leading-tight text-black mt-1">
                   {milestone.title}
                 </h2>
               </div>
@@ -107,16 +107,16 @@ export function MilestoneDetailModal({
                 <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">
                   Fundraising Goal
                 </p>
-                <div className="flex items-baseline gap-2 mt-1">
-                  <span className="text-4xl font-black tracking-tighter">
+                <div className="flex flex-wrap items-baseline gap-2 mt-1">
+                  <span className="text-3xl sm:text-4xl font-black tracking-tighter">
                     {milestone.current_amount.toFixed(2)}
                   </span>
-                  <span className="text-xl text-gray-400 font-medium">
+                  <span className="text-lg sm:text-xl text-gray-400 font-medium">
                     / {milestone.target_amount.toFixed(2)}
                   </span>
                   <Badge
                     variant="outline"
-                    className="ml-auto border-black bg-white"
+                    className="ml-auto border-black bg-white text-[10px] sm:text-xs"
                   >
                     {milestone.coin_type?.includes("sui") ? "SUI" : "USDC"}
                   </Badge>
@@ -133,7 +133,7 @@ export function MilestoneDetailModal({
 
               {/* Storage Section — expiry badge only, renewal is automated */}
               <div className="space-y-3 pt-2">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider flex items-center gap-2">
                     Walrus Storage
                   </p>
@@ -143,7 +143,7 @@ export function MilestoneDetailModal({
                         ? "secondary"
                         : "destructive"
                     }
-                    className="font-mono text-[10px]"
+                    className="font-mono text-[10px] w-fit"
                   >
                     {milestone.expires_at
                       ? `Expires: ${new Date(milestone.expires_at).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}`
@@ -152,7 +152,7 @@ export function MilestoneDetailModal({
                         : "Expiration Unknown"}
                   </Badge>
                 </div>
-                <p className="text-[10px] text-center text-gray-400 max-w-xs mx-auto">
+                <p className="text-[10px] text-center sm:text-left text-gray-400 max-w-xs">
                   Storage is automatically renewed daily by the system.
                 </p>
               </div>

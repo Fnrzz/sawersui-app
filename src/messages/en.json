@@ -167,7 +167,7 @@
       "activeDesc": "You already have an active or completed milestone. Please cancel it or wait for it to be minted before creating a new one.",
       "labels": {
         "title": "Title",
-        "titlePlaceholder": "e.g. 24h Stream Marathon",
+        "titlePlaceholder": "24h Stream Marathon",
         "coinType": "Coin Type",
         "targetAmount": "Target Amount ({coin})",
         "targetPlaceholder": "e.g. 100.00",

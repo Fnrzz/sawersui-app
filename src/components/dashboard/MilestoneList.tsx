@@ -91,8 +91,8 @@ export function MilestoneList() {
                 layout
               >
                 <Card className="border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] transition-all">
-                  <CardContent className="p-4 flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-4">
+                  <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-4 w-full sm:w-auto">
                       {/* Thumbnail */}
                       <div className="w-16 h-16 bg-gray-100 border border-black rounded overflow-hidden flex-shrink-0">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -103,14 +103,14 @@ export function MilestoneList() {
                         />
                       </div>
 
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h4 className="font-bold text-lg">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h4 className="font-bold text-base sm:text-lg truncate">
                             {milestone.title}
                           </h4>
                           <Badge
                             variant="outline"
-                            className={`border ${getStatusColor(milestone.status)} uppercase text-xs font-bold`}
+                            className={`border ${getStatusColor(milestone.status)} uppercase text-[10px] sm:text-xs font-bold whitespace-nowrap`}
                           >
                             {milestone.status}
                           </Badge>
@@ -142,7 +142,7 @@ export function MilestoneList() {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 self-end sm:self-center">
                       <a
                         href={milestone.walrus_url}
                         target="_blank"
