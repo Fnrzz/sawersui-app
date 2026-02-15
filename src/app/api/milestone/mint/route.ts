@@ -1,31 +1,9 @@
 import { NextResponse } from "next/server";
 import { Transaction } from "@mysten/sui/transactions";
 import { getSuiClient } from "@/lib/sui-client";
-import { decodeSuiPrivateKey } from "@mysten/sui/cryptography";
-import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
-import { fromBase64 } from "@mysten/sui/utils";
+import { getSponsorKeypair } from "@/lib/sui-sponsor";
 import { CONFIG } from "@/lib/config";
 import { createAdminClient } from "@/lib/supabase/server";
-
-const SPONSOR_SECRET_KEY = process.env.SPONSOR_SECRET_KEY || "";
-
-function getAdminKeypair(): Ed25519Keypair {
-  if (!SPONSOR_SECRET_KEY) {
-    throw new Error("SPONSOR_SECRET_KEY is not set in environment variables");
-  }
-
-  if (SPONSOR_SECRET_KEY.startsWith("suiprivkey")) {
-    const { secretKey } = decodeSuiPrivateKey(SPONSOR_SECRET_KEY);
-    return Ed25519Keypair.fromSecretKey(secretKey);
-  }
-
-  const rawBytes = fromBase64(SPONSOR_SECRET_KEY);
-  if (rawBytes.length === 32) {
-    return Ed25519Keypair.fromSecretKey(rawBytes);
-  }
-
-  throw new Error("Invalid key length. Expected 32 bytes.");
-}
 
 export async function POST(req: Request) {
   try {
@@ -68,13 +46,13 @@ export async function POST(req: Request) {
       );
     }
 
-    // Initialize Sui Client and Admin Signer
+    // Initialize Sui Client and Sponsor Signer
     const client = getSuiClient();
-    const adminKeypair = getAdminKeypair();
-    const adminAddress = adminKeypair.toSuiAddress();
+    const sponsorKeypair = getSponsorKeypair();
+    const sponsorAddress = sponsorKeypair.toSuiAddress();
 
     const tx = new Transaction();
-    tx.setSender(adminAddress);
+    tx.setSender(sponsorAddress);
 
     // Call mint_to_winner
     // Module assumed to be 'milestone_nft' based on common patterns,
@@ -93,7 +71,7 @@ export async function POST(req: Request) {
 
     // Sign and Execute
     const { digest } = await client.signAndExecuteTransaction({
-      signer: adminKeypair,
+      signer: sponsorKeypair,
       transaction: tx,
     });
 
