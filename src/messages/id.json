@@ -431,6 +431,14 @@
         "val": "Instan",
         "desc": "Dana sampai dalam hitungan detik. Tidak ada masa tunggu."
       }
+    },
+    "TTS": {
+      "title": "Text-to-Speech (TTS)",
+      "desc": "Kreator dapat mengaktifkan <bold>suara ditenagai AI</bold> (Gemini TTS) untuk membacakan pesan donasi secara keras selama stream.",
+      "p1": "Kamu bisa mengatur <bold>Minimal Nominal untuk TTS</bold> untuk memastikan hanya donasi besar yang dibacakan, demi menghindari spam.",
+      "p2": "Tersedia berbagai pilihan suara, memungkinkan kamu memilih persona yang paling cocok dengan vibe stream kamu.",
+      "minAmountLabel": "Minimal Nominal",
+      "voiceLabel": "Kustomisasi Suara"
     }
   },
   "MilestonesGuidePage": {
