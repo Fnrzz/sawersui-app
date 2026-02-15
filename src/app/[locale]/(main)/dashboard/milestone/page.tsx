@@ -19,15 +19,17 @@ export default async function MilestoneListPage() {
           {tAction("backToDashboard")}
         </Link>
         <div>
-          <h1 className="text-2xl font-extrabold text-foreground flex items-center gap-2">
-            <History className="w-8 h-8" />
+          <h1 className="text-xl sm:text-2xl font-extrabold text-foreground flex items-center gap-2">
+            <History className="w-6 h-6 sm:w-8 sm:h-8" />
             {t("title")}
           </h1>
-          <p className="text-muted-foreground text-sm mt-1">{t("subtitle")}</p>
+          <p className="text-muted-foreground text-xs sm:text-sm mt-1">
+            {t("subtitle")}
+          </p>
         </div>
       </div>
 
-      <div className="bg-zinc-50 border-[3px] border-black rounded-xl p-6 shadow-[6px_6px_0px_0px_#000]">
+      <div className="bg-zinc-50 border-[3px] border-black rounded-xl p-4 sm:p-6 shadow-[6px_6px_0px_0px_#000]">
         <MilestoneList />
       </div>
     </div>

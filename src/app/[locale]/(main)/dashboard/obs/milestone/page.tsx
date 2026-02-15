@@ -44,7 +44,7 @@ export default async function MilestoneSettingsPage() {
   const overlayUrl = `${protocol}://${host}/overlay/${profile.wallet_address}/milestone`;
 
   return (
-    <div className="p-4 space-y-6">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4 mb-2">
         <Link

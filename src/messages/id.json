@@ -167,7 +167,7 @@
       "activeDesc": "Kamu sudah memiliki milestone aktif atau selesai. Mohon batalkan atau tunggu sampai di-mint sebelum membuat yang baru.",
       "labels": {
         "title": "Judul",
-        "titlePlaceholder": "cth. Marathon Stream 24 Jam",
+        "titlePlaceholder": "Marathon Stream 24 Jam",
         "coinType": "Tipe Koin",
         "targetAmount": "Target Jumlah ({coin})",
         "targetPlaceholder": "cth. 100.00",
