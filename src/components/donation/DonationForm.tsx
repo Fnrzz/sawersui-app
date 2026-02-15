@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useRef } from "react";
 import { useCurrentAccount, useDisconnectWallet } from "@mysten/dapp-kit";
 import { useTranslations } from "next-intl";
+import { OverlaySettings } from "@/lib/overlay-settings";
 import {
   Loader2,
   CheckCircle,
@@ -8,7 +9,10 @@ import {
   Check,
   LogOut,
   Wallet,
+  Play,
+  Square,
 } from "lucide-react";
+
 import { useDonate } from "@/hooks/useDonate";
 import { useZkDonation } from "@/hooks/useZkDonation";
 import { saveDonation, StreamerProfile } from "@/lib/actions/donation";
@@ -20,6 +24,7 @@ import { signOut } from "@/lib/actions/auth";
 
 interface DonationFormProps {
   streamer: StreamerProfile;
+  settings: OverlaySettings;
   onLoginClick?: () => void;
 }
 
@@ -27,6 +32,13 @@ type DonationStatus = "idle" | "signing" | "confirming" | "success" | "error";
 
 const AMOUNT_PRESETS_USDC = [1, 5, 10, 25, 50, 100];
 const AMOUNT_PRESETS_SUI = [1, 5, 10, 20, 50, 100];
+
+const VOICE_OPTIONS = [
+  { id: "kore", label: "Kore" },
+  { id: "charon", label: "Charon" },
+  { id: "puck", label: "Puck" },
+  { id: "zephyr", label: "Zephyr" },
+];
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -45,7 +57,11 @@ const itemVariants: Variants = {
   },
 };
 
-export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
+export function DonationForm({
+  streamer,
+  settings,
+  onLoginClick,
+}: DonationFormProps) {
   const t = useTranslations("DonationForm");
   const currentAccount = useCurrentAccount();
   const { mutate: disconnect } = useDisconnectWallet();
@@ -66,6 +82,7 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
   const [isCustom, setIsCustom] = useState(false);
   const [donorName, setDonorName] = useState("");
   const [message, setMessage] = useState("");
+  const [ttsVoice, setTtsVoice] = useState<string>("kore");
 
   // Checkbox States
   const [isAgeChecked, setIsAgeChecked] = useState(false);
@@ -112,6 +129,34 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
   };
 
   const currentBalance = coinType === "USDC" ? balances.usdc : balances.sui;
+
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const isTtsAllowed =
+    settings.is_tts_enabled && getAmount() >= settings.tts_min_amount;
+
+  const playVoicePreview = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+
+    const audioPath = `/sound-tts/${ttsVoice}.wav`;
+    const audio = new Audio(audioPath);
+
+    audio.onended = () => {
+      setIsPlaying(false);
+    };
+
+    audioRef.current = audio;
+    setIsPlaying(true);
+    audio.play().catch((err) => {
+      console.error("Failed to play audio:", err);
+      setIsPlaying(false);
+      toast.error("Gagal memutar preview suara");
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -175,6 +220,7 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
         tx_digest: digest,
         // coin_type is determined by server from tx, so we don't strictly need to pass it if saveDonation verifies tx
         // but verifyDonationAmount extracts it.
+        tts_voice: isTtsAllowed ? ttsVoice : undefined,
       });
 
       setStatus("success");
@@ -188,7 +234,9 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
         setCustomAmount("");
         setIsCustom(false);
         setDonorName("");
+        setDonorName("");
         setMessage("");
+        setTtsVoice("female");
         setStatus("idle");
         setTxDigest(null);
         setIsAgeChecked(false);
@@ -402,19 +450,87 @@ export function DonationForm({ streamer, onLoginClick }: DonationFormProps) {
         />
       </motion.div>
 
+      {/* Voice Selector */}
+      {settings.is_tts_enabled && (
+        <motion.div className="mb-6" variants={itemVariants}>
+          <label className="text-sm font-bold text-black mb-1 block">
+            {t("voice") || "Suara (TTS)"}
+          </label>
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <select
+                value={ttsVoice}
+                onChange={(e) => setTtsVoice(e.target.value)}
+                disabled={!isTtsAllowed}
+                className="w-full appearance-none py-2 px-3 rounded-lg border-2 border-black font-bold text-sm bg-white disabled:opacity-50 disabled:bg-gray-100 transition-all focus:outline-none focus:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+              >
+                {VOICE_OPTIONS.map((voice) => (
+                  <option key={voice.id} value={voice.id}>
+                    {voice.label}
+                  </option>
+                ))}
+              </select>
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                <svg
+                  className="w-4 h-4 text-black"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={playVoicePreview}
+              disabled={!isTtsAllowed}
+              className={`w-10 h-10 flex items-center justify-center rounded-lg border-2 border-black transition-all ${
+                isPlaying
+                  ? "bg-red-100 text-red-600 shadow-none translate-y-1"
+                  : "bg-white text-black hover:bg-gray-50 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"
+              } disabled:opacity-50 disabled:bg-gray-100 disabled:shadow-none disabled:translate-y-0`}
+            >
+              {isPlaying ? (
+                <Square className="w-4 h-4 fill-current" />
+              ) : (
+                <Play className="w-4 h-4 fill-current" />
+              )}
+            </button>
+          </div>
+          {!isTtsAllowed && (
+            <p className="text-xs text-amber-600 font-bold mt-2 flex items-center gap-1">
+              <AlertCircle className="w-3 h-3" />
+              Minimal donasi {settings.tts_min_amount} koin untuk fitur Suara.
+            </p>
+          )}
+        </motion.div>
+      )}
+
       {/* Pesan */}
       <motion.div className="mb-8" variants={itemVariants}>
         <label className="text-sm font-bold text-black mb-1 block">
           {t("message")} <span className="text-red-500">*</span>
         </label>
-        <textarea
-          placeholder={t("placeholderMessage")}
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          maxLength={200}
-          rows={1}
-          className="w-full py-2 text-lg font-bold bg-transparent border-b-[3px] border-black text-black placeholder:text-black/30 resize-none focus:outline-none focus:border-black/60 rounded-none transition-all px-0 min-h-[40px]"
-        />
+        <div className="relative">
+          <textarea
+            placeholder={t("placeholderMessage")}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            maxLength={200}
+            rows={1}
+            className="w-full py-2 text-lg font-bold bg-transparent border-b-[3px] border-black text-black placeholder:text-black/30 resize-none focus:outline-none focus:border-black/60 rounded-none transition-all px-0 min-h-[40px]"
+          />
+          <div className="absolute right-0 bottom-2 text-[10px] font-bold text-black/40">
+            {message.length}/200
+          </div>
+        </div>
       </motion.div>
 
       {/* Checkboxes */}

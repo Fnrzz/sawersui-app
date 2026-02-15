@@ -8,6 +8,8 @@ import { LoginModal } from "@/components/auth/LoginModal";
 import { useTranslations } from "next-intl";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
+import { OverlaySettings } from "@/lib/overlay-settings";
+
 interface DonationPageProps {
   streamer: {
     id: string;
@@ -15,6 +17,7 @@ interface DonationPageProps {
     display_name: string;
     wallet_address: string;
   };
+  settings: OverlaySettings;
 }
 
 const containerVariants: Variants = {
@@ -26,7 +29,7 @@ const containerVariants: Variants = {
   },
 };
 
-export function DonationPageClient({ streamer }: DonationPageProps) {
+export function DonationPageClient({ streamer, settings }: DonationPageProps) {
   const t = useTranslations("DonationPage");
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
@@ -77,6 +80,7 @@ export function DonationPageClient({ streamer }: DonationPageProps) {
             <div className="bg-white border-[3px] border-black rounded-lg p-6 md:p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] relative z-10">
               <DonationForm
                 streamer={streamer}
+                settings={settings}
                 onLoginClick={() => setIsLoginModalOpen(true)}
               />
             </div>

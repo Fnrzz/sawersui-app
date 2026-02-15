@@ -1,6 +1,6 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createAdminClient } from "@/lib/supabase/server";
 import {
   OverlaySettings,
   DEFAULT_OVERLAY_SETTINGS,
@@ -12,7 +12,7 @@ import {
 export async function getOverlaySettings(
   userId: string,
 ): Promise<OverlaySettings> {
-  const supabase = await createClient();
+  const supabase = await createAdminClient();
 
   const { data, error } = await supabase
     .from("overlay_settings")
@@ -30,6 +30,10 @@ export async function getOverlaySettings(
     ...data,
     // Ensure min_amount is never null (old rows may not have it)
     min_amount: data.min_amount ?? DEFAULT_OVERLAY_SETTINGS.min_amount,
+    is_tts_enabled:
+      data.is_tts_enabled ?? DEFAULT_OVERLAY_SETTINGS.is_tts_enabled,
+    tts_min_amount:
+      data.tts_min_amount ?? DEFAULT_OVERLAY_SETTINGS.tts_min_amount,
   } as OverlaySettings;
 }
 
@@ -58,6 +62,11 @@ export async function saveOverlaySettings(
   // Extract min_amount
   const min_amount_raw = formData.get("min_amount") as string;
   const min_amount = Math.max(0, parseFloat(min_amount_raw) || 0);
+
+  // Extract TTS settings
+  const is_tts_enabled = formData.get("is_tts_enabled") === "on";
+  const tts_min_amount_raw = formData.get("tts_min_amount") as string;
+  const tts_min_amount = Math.max(0, parseFloat(tts_min_amount_raw) || 0);
 
   // Validate hex colors
   const hexRegex = /^#[0-9A-Fa-f]{6}$/;
@@ -124,6 +133,8 @@ export async function saveOverlaySettings(
       message_color,
       sound_url,
       min_amount,
+      is_tts_enabled,
+      tts_min_amount,
       updated_at: new Date().toISOString(),
     },
     { onConflict: "user_id" },

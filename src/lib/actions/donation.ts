@@ -162,12 +162,14 @@ export async function saveDonation({
   message,
   amount_net,
   tx_digest,
+  tts_voice,
 }: {
   streamer_id: string;
   donor_name: string;
   message: string;
   amount_net: number;
   tx_digest: string;
+  tts_voice?: string;
 }) {
   // 1. Verify Info
   const supabase = await createClient();
@@ -206,7 +208,7 @@ export async function saveDonation({
       .select("id, status, title")
       .eq("streamer_id", streamer_id)
       .eq("status", "active")
-      .eq("coin_type", coinType) // <-- MATCH COIN TYPE
+      .eq("coin_type", coinType) // Match short coin type: "USDC" or "SUI"
       .limit(1)
       .maybeSingle();
 
@@ -235,6 +237,7 @@ export async function saveDonation({
     sender_address: senderAddress, // Save immediately
     milestone_id: milestoneId, // Save immediately
     coin_type: coinType, // Save Coin Type
+    tts_voice: tts_voice || "female", // Default to female
   };
 
   const { error: insertError } = await adminSupabase

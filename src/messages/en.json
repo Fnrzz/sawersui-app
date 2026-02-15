@@ -135,7 +135,10 @@
     "poweredBy": "Powered by <brand>SawerSui</brand> on Sui Network",
     "minDonation": "Minimum donation is $0.50 USDC",
     "agreementError": "Please agree to the terms and conditions.",
-    "viewTransaction": "View Transaction"
+    "viewTransaction": "View Transaction",
+    "voice": "Voice (TTS)",
+    "voiceFemale": "Female",
+    "voiceMale": "Male"
   },
   "Settings": {
     "livePreview": "Live Preview",
@@ -145,6 +148,8 @@
     "previewDesc": "Colors update instantly as you choose",
     "soundDesc": "Leave empty to use default sound.",
     "minDonationDesc": "Donations below this amount will not appear on overlay.",
+    "ttsDesc": "Enable AI voice to read donation messages automatically.",
+    "ttsMinAmount": "Minimum Donation for TTS",
     "labels": {
       "background": "Background",
       "sender": "Sender Name",
