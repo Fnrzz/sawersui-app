@@ -67,7 +67,12 @@ export default function CreateMilestoneForm() {
           throw new Error(uploadResult.error || "Upload failed");
         }
 
-        const { blobId, url: walrusUrl } = uploadResult.data;
+        const {
+          blobId,
+          url: walrusUrl,
+          expiresAt,
+          expirationEpoch,
+        } = uploadResult.data;
         toast.success(t("toast.uploaded"));
 
         // 2. Call Server Action
@@ -77,6 +82,7 @@ export default function CreateMilestoneForm() {
           image_blob_id: blobId, // Passing required blobId
           walrus_url: walrusUrl,
           coin_type: coinType,
+          expires_at: expiresAt,
         });
 
         if (result.error) {
