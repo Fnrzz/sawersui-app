@@ -12,6 +12,8 @@ export interface OverlaySettings {
   message_color: string;
   sound_url: string | null;
   min_amount: number;
+  is_tts_enabled: boolean;
+  tts_min_amount: number;
 }
 
 export const DEFAULT_OVERLAY_SETTINGS: Omit<OverlaySettings, "user_id"> = {
@@ -21,4 +23,6 @@ export const DEFAULT_OVERLAY_SETTINGS: Omit<OverlaySettings, "user_id"> = {
   message_color: "#ffffff",
   sound_url: null,
   min_amount: 0.5,
+  is_tts_enabled: false,
+  tts_min_amount: 10,
 };

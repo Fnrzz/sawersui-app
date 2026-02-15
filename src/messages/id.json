@@ -135,7 +135,10 @@
     "poweredBy": "Powered by <brand>SawerSui</brand> on Sui Network",
     "minDonation": "Minimum donation is $0.50 USDC",
     "agreementError": "Mohon setujui syarat dan ketentuan.",
-    "viewTransaction": "Lihat Transaksi"
+    "viewTransaction": "Lihat Transaksi",
+    "voice": "Suara (TTS)",
+    "voiceFemale": "Wanita",
+    "voiceMale": "Pria"
   },
   "Settings": {
     "livePreview": "Live Preview",
@@ -145,6 +148,8 @@
     "previewDesc": "Warna berubah langsung saat kamu pilih",
     "soundDesc": "Kosongkan untuk menggunakan suara default.",
     "minDonationDesc": "Donasi di bawah nominal ini tidak akan muncul di overlay.",
+    "ttsDesc": "Aktifkan suara AI untuk membacakan pesan donasi secara otomatis.",
+    "ttsMinAmount": "Minimum Donasi untuk TTS",
     "labels": {
       "background": "Background",
       "sender": "Nama Pengirim",

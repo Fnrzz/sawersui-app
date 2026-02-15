@@ -12,6 +12,13 @@ interface DonationAlertProps {
   settings?: OverlaySettings;
 }
 
+// Extend Window interface for webkitAudioContext
+declare global {
+  interface Window {
+    webkitAudioContext: typeof AudioContext;
+  }
+}
+
 export function DonationAlert({ streamerId, settings }: DonationAlertProps) {
   const [queue, setQueue] = useState<DonationEvent[]>([]);
   const [currentAlert, setCurrentAlert] = useState<DonationEvent | null>(null);
@@ -35,6 +42,56 @@ export function DonationAlert({ streamerId, settings }: DonationAlertProps) {
   useEffect(() => {
     if (queue.length === 0 || isShowing || isProcessing.current) return;
 
+    // Helper to play base64 PCM audio
+    const playAudio = async (base64: string): Promise<void> => {
+      // Create context inside the user interaction flow (or here in effect)
+      // Note: Browsers usually require user interaction to start AudioContext,
+      // but in OBS Browser Source, it's often allowed or "autoplay" is enabled.
+      // If it fails, we catch it.
+      const AudioContextClass =
+        window.AudioContext || window.webkitAudioContext;
+      const audioCtx = new AudioContextClass({ sampleRate: 24000 });
+
+      return new Promise((resolve, reject) => {
+        try {
+          const binaryString = window.atob(base64);
+          const len = binaryString.length;
+          const bytes = new Uint8Array(len);
+          for (let i = 0; i < len; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+          }
+
+          const arrayBuffer = bytes.buffer;
+          const dataView = new DataView(arrayBuffer);
+
+          // PCM 16-bit is 2 bytes per sample
+          // Gemini returns 16-bit PCM at 24kHz
+          const numSamples = arrayBuffer.byteLength / 2;
+          const audioBuffer = audioCtx.createBuffer(1, numSamples, 24000);
+          const channelData = audioBuffer.getChannelData(0);
+
+          for (let i = 0; i < numSamples; i++) {
+            // Convert Int16 to Float32 [-1.0, 1.0]
+            const int16 = dataView.getInt16(i * 2, true); // Little endian
+            channelData[i] = int16 / 32768.0;
+          }
+
+          const source = audioCtx.createBufferSource();
+          source.buffer = audioBuffer;
+          source.connect(audioCtx.destination);
+          source.onended = () => {
+            source.disconnect();
+            audioCtx.close();
+            resolve();
+          };
+          source.start();
+        } catch (e) {
+          audioCtx.close();
+          reject(e);
+        }
+      });
+    };
+
     const processNext = async () => {
       isProcessing.current = true;
       const nextDonation = queue[0];
@@ -57,42 +114,95 @@ export function DonationAlert({ streamerId, settings }: DonationAlertProps) {
           const nft = await getLatestMilestoneNft(nextDonation.sender_address);
           if (nft) {
             nftUrl = nft.imageUrl;
-            // console.log("[DonationAlert] Found Reward NFT:", nftUrl);
           }
         } catch (error) {
           console.error("[DonationAlert] Error fetching NFT:", error);
         }
       }
 
-      // Show Alert
+      // --- Alerts & TTS Logic ---
+      const isTTSEnabled =
+        settings?.is_tts_enabled &&
+        nextDonation.amount_net >= (settings?.tts_min_amount || 0);
+
+      let audioBase64: string | null = null;
+
+      // 1. Pre-fetch TTS if enabled
+      if (isTTSEnabled) {
+        try {
+          const text = `${nextDonation.donor_name} berdonasi ${nextDonation.amount_net} koin ${nextDonation.coin_type}. ${nextDonation.message}`;
+          const res = await fetch("/api/tts", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              text,
+              voiceType: nextDonation.tts_voice || "female",
+            }),
+          });
+          const data = await res.json();
+          if (data.audioBase64) {
+            audioBase64 = data.audioBase64;
+          }
+        } catch (error) {
+          console.error("[DonationAlert] TTS Generation Error:", error);
+          // Continue without TTS if generation fails
+        }
+      }
+
+      // 2. Show Alert (Now that audio is ready or failed)
       setCurrentNftImage(nftUrl);
       setCurrentAlert(nextDonation);
       setIsShowing(true);
 
-      // Play Sound — use custom sound if set, else default
+      // 3. Play Sounds
       try {
+        // Play Alert Sound (Ding!)
         const soundSrc = settings?.sound_url || "/sound/soundnotif.mp3";
-        const audio = new Audio(soundSrc);
-        await audio.play();
-      } catch (err) {
-        console.error("[DonationAlert] Audio playback failed:", err);
+        await new Promise<void>((resolve) => {
+          const audio = new Audio(soundSrc);
+          audio.onended = () => resolve();
+          audio.onerror = () => resolve(); // Proceed even if error
+          audio.play().catch(() => resolve()); // Proceed if autoplay blocked
+        });
+      } catch {
+        // ignore
       }
 
-      // Display Duration (10 seconds)
-      setTimeout(() => {
-        setIsShowing(false);
+      // Play TTS if available
+      if (audioBase64) {
+        try {
+          await playAudio(audioBase64);
+          // Add a small delay after speech before closing
+          await new Promise((r) => setTimeout(r, 1000));
+        } catch (e) {
+          console.error("[DonationAlert] Audio Playback Error:", e);
+          await new Promise((r) => setTimeout(r, 5000)); // Fallback wait
+        }
+      } else {
+        // No TTS or TTS failed: Standard wait
+        await new Promise((r) => setTimeout(r, 10000));
+      }
 
-        // Wait for exit animation (500ms) before processing next
-        setTimeout(() => {
-          setCurrentAlert(null);
-          setCurrentNftImage(undefined);
-          isProcessing.current = false;
-        }, 500);
-      }, 10000);
+      // Close Alert
+      setIsShowing(false);
+
+      // Wait for exit animation (500ms) before processing next
+      setTimeout(() => {
+        setCurrentAlert(null);
+        setCurrentNftImage(undefined);
+        isProcessing.current = false;
+      }, 500);
     };
 
     processNext();
-  }, [queue, isShowing, settings?.sound_url, settings?.min_amount]);
+  }, [
+    queue,
+    isShowing,
+    settings?.sound_url,
+    settings?.min_amount,
+    settings?.is_tts_enabled,
+    settings?.tts_min_amount,
+  ]);
 
   return (
     <div className="w-full h-screen flex items-center justify-center pb-20 p-4">
