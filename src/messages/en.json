@@ -322,6 +322,10 @@
       "Stablecoin": {
         "title": "Stable Income",
         "desc": "Accept <bold>SUI</bold> or <bold>USDC</bold>. Choose between the native token of the network or a stablecoin to avoid volatility."
+      },
+      "TTS": {
+        "title": "Text-to-Speech (TTS)",
+        "desc": "Engage your audience with AI-powered voice messages (Gemini TTS) that read donation messages aloud on stream. Includes multiple voice options and audio previews."
       }
     },
     "Architecture": {
@@ -378,6 +382,10 @@
       "Step3": {
         "title": "3. Setup OBS Overlay",
         "desc": "Go to the <bold>Dashboard > Overlay</bold> menu. Copy your unique Overlay URL and add it as a 'Browser Source' in OBS/Streamlabs. <bold>Recommended Size: 500x500px</bold> for best visibility."
+      },
+      "Step4": {
+        "title": "4. Enable TTS",
+        "desc": "In <bold>Dashboard > Overlay</bold>, enable 'Text-to-Speech' and set a minimum donation amount. Your audience can now choose a voice and hear their message read aloud!"
       }
     },
     "Supporters": {
@@ -432,6 +440,14 @@
         "val": "Instant",
         "desc": "Funds arrive in seconds. No holding period."
       }
+    },
+    "TTS": {
+      "title": "Text-to-Speech (TTS)",
+      "desc": "Creators can enable <bold>AI-powered voices</bold> (Gemini TTS) to read donation messages aloud during the stream.",
+      "p1": "You can configure a <bold>Minimum Amount for TTS</bold> to ensure only major donations are read aloud, preventing spam.",
+      "p2": "Multiple voice options are available, allowing you to choose the persona that best fits your stream's vibe.",
+      "minAmountLabel": "Minimum Amount",
+      "voiceLabel": "Voice Customization"
     }
   },
   "MilestonesGuidePage": {

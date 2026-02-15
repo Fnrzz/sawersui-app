@@ -53,6 +53,10 @@ By leveraging the **Sui Network**, SawerSui solves the common pain points of tra
 - **Milestone System:** Set funding goals (e.g., "New Camera Fund"). When reached, the system triggers celebrations.
 - **Stable Income:** Accept **USDC** to avoid crypto volatility.
 - **Dashboard Analytics:** Track donation history and active balances in a unified dashboard.
+- **Text-to-Speech (TTS):** Engage your audience with AI-powered voice messages (Gemini TTS) that read donation messages aloud on stream.
+  - **Multiple Voice Options:** Choose from voices like Kore, Charon, Puck, and Zephyr.
+  - **Customizable Threshold:** Set a minimum donation amount for TTS to prevent spam.
+  - **Live Previews:** Streamers can test voices directly in the dashboard.
 - **Neo-Brutalist Design:** A bold, high-contrast interface that stands out.
 
 ### 👤 For Supporters (Donors)
@@ -78,7 +82,16 @@ SawerSui is built as a hybrid decentralized application (dApp) ensuring speed, s
   - **Enoki / zkLogin:** Social login provider for Web3 abstraction.
 - **Backend & Data:**
   - **Supabase:** Handling off-chain user metadata, real-time websocket events for OBS, and historical indexing.
+  - **Gemini AI:** Powering the Text-to-Speech (TTS) engine for natural-sounding voice alerts.
 - **Media Storage:** Walrus & Supabase Storage.
+
+### **Configuration**
+
+To enable TTS, add your Google Gemini API key to `.env`:
+
+```env
+GEMINI_API_KEY=your_api_key_here
+```
 
 ### **System Flow**
 

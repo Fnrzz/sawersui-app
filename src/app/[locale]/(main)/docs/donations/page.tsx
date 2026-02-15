@@ -126,6 +126,44 @@ export default function DonationsPage() {
             </div>
           </div>
         </section>
+
+        {/* TTS Section */}
+        <section className="space-y-6">
+          <h2 className="text-3xl font-extrabold text-[#1C1E21] uppercase tracking-tight flex items-center gap-3 drop-shadow-[2px_2px_0px_rgba(245,158,11,0.5)]">
+            <span>🗣️</span> {t("TTS.title")}
+          </h2>
+          <div className="bg-white border-2 border-[#1C1E21] shadow-[4px_4px_0px_0px_#1C1E21] p-8 rounded-xl">
+            <div className="prose prose-lg prose-gray max-w-none text-[#1C1E21] space-y-4">
+              <p className="text-xl font-medium">
+                {t.rich("TTS.desc", {
+                  bold: (chunks) => <strong>{chunks}</strong>,
+                })}
+              </p>
+              <div className="grid sm:grid-cols-2 gap-6 mt-6">
+                <div className="bg-blue-50 border-2 border-blue-200 p-4 rounded-lg">
+                  <h4 className="font-black text-blue-800 mb-2 uppercase text-sm">
+                    {t("TTS.minAmountLabel")}
+                  </h4>
+                  <p className="text-blue-900/80 font-bold">
+                    {t.rich("TTS.p1", {
+                      bold: (chunks) => <strong>{chunks}</strong>,
+                    })}
+                  </p>
+                </div>
+                <div className="bg-yellow-50 border-2 border-yellow-200 p-4 rounded-lg">
+                  <h4 className="font-black text-yellow-800 mb-2 uppercase text-sm">
+                    {t("TTS.voiceLabel")}
+                  </h4>
+                  <p className="text-yellow-900/80 font-bold">
+                    {t.rich("TTS.p2", {
+                      bold: (chunks) => <strong>{chunks}</strong>,
+                    })}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   );
