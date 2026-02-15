@@ -19,9 +19,6 @@ export async function POST(req: NextRequest) {
       charon: "Charon",
       puck: "Puck",
       zephyr: "Zephyr",
-      // Fallbacks
-      female: "Kore",
-      male: "Charon",
     };
     const voiceName = voiceMap[voiceType] || "Kore";
 
