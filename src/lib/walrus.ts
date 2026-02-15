@@ -68,7 +68,6 @@ export async function uploadToWalrus(
 }> {
   try {
     const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
 
     // Build URL — clean PUT request to Publisher
     const url = `${WALRUS_PUBLISHER_URL}?epochs=${epochs}`;
@@ -78,7 +77,7 @@ export async function uploadToWalrus(
       headers: {
         "Content-Type": "application/octet-stream",
       },
-      body: buffer,
+      body: arrayBuffer,
     });
 
     if (!response.ok) {
