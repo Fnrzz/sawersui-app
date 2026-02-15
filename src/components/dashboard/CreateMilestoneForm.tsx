@@ -2,7 +2,7 @@
 
 import { useState, useTransition, useCallback, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { uploadImage } from "@/lib/actions/upload";
+import { uploadToWalrus } from "@/lib/walrus";
 import { createMilestone } from "@/lib/actions/milestone";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -55,24 +55,12 @@ export default function CreateMilestoneForm() {
 
     startTransition(async () => {
       try {
-        // 1. Upload to Walrus via Server Action
+        // 1. Upload to Walrus via direct client upload
         toast.info(t("toast.uploading"));
 
-        const formData = new FormData();
-        formData.append("file", file);
+        const uploadResult = await uploadToWalrus(file, 2);
 
-        const uploadResult = await uploadImage(formData);
-
-        if (uploadResult.error || !uploadResult.data) {
-          throw new Error(uploadResult.error || "Upload failed");
-        }
-
-        const {
-          blobId,
-          url: walrusUrl,
-          expiresAt,
-          expirationEpoch,
-        } = uploadResult.data;
+        const { blobId, url: walrusUrl, expiresAt } = uploadResult;
         toast.success(t("toast.uploaded"));
 
         // 2. Call Server Action
