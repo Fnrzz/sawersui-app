@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-import { useRenewWalrusBlob } from "@/hooks/useRenewWalrusBlob";
 import {
   Dialog,
   DialogContent,
@@ -9,12 +7,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RefreshCcw, ExternalLink } from "lucide-react";
 
 interface Milestone {
   id: string;
@@ -39,17 +32,6 @@ export function MilestoneDetailModal({
   milestone,
   trigger,
 }: MilestoneDetailModalProps) {
-  const { renewBlob, isRenewing } = useRenewWalrusBlob();
-
-  const handleRenew = async () => {
-    // User requested "max epochs", defaulting to 53 as per Walrus limits
-    await renewBlob(
-      milestone.image_blob_id,
-      milestone.id,
-      53, // Additional epochs
-    );
-  };
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active":
@@ -98,9 +80,9 @@ export function MilestoneDetailModal({
             </div>
 
             <div className="space-y-2">
-              <Label className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">
+              <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">
                 Blob ID
-              </Label>
+              </p>
               <div className="text-[10px] font-mono break-all bg-gray-50 p-2 rounded border border-gray-200 text-gray-600">
                 {milestone.image_blob_id}
               </div>
@@ -112,9 +94,9 @@ export function MilestoneDetailModal({
             <div className="flex-1 space-y-6">
               {/* Title Section */}
               <div>
-                <Label className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">
+                <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">
                   Title
-                </Label>
+                </p>
                 <h2 className="text-2xl font-bold leading-tight text-black mt-1">
                   {milestone.title}
                 </h2>
@@ -122,9 +104,9 @@ export function MilestoneDetailModal({
 
               {/* Target Section */}
               <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-                <Label className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">
+                <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">
                   Fundraising Goal
-                </Label>
+                </p>
                 <div className="flex items-baseline gap-2 mt-1">
                   <span className="text-4xl font-black tracking-tighter">
                     {milestone.current_amount.toFixed(2)}
@@ -149,12 +131,12 @@ export function MilestoneDetailModal({
                 </div>
               </div>
 
-              {/* Storage Section */}
+              {/* Storage Section — expiry badge only, renewal is automated */}
               <div className="space-y-3 pt-2">
                 <div className="flex items-center justify-between">
-                  <Label className="text-[10px] text-gray-500 uppercase font-bold tracking-wider flex items-center gap-2">
+                  <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider flex items-center gap-2">
                     Walrus Storage
-                  </Label>
+                  </p>
                   <Badge
                     variant={
                       milestone.expires_at || milestone.expiration_epoch
@@ -170,28 +152,8 @@ export function MilestoneDetailModal({
                         : "Expiration Unknown"}
                   </Badge>
                 </div>
-
-                <Button
-                  onClick={handleRenew}
-                  disabled={isRenewing}
-                  size="lg"
-                  className="w-full bg-black text-white hover:bg-gray-800 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all h-14 text-base font-bold"
-                >
-                  {isRenewing ? (
-                    <>
-                      <RefreshCcw className="w-5 h-5 mr-3 animate-spin" />
-                      Extending Storage...
-                    </>
-                  ) : (
-                    <>
-                      <RefreshCcw className="w-5 h-5 mr-3" />
-                      Renew Storage
-                    </>
-                  )}
-                </Button>
                 <p className="text-[10px] text-center text-gray-400 max-w-xs mx-auto">
-                  Extends storage duration by +53 epochs (approx. 1 year) or
-                  maximum allowed.
+                  Storage is automatically renewed daily by the system.
                 </p>
               </div>
             </div>

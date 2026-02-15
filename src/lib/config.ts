@@ -19,6 +19,19 @@ export const CONFIG = {
     URL: process.env.NEXT_PUBLIC_SUPABASE_URL!,
     ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
   },
+  WALRUS: {
+    PACKAGE_ID: process.env.WALRUS_PACKAGE_ID || "",
+    SYSTEM_OBJECT: process.env.WALRUS_SYSTEM_OBJECT || "",
+    WAL_COIN_TYPE: process.env.WAL_COIN_TYPE || "",
+    PUBLISHER_URL:
+      process.env.NEXT_PUBLIC_SUI_NETWORK === "mainnet"
+        ? "https://publisher.walrus.space/v1/blobs"
+        : "https://publisher.walrus-testnet.walrus.space/v1/blobs",
+    AGGREGATOR_URL:
+      process.env.NEXT_PUBLIC_SUI_NETWORK === "mainnet"
+        ? "https://aggregator.walrus.space/v1/blobs/"
+        : "https://aggregator.walrus-testnet.walrus.space/v1/blobs/",
+  },
 } as const;
 
 // Quick checks to warn in dev

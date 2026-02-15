@@ -1,7 +1,25 @@
-export const WALRUS_PUBLISHER_URL =
-  "https://publisher.walrus-testnet.walrus.space/v1/blobs";
-export const WALRUS_AGGREGATOR_URL =
-  "https://aggregator.walrus-testnet.walrus.space/v1/blobs/";
+import { Transaction } from "@mysten/sui/transactions";
+import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
+import { getSuiClient } from "@/lib/sui-client";
+import { CONFIG } from "@/lib/config";
+import type { WalrusClient } from "@mysten/walrus";
+
+// Lazy initialize WalrusClient with dynamic import
+let walrusClientInstance: WalrusClient | null = null;
+export async function getWalrusClient(): Promise<WalrusClient> {
+  if (!walrusClientInstance) {
+    const { WalrusClient } = await import("@mysten/walrus");
+    walrusClientInstance = new WalrusClient({
+      network: CONFIG.SUI.NETWORK === "mainnet" ? "mainnet" : "testnet",
+      suiClient: getSuiClient(),
+    });
+  }
+  return walrusClientInstance;
+}
+
+// ─── URLs — driven by NEXT_PUBLIC_SUI_NETWORK in config.ts ───
+export const WALRUS_PUBLISHER_URL = CONFIG.WALRUS.PUBLISHER_URL;
+export const WALRUS_AGGREGATOR_URL = CONFIG.WALRUS.AGGREGATOR_URL;
 
 export interface WalrusUploadResponse {
   newlyCreated: {
@@ -33,9 +51,15 @@ export interface WalrusUploadResponse {
   };
 }
 
+/**
+ * Upload a file to Walrus via the HTTP publisher.
+ *
+ * @param file The file to upload
+ * @param epochs Duration in epochs (default 2)
+ */
 export async function uploadToWalrus(
   file: File,
-  epochs: number = 53, // Default to MAX allowed epochs
+  epochs: number = 2,
 ): Promise<{
   blobId: string;
   url: string;
@@ -46,7 +70,10 @@ export async function uploadToWalrus(
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    const response = await fetch(`${WALRUS_PUBLISHER_URL}?epochs=${epochs}`, {
+    // Build URL — clean PUT request to Publisher
+    const url = `${WALRUS_PUBLISHER_URL}?epochs=${epochs}`;
+
+    const response = await fetch(url, {
       method: "PUT",
       headers: {
         "Content-Type": "application/octet-stream",
@@ -65,12 +92,7 @@ export async function uploadToWalrus(
 
     // Check if newlyCreated or alreadyCertified
     const blobObject = data.newlyCreated?.blobObject || data.alreadyCertified;
-
     const blobId = blobObject?.blobId || data.alreadyCertified?.blobId;
-    // Walrus response structure for alreadyCertified might be slightly different or same,
-    // but based on type def:
-    // newlyCreated.blobObject.storage.endEpoch
-    // alreadyCertified.endEpoch
 
     let expirationEpoch = 0;
     if (data.newlyCreated) {
@@ -96,3 +118,5 @@ export async function uploadToWalrus(
     throw error;
   }
 }
+
+// ─── purchaseAndUploadToWalrus removed — Publisher doesn't support storage_id ───
