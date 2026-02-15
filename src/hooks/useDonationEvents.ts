@@ -14,6 +14,7 @@ export interface DonationEvent {
   status: string;
   sender_address: string | null;
   coin_type: string | null;
+  tts_voice?: string;
 }
 
 export function useDonationEvents(

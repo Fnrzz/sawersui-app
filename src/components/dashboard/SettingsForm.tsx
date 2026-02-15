@@ -93,6 +93,7 @@ interface SettingsFormProps {
 export function SettingsForm({ initialSettings }: SettingsFormProps) {
   const t = useTranslations("Settings");
   const tAction = useTranslations("Action");
+  const tDashboard = useTranslations("Dashboard");
   const [isPending, startTransition] = useTransition();
 
   const [cardBgColor, setCardBgColor] = useState(initialSettings.card_bg_color);
@@ -108,6 +109,12 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
   );
 
   const [minAmount, setMinAmount] = useState(initialSettings.min_amount);
+  const [isTtsEnabled, setIsTtsEnabled] = useState(
+    initialSettings.is_tts_enabled,
+  );
+  const [ttsMinAmount, setTtsMinAmount] = useState(
+    initialSettings.tts_min_amount,
+  );
 
   const colorFields = [
     {
@@ -144,6 +151,8 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
     message_color: messageColor,
     sound_url: existingSoundUrl,
     min_amount: minAmount,
+    is_tts_enabled: isTtsEnabled,
+    tts_min_amount: ttsMinAmount,
   };
 
   function handleResetDefaults() {
@@ -152,6 +161,8 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
     setAmountColor(DEFAULT_OVERLAY_SETTINGS.amount_color);
     setMessageColor(DEFAULT_OVERLAY_SETTINGS.message_color);
     setMinAmount(DEFAULT_OVERLAY_SETTINGS.min_amount);
+    setIsTtsEnabled(DEFAULT_OVERLAY_SETTINGS.is_tts_enabled);
+    setTtsMinAmount(DEFAULT_OVERLAY_SETTINGS.tts_min_amount);
   }
 
   function handleSave() {
@@ -162,6 +173,8 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
       formData.set("amount_color", amountColor);
       formData.set("message_color", messageColor);
       formData.set("min_amount", minAmount.toString());
+      formData.set("is_tts_enabled", isTtsEnabled ? "on" : "off");
+      formData.set("tts_min_amount", ttsMinAmount.toString());
 
       if (soundFile) {
         formData.set("sound_file", soundFile);
@@ -172,9 +185,9 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
       const result = await saveOverlaySettings(formData);
 
       if (result.success) {
-        toast.success(t("Dashboard.toast.settingsSaved"));
+        toast.success(tDashboard("toast.settingsSaved"));
       } else {
-        toast.error(result.error || t("Dashboard.toast.settingsFailed"));
+        toast.error(result.error || tDashboard("toast.settingsFailed"));
       }
     });
   }
@@ -290,25 +303,86 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
         <p className="text-xs font-medium text-black/50">{t("soundDesc")}</p>
       </div>
 
-      {/* Min Amount */}
-      <div className="bg-white border-[3px] border-black rounded-xl p-6 space-y-4 shadow-[6px_6px_0px_0px_#000]">
-        <h2 className="font-black text-lg text-black">{t("minDonation")}</h2>
-        <p className="text-xs font-medium text-black/60">
-          {t("minDonationDesc")}
-        </p>
-        <div className="flex items-center gap-3 p-3 bg-white border-2 border-black rounded-lg">
-          <input
-            type="number"
-            min="0"
-            step="0.01"
-            value={minAmount}
-            onChange={(e) =>
-              setMinAmount(Math.max(0, parseFloat(e.target.value) || 0.5))
-            }
-            className="flex-1 px-2 py-1 text-base font-black font-mono bg-transparent outline-none text-black placeholder:text-black/30"
-            placeholder="0.5"
-          />
-          <span className="text-sm font-black text-black shrink-0">USDC</span>
+      {/* Min Amount & TTS */}
+      <div className="bg-white border-[3px] border-black rounded-xl p-6 space-y-6 shadow-[6px_6px_0px_0px_#000]">
+        {/* Standard Min Amount */}
+        <div className="space-y-4">
+          <h2 className="font-black text-lg text-black">{t("minDonation")}</h2>
+          <p className="text-xs font-medium text-black/60">
+            {t("minDonationDesc")}
+          </p>
+          <div className="flex items-center gap-3 p-3 bg-white border-2 border-black rounded-lg">
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              value={minAmount}
+              onChange={(e) =>
+                setMinAmount(Math.max(0, parseFloat(e.target.value) || 0))
+              }
+              className="flex-1 px-2 py-1 text-base font-black font-mono bg-transparent outline-none text-black placeholder:text-black/30"
+              placeholder="0.5"
+            />
+            <span className="text-sm font-black text-black shrink-0">USDC</span>
+          </div>
+        </div>
+
+        <hr className="border-t-2 border-black/10" />
+
+        {/* TTS Settings */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="font-black text-lg text-black flex items-center gap-2">
+                Draft: Text-to-Speech (TTS)
+                <span className="bg-[#FFDF20] text-black text-[10px] px-2 py-0.5 rounded border border-black shadow-[2px_2px_0px_0px_#000]">
+                  PRO
+                </span>
+              </h2>
+              <p className="text-xs font-medium text-black/60 mt-1">
+                {t("ttsDesc") ||
+                  "Enable AI voice to read donation messages automatically."}
+              </p>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isTtsEnabled}
+                onChange={(e) => setIsTtsEnabled(e.target.checked)}
+                className="sr-only peer"
+              />
+              <div className="w-14 h-7 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black border-2 border-black" />
+            </label>
+          </div>
+
+          {isTtsEnabled && (
+            <div className="space-y-2 animate-in fade-in slide-in-from-top-2">
+              <label className="text-sm font-bold text-black">
+                {t("ttsMinAmount") || "Minimum Amount for TTS"}
+              </label>
+              <div className="flex items-center gap-3 p-3 bg-blue-50 border-2 border-black rounded-lg">
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={ttsMinAmount}
+                  onChange={(e) =>
+                    setTtsMinAmount(
+                      Math.max(0, parseFloat(e.target.value) || 0),
+                    )
+                  }
+                  className="flex-1 px-2 py-1 text-base font-black font-mono bg-transparent outline-none text-black placeholder:text-black/30"
+                  placeholder="10"
+                />
+                <span className="text-sm font-black text-black shrink-0">
+                  USDC
+                </span>
+              </div>
+              <p className="text-[10px] font-bold text-blue-600">
+                Tip: Set a higher limit for TTS to prevent spam.
+              </p>
+            </div>
+          )}
         </div>
       </div>
 

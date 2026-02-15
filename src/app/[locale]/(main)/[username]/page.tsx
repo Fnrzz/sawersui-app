@@ -25,14 +25,22 @@ export default async function DonationPage({ params }: DonationPageProps) {
     notFound();
   }
 
-  return <DonationPageClient streamer={streamer} />;
+  // Fetch overlay settings
+  const { getOverlaySettings } = await import("@/lib/actions/settings");
+  const overlaySettings = await getOverlaySettings(streamer.id);
+
+  return <DonationPageClient streamer={streamer} settings={overlaySettings} />;
 }
 
 // ============================================================
 // METADATA
 // ============================================================
 
-export async function generateMetadata({ params }: { params: Promise<{ username: string }> }) {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ username: string }>;
+}) {
   const { username } = await params;
   return {
     title: `Donate to @${username} | SawerSui`,

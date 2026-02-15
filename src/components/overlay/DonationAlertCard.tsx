@@ -53,8 +53,7 @@ export function DonationAlertCard({
           className="text-3xl font-bold font-[family-name:var(--font-pixel)] drop-shadow-[2px_2px_0px_rgba(0,0,0,1)] tracking-widest mt-2"
           style={{ color: amountColor }}
         >
-          {data.amount_net.toLocaleString()}{" "}
-          {data.coin_type?.includes("0x2::sui::SUI") ? "SUI" : "USDC"}
+          {data.amount_net.toLocaleString()} {data.coin_type}
         </p>
       </div>
 
