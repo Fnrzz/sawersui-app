@@ -124,7 +124,7 @@ export function HomePage() {
             className="w-full drop-shadow-lg object-contain block md:hidden"
           />
           <Image
-            src="/hero.webp"
+            src="/hero-desktop.webp"
             alt="SawerSui Hero"
             width={1200}
             height={1200}
