@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 import { motion, Variants } from "framer-motion";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { Link } from "@/i18n/routing";
 import { useRouter } from "next/navigation";
@@ -112,14 +113,24 @@ export function HomePage() {
         variants={containerVariants}
       >
         {/* Logo / Mascot */}
-        <motion.div variants={itemVariants} className="mb-4">
-          <video
-            src="/animation.webm"
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="w-32 h-32 md:w-40 md:h-40 drop-shadow-lg"
+        <motion.div variants={itemVariants} className="mb-6">
+          <Image
+            src="/hero-mobile.webp"
+            alt="SawerSui Hero"
+            width={800}
+            height={800}
+            quality={100}
+            priority
+            className="w-full drop-shadow-lg object-contain block md:hidden"
+          />
+          <Image
+            src="/hero.webp"
+            alt="SawerSui Hero"
+            width={1200}
+            height={1200}
+            quality={100}
+            priority
+            className="w-full md:w-[800px] drop-shadow-lg object-contain hidden md:block"
           />
         </motion.div>
 
