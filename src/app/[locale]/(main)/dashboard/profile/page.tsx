@@ -5,6 +5,7 @@ import { WalletAddressCopy } from "@/components/dashboard/WalletAddressCopy";
 import Link from "next/link";
 import { ArrowLeft, Trophy } from "lucide-react";
 import { getOwnedMilestoneNfts } from "@/lib/nft";
+import { NftCard } from "@/components/dashboard/NftCard";
 
 export default async function ProfilePage() {
   const t = await getTranslations("Profile");
@@ -115,27 +116,12 @@ export default async function ProfilePage() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {nfts.map((nft) => (
-                <div
+                <NftCard
                   key={nft.objectId}
-                  className="group bg-white border-[3px] border-black rounded-xl overflow-hidden shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-200"
-                >
-                  <div className="aspect-video w-full bg-zinc-100 border-b-[3px] border-black relative overflow-hidden">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={nft.imageUrl}
-                      alt={nft.name || "Reward NFT"}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-black text-lg leading-tight uppercase line-clamp-2">
-                      {nft.name || "Untitled Milestone"}
-                    </h3>
-                    <p className="text-xs text-muted-foreground mt-2 font-mono truncate">
-                      ID: {nft.objectId}
-                    </p>
-                  </div>
-                </div>
+                  imageUrl={nft.imageUrl}
+                  name={nft.name}
+                  objectId={nft.objectId}
+                />
               ))}
             </div>
           )}

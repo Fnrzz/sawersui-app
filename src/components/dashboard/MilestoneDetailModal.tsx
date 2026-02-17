@@ -8,6 +8,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
 
 interface Milestone {
   id: string;
@@ -32,6 +33,7 @@ export function MilestoneDetailModal({
   milestone,
   trigger,
 }: MilestoneDetailModalProps) {
+  const [imgError, setImgError] = useState(false);
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active":
@@ -71,12 +73,20 @@ export function MilestoneDetailModal({
           {/* Left Column: Image (5 cols) */}
           <div className="md:col-span-5 space-y-4">
             <div className="relative aspect-square w-full rounded-xl border-2 border-black overflow-hidden bg-gray-100 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)]">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={milestone.walrus_url}
-                alt={milestone.title}
-                className="w-full h-full object-cover"
-              />
+              {imgError ? (
+                <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 gap-2">
+                  <span className="text-4xl">🖼️</span>
+                  <span className="text-sm font-bold">Image Expired</span>
+                </div>
+              ) : (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={milestone.walrus_url}
+                  alt={milestone.title}
+                  className="w-full h-full object-cover"
+                  onError={() => setImgError(true)}
+                />
+              )}
             </div>
 
             <div className="space-y-2">
