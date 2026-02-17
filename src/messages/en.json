@@ -606,5 +606,19 @@
       "FAQ": "FAQ",
       "Terms": "Terms of Service"
     }
+  },
+  "ShareLink": {
+    "title": "Share Link",
+    "subtitle": "Share your donation link with your audience",
+    "back": "Back to Dashboard",
+    "linkTitle": "Your Donation Link",
+    "linkDesc": "Share this link on your stream, social media, or bio so your audience can support you.",
+    "copyButton": "Copy Link",
+    "copySuccess": "Donation link copied!",
+    "copyError": "Failed to copy link",
+    "qrTitle": "QR Code",
+    "qrDesc": "Your audience can scan this QR code to visit your donation page instantly.",
+    "downloadButton": "Download QR Code",
+    "downloadSuccess": "QR Code downloaded!"
   }
 }

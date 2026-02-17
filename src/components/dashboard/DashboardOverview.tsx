@@ -97,14 +97,6 @@ export function DashboardOverview({
     }
   };
 
-  const handleCopyLink = () => {
-    const url = `${window.location.origin}/${username}`;
-    navigator.clipboard
-      .writeText(url)
-      .then(() => toast.success(t("toast.copySuccess")))
-      .catch(() => toast.error(t("toast.copyError")));
-  };
-
   return (
     <motion.div
       className="space-y-8"
@@ -161,8 +153,7 @@ export function DashboardOverview({
           description={t("menu.share.desc")}
           icon={Share2}
           colorClass="bg-[#BFDBFE]" // Blue-200ish
-          onClick={handleCopyLink}
-          actionLabel={t("menu.share.action")}
+          href="/dashboard/share"
         />
 
         {/* Dukungan Masuk & Cashout - Purple */}

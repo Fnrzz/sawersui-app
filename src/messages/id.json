@@ -597,5 +597,19 @@
       "FAQ": "FAQ",
       "Terms": "Syarat & Ketentuan"
     }
+  },
+  "ShareLink": {
+    "title": "Bagikan Link",
+    "subtitle": "Bagikan link donasi ke penonton kamu",
+    "back": "Kembali ke Dashboard",
+    "linkTitle": "Link Donasi Kamu",
+    "linkDesc": "Bagikan link ini di stream, media sosial, atau bio kamu agar penonton bisa mendukungmu.",
+    "copyButton": "Salin Link",
+    "copySuccess": "Link donasi berhasil disalin!",
+    "copyError": "Gagal menyalin link",
+    "qrTitle": "Kode QR",
+    "qrDesc": "Penonton kamu bisa scan kode QR ini untuk langsung masuk ke halaman donasi.",
+    "downloadButton": "Download Kode QR",
+    "downloadSuccess": "Kode QR berhasil diunduh!"
   }
 }
