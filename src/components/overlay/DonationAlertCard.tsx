@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
 import { DonationEvent } from "@/hooks/useDonationEvents";
 import { OverlaySettings } from "@/lib/overlay-settings";
 
@@ -25,6 +26,7 @@ export function DonationAlertCard({
   const senderColor = settings?.sender_color ?? "#FFDF20";
   const amountColor = settings?.amount_color ?? "#A3E635";
   const messageColor = settings?.message_color ?? "#ffffff";
+  const [imgError, setImgError] = useState(false);
 
   const content = (
     <div className="p-8 flex items-center justify-between gap-8 h-full min-h-[200px] max-w-2xl">
@@ -58,7 +60,7 @@ export function DonationAlertCard({
       </div>
 
       {/* Right Content: Image */}
-      {nftImage && (
+      {nftImage && !imgError && (
         <div className="w-40 h-40 shrink-0 relative">
           <div className="absolute inset-0 bg-white border-[4px] border-black rounded-full shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -66,6 +68,7 @@ export function DonationAlertCard({
               src={nftImage}
               alt="Reward NFT"
               className="w-full h-full object-cover"
+              onError={() => setImgError(true)}
             />
           </div>
           {/* Decorative Bubble */}
