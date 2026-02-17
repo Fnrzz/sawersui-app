@@ -1,19 +1,18 @@
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
-import { getSponsorKeypair } from "@/lib/sui-sponsor";
-import { getSuiClient } from "@/lib/sui-client";
 import { createAdminClient } from "@/lib/supabase/server";
-import { CONFIG } from "@/lib/config";
-import { getWalrusClient } from "@/lib/walrus";
+import { WALRUS_AGGREGATOR_URL, WALRUS_PUBLISHER_URL } from "@/lib/walrus";
 
 /**
  * Vercel Cron Job — runs daily at midnight UTC.
  * Renews Walrus blob storage for milestones expiring within 48 hours.
  *
- * 2-Coin Architecture:
- *  - SUI  → used implicitly for transaction gas (tx.gas)
- *  - WAL  → explicitly fetched and split, used to pay Walrus storage fees
+ * Strategy (Content-Addressing HTTP hack):
+ *  1. Download the blob bytes from the Aggregator.
+ *  2. Re-upload the exact same bytes to the Publisher.
+ *  3. Because Walrus is content-addressed, the same Blob ID is reused
+ *     but a fresh Storage object with new epochs is created.
  */
 export async function GET(req: Request) {
   // ── 1. Auth check ──
@@ -36,7 +35,7 @@ export async function GET(req: Request) {
 
     const { data: milestones, error: queryError } = await supabase
       .from("milestones")
-      .select("id, image_blob_id, expires_at")
+      .select("id, image_blob_id, walrus_url, expires_at")
       .not("image_blob_id", "is", null)
       .lt("expires_at", cutoff);
 
@@ -57,87 +56,51 @@ export async function GET(req: Request) {
 
     results.processed = milestones.length;
 
-    // ── 3. Initialize Sui client and sponsor ──
-    const client = getSuiClient();
-    const sponsor = getSponsorKeypair();
-    const sponsorAddress = sponsor.toSuiAddress();
-
-    // ── 4. Fetch WAL coins from sponsor wallet ──
-    // WAL (or FROST on testnet) is the token used to pay Walrus storage fees.
-    // SUI is only used for gas. This is the "2-Coin Architecture".
-    const walCoinType = CONFIG.WALRUS.WAL_COIN_TYPE;
-
-    if (!walCoinType) {
-      return NextResponse.json(
-        { error: "WAL_COIN_TYPE env var is not configured" },
-        { status: 500 },
-      );
-    }
-
-    const { data: walCoins } = await client.getCoins({
-      owner: sponsorAddress,
-      coinType: walCoinType,
-    });
-
-    if (!walCoins || walCoins.length === 0) {
-      return NextResponse.json(
-        {
-          error:
-            "Insufficient WAL balance — sponsor wallet has no WAL coins for storage fees",
-        },
-        { status: 400 },
-      );
-    }
-
-    // ── 5. Process each milestone ──
-    // After each on-chain tx the WAL coin's version/digest changes,
-    // so we re-fetch WAL coins before each iteration.
+    // ── 3. Process each milestone: download → re-upload ──
     for (const milestone of milestones) {
       try {
-        if (!milestone.image_blob_id) {
+        const blobUrl =
+          milestone.walrus_url ||
+          `${WALRUS_AGGREGATOR_URL}${milestone.image_blob_id}`;
+
+        // 3a. Download blob bytes from the Aggregator
+        const downloadRes = await fetch(blobUrl);
+        if (!downloadRes.ok) {
           results.failed++;
-          results.errors.push(`${milestone.id}: missing image_blob_id`);
+          results.errors.push(
+            `${milestone.id}: download failed (${downloadRes.status})`,
+          );
           continue;
         }
 
-        // Re-fetch WAL coins to get the latest object reference
-        const { data: freshWalCoins } = await client.getCoins({
-          owner: sponsorAddress,
-          coinType: walCoinType,
+        const body = await downloadRes.arrayBuffer();
+
+        // 3b. Re-upload the exact same bytes to the Publisher (2 epochs)
+        const uploadRes = await fetch(`${WALRUS_PUBLISHER_URL}?epochs=2`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/octet-stream" },
+          body,
         });
 
-        if (!freshWalCoins || freshWalCoins.length === 0) {
+        if (!uploadRes.ok) {
+          const errText = await uploadRes.text();
           results.failed++;
-          results.errors.push(`${milestone.id}: WAL balance exhausted`);
-          break; // No point continuing if wallet is empty
+          results.errors.push(
+            `${milestone.id}: re-upload failed (${uploadRes.status}): ${errText}`,
+          );
+          continue;
         }
 
-        // Build PTB — extend storage by 1 epoch using SDK
-        const walrusClient = await getWalrusClient();
-        const tx = await walrusClient.extendBlobTransaction({
-          blobObjectId: milestone.image_blob_id,
-          epochs: 1,
-        });
-
-        // Set the sender as the sponsor
-        tx.setSender(sponsorAddress);
-
-        // Sign and execute — sponsor pays SUI gas from its own balance
-        const { digest } = await client.signAndExecuteTransaction({
-          signer: sponsor,
-          transaction: tx,
-        });
-
         console.log(
-          `[Cron/WalrusRenew] Extended ${milestone.id} | blob: ${milestone.image_blob_id} | digest: ${digest}`,
+          `[Cron/WalrusRenew] Re-uploaded ${milestone.id} | blob: ${milestone.image_blob_id}`,
         );
 
-        // ── 6. Update DB — add 24h to the CURRENT expires_at ──
+        // ── 4. Update DB — extend expires_at by 2 days ──
         const currentExpiresAt = milestone.expires_at
           ? new Date(milestone.expires_at).getTime()
           : Date.now();
         const newExpiresAt = new Date(
-          currentExpiresAt + 1 * 24 * 60 * 60 * 1000,
+          currentExpiresAt + 2 * 24 * 60 * 60 * 1000,
         ).toISOString();
 
         const { error: updateError } = await supabase
@@ -152,7 +115,7 @@ export async function GET(req: Request) {
           );
           results.failed++;
           results.errors.push(
-            `${milestone.id}: on-chain OK but DB update failed`,
+            `${milestone.id}: re-upload OK but DB update failed`,
           );
         } else {
           results.success++;
