@@ -63,7 +63,7 @@ export function ShareLinkClient({ username }: ShareLinkClientProps) {
   const donationUrl = origin ? `${origin}/${username}` : `/${username}`;
 
   const qrUrl = origin
-    ? `https://slush.app/browser?url=${origin}/${username}}`
+    ? `https://my.slush.app/browse/${origin}/${username}}`
     : `/${username}`;
 
   const handleCopy = useCallback(() => {
