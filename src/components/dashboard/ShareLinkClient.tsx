@@ -61,6 +61,9 @@ export function ShareLinkClient({ username }: ShareLinkClientProps) {
   }, []);
 
   const donationUrl = origin ? `${origin}/${username}` : `/${username}`;
+  const qrUrl = origin
+    ? `https://slush.app/browser?url=${encodeURIComponent(`${origin}/${username}`)}`
+    : `/${username}`;
 
   const handleCopy = useCallback(() => {
     navigator.clipboard
@@ -209,7 +212,7 @@ export function ShareLinkClient({ username }: ShareLinkClientProps) {
             className="bg-white border-[3px] border-black rounded-xl p-6 shadow-[4px_4px_0px_0px_#000] inline-block"
           >
             <QRCodeCanvas
-              value={donationUrl}
+              value={qrUrl}
               size={200}
               level="H"
               marginSize={0}
