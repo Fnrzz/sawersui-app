@@ -9,6 +9,7 @@ export interface CreateMilestoneData {
   image_blob_id: string;
   walrus_url: string;
   coin_type: "USDC" | "SUI";
+  blob_object_id?: string;
   expires_at?: string;
 }
 
@@ -58,6 +59,7 @@ export async function createMilestone(data: CreateMilestoneData) {
     target_amount: data.target_amount,
     current_amount: 0,
     image_blob_id: data.image_blob_id,
+    blob_object_id: data.blob_object_id,
     walrus_url: data.walrus_url,
     status: "active",
     coin_type: data.coin_type,

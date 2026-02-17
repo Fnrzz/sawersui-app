@@ -1,21 +1,4 @@
-import { Transaction } from "@mysten/sui/transactions";
-import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
-import { getSuiClient } from "@/lib/sui-client";
 import { CONFIG } from "@/lib/config";
-import type { WalrusClient } from "@mysten/walrus";
-
-// Lazy initialize WalrusClient with dynamic import
-let walrusClientInstance: WalrusClient | null = null;
-export async function getWalrusClient(): Promise<WalrusClient> {
-  if (!walrusClientInstance) {
-    const { WalrusClient } = await import("@mysten/walrus");
-    walrusClientInstance = new WalrusClient({
-      network: CONFIG.SUI.NETWORK === "mainnet" ? "mainnet" : "testnet",
-      suiClient: getSuiClient(),
-    });
-  }
-  return walrusClientInstance;
-}
 
 // ─── URLs — driven by NEXT_PUBLIC_SUI_NETWORK in config.ts ───
 export const WALRUS_PUBLISHER_URL = CONFIG.WALRUS.PUBLISHER_URL;
@@ -24,6 +7,7 @@ export const WALRUS_AGGREGATOR_URL = CONFIG.WALRUS.AGGREGATOR_URL;
 export interface WalrusUploadResponse {
   newlyCreated: {
     blobObject: {
+      id?: string;
       blobId: string;
       storage: {
         id: string;
@@ -62,6 +46,7 @@ export async function uploadToWalrus(
   epochs: number = 2,
 ): Promise<{
   blobId: string;
+  blobObjectId: string;
   url: string;
   expirationEpoch: number;
   expiresAt: string;
@@ -92,6 +77,7 @@ export async function uploadToWalrus(
     // Check if newlyCreated or alreadyCertified
     const blobObject = data.newlyCreated?.blobObject || data.alreadyCertified;
     const blobId = blobObject?.blobId || data.alreadyCertified?.blobId;
+    const blobObjectId = data.newlyCreated?.blobObject?.id ?? "";
 
     let expirationEpoch = 0;
     if (data.newlyCreated) {
@@ -106,6 +92,7 @@ export async function uploadToWalrus(
 
     return {
       blobId,
+      blobObjectId,
       url: `${WALRUS_AGGREGATOR_URL}${blobId}`,
       expirationEpoch,
       expiresAt: new Date(

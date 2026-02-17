@@ -60,14 +60,20 @@ export default function CreateMilestoneForm() {
 
         const uploadResult = await uploadToWalrus(file, 2);
 
-        const { blobId, url: walrusUrl, expiresAt } = uploadResult;
+        const {
+          blobId,
+          blobObjectId,
+          url: walrusUrl,
+          expiresAt,
+        } = uploadResult;
         toast.success(t("toast.uploaded"));
 
         // 2. Call Server Action
         const result = await createMilestone({
           title,
           target_amount: parseFloat(targetAmount),
-          image_blob_id: blobId, // Passing required blobId
+          image_blob_id: blobId,
+          blob_object_id: blobObjectId,
           walrus_url: walrusUrl,
           coin_type: coinType,
           expires_at: expiresAt,
