@@ -28,6 +28,7 @@ interface Milestone {
 export function MilestoneList() {
   const t = useTranslations("Milestone.history");
   const [milestones, setMilestones] = useState<Milestone[]>([]);
+  const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
   const [isPending, startTransition] = useTransition();
 
   const fetchMilestones = async () => {
@@ -95,12 +96,23 @@ export function MilestoneList() {
                     <div className="flex items-center gap-4 w-full sm:w-auto">
                       {/* Thumbnail */}
                       <div className="w-16 h-16 bg-gray-100 border border-black rounded overflow-hidden flex-shrink-0">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={milestone.walrus_url}
-                          alt={milestone.title}
-                          className="w-full h-full object-cover"
-                        />
+                        {failedImages.has(milestone.id) ? (
+                          <div className="w-full h-full flex items-center justify-center text-gray-400 text-[10px] font-bold text-center p-1">
+                            Expired
+                          </div>
+                        ) : (
+                          /* eslint-disable-next-line @next/next/no-img-element */
+                          <img
+                            src={milestone.walrus_url}
+                            alt={milestone.title}
+                            className="w-full h-full object-cover"
+                            onError={() =>
+                              setFailedImages((prev) =>
+                                new Set(prev).add(milestone.id),
+                              )
+                            }
+                          />
+                        )}
                       </div>
 
                       <div className="flex-1 min-w-0">
@@ -143,15 +155,21 @@ export function MilestoneList() {
                     </div>
 
                     <div className="flex items-center gap-2 self-end sm:self-center">
-                      <a
-                        href={milestone.walrus_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <Button variant="ghost" size="icon" title="View Image">
-                          <ExternalLink className="w-4 h-4" />
-                        </Button>
-                      </a>
+                      {!failedImages.has(milestone.id) && (
+                        <a
+                          href={milestone.walrus_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            title="View Image"
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                          </Button>
+                        </a>
+                      )}
                       <MilestoneDetailModal
                         milestone={milestone}
                         trigger={

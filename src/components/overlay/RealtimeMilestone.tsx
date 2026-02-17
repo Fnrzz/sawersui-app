@@ -13,6 +13,7 @@ interface Milestone {
   current_amount: number;
   walrus_url: string;
   status: string;
+  expires_at?: string;
 }
 
 interface RealtimeMilestoneProps {
@@ -38,6 +39,7 @@ export function RealtimeMilestone({
         }
       : initialData,
   );
+  const [imgError, setImgError] = useState(false);
   const supabase = createClient();
 
   useEffect(() => {
@@ -119,12 +121,19 @@ export function RealtimeMilestone({
       >
         {/* Header Image */}
         <div className="h-32 w-full relative bg-gray-100 border-b-[3px] border-black overflow-hidden group">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={milestone.walrus_url}
-            alt={milestone.title}
-            className="w-full h-full object-cover"
-          />
+          {imgError ? (
+            <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm font-bold">
+              Image Expired
+            </div>
+          ) : (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              src={milestone.walrus_url}
+              alt={milestone.title}
+              className="w-full h-full object-cover"
+              onError={() => setImgError(true)}
+            />
+          )}
           {isCompleted && (
             <div className="absolute inset-0 bg-lime-300/80 flex items-center justify-center backdrop-blur-sm">
               <motion.div
