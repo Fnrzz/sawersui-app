@@ -18,11 +18,8 @@ interface Milestone {
   current_amount: number;
   status: string;
   created_at: string;
-  walrus_url: string;
-  image_blob_id: string;
+  image_url: string;
   coin_type?: string;
-  expiration_epoch?: number;
-  expires_at?: string;
 }
 
 export function MilestoneList() {
@@ -103,7 +100,7 @@ export function MilestoneList() {
                         ) : (
                           /* eslint-disable-next-line @next/next/no-img-element */
                           <img
-                            src={milestone.walrus_url}
+                            src={milestone.image_url}
                             alt={milestone.title}
                             className="w-full h-full object-cover"
                             onError={() =>
@@ -134,30 +131,13 @@ export function MilestoneList() {
                             ? "SUI"
                             : "USDC"}
                         </div>
-                        {milestone.expires_at ? (
-                          <div className="text-xs text-gray-500 mt-1">
-                            Expires:{" "}
-                            {new Date(milestone.expires_at).toLocaleDateString(
-                              undefined,
-                              {
-                                year: "numeric",
-                                month: "short",
-                                day: "numeric",
-                              },
-                            )}
-                          </div>
-                        ) : milestone.expiration_epoch ? (
-                          <div className="text-xs text-gray-500 mt-1">
-                            Expires: Epoch {milestone.expiration_epoch}
-                          </div>
-                        ) : null}
                       </div>
                     </div>
 
                     <div className="flex items-center gap-2 self-end sm:self-center">
                       {!failedImages.has(milestone.id) && (
                         <a
-                          href={milestone.walrus_url}
+                          href={milestone.image_url}
                           target="_blank"
                           rel="noopener noreferrer"
                         >

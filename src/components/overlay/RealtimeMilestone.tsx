@@ -11,9 +11,8 @@ interface Milestone {
   title: string;
   target_amount: number;
   current_amount: number;
-  walrus_url: string;
+  image_url: string;
   status: string;
-  expires_at?: string;
 }
 
 interface RealtimeMilestoneProps {
@@ -34,7 +33,7 @@ export function RealtimeMilestone({
           title: "Example Milestone Goal",
           target_amount: 100,
           current_amount: 45.5,
-          walrus_url: "https://picsum.photos/seed/milestone/800/400",
+          image_url: "https://picsum.photos/seed/milestone/800/400",
           status: "active",
         }
       : initialData,
@@ -128,7 +127,7 @@ export function RealtimeMilestone({
           ) : (
             /* eslint-disable-next-line @next/next/no-img-element */
             <img
-              src={milestone.walrus_url}
+              src={milestone.image_url}
               alt={milestone.title}
               className="w-full h-full object-cover"
               onError={() => setImgError(true)}

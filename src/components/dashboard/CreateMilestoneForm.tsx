@@ -2,7 +2,7 @@
 
 import { useState, useTransition, useCallback, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { uploadToWalrus } from "@/lib/walrus";
+import { createClient } from "@/lib/supabase/client";
 import { createMilestone } from "@/lib/actions/milestone";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,13 +29,24 @@ export default function CreateMilestoneForm() {
     }
   }, []);
 
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
       "image/*": [".png", ".jpg", ".jpeg", ".gif", ".webp"],
     },
     maxFiles: 1,
+    maxSize: MAX_FILE_SIZE,
     disabled: isPending,
+    onDropRejected: (rejections) => {
+      const isTooLarge = rejections.some((r) =>
+        r.errors.some((e) => e.code === "file-too-large"),
+      );
+      if (isTooLarge) {
+        toast.error("File is too large. Maximum size is 10 MB.");
+      }
+    },
   });
 
   const removeFile = (e: React.MouseEvent) => {
@@ -53,30 +64,39 @@ export default function CreateMilestoneForm() {
       return;
     }
 
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error("File is too large. Maximum size is 10 MB.");
+      return;
+    }
+
     startTransition(async () => {
       try {
-        // 1. Upload to Walrus via direct client upload
+        // 1. Upload to Supabase Storage
         toast.info(t("toast.uploading"));
 
-        const uploadResult = await uploadToWalrus(file, 2);
+        const supabase = createClient();
+        const filePath = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, "")}`;
 
-        const {
-          blobId,
-          blobObjectId,
-          url: walrusUrl,
-          expiresAt,
-        } = uploadResult;
+        const { error: uploadError } = await supabase.storage
+          .from("nft")
+          .upload(filePath, file);
+
+        if (uploadError) {
+          throw new Error(`Upload failed: ${uploadError.message}`);
+        }
+
+        const { data: publicUrlData } = supabase.storage
+          .from("nft")
+          .getPublicUrl(filePath);
+
         toast.success(t("toast.uploaded"));
 
         // 2. Call Server Action
         const result = await createMilestone({
           title,
           target_amount: parseFloat(targetAmount),
-          image_blob_id: blobId,
-          blob_object_id: blobObjectId,
-          walrus_url: walrusUrl,
+          image_url: publicUrlData.publicUrl,
           coin_type: coinType,
-          expires_at: expiresAt,
         });
 
         if (result.error) {

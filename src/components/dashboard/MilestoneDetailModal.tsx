@@ -17,11 +17,8 @@ interface Milestone {
   current_amount: number;
   status: string;
   created_at: string;
-  walrus_url: string;
+  image_url: string;
   coin_type?: string;
-  image_blob_id: string;
-  expiration_epoch?: number;
-  expires_at?: string;
 }
 
 interface MilestoneDetailModalProps {
@@ -81,21 +78,12 @@ export function MilestoneDetailModal({
               ) : (
                 /* eslint-disable-next-line @next/next/no-img-element */
                 <img
-                  src={milestone.walrus_url}
+                  src={milestone.image_url}
                   alt={milestone.title}
                   className="w-full h-full object-cover"
                   onError={() => setImgError(true)}
                 />
               )}
-            </div>
-
-            <div className="space-y-2">
-              <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">
-                Blob ID
-              </p>
-              <div className="text-[10px] font-mono break-all bg-gray-50 p-2 rounded border border-gray-200 text-gray-600">
-                {milestone.image_blob_id}
-              </div>
             </div>
           </div>
 
@@ -139,32 +127,6 @@ export function MilestoneDetailModal({
                     }}
                   />
                 </div>
-              </div>
-
-              {/* Storage Section — expiry badge only, renewal is automated */}
-              <div className="space-y-3 pt-2">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider flex items-center gap-2">
-                    Walrus Storage
-                  </p>
-                  <Badge
-                    variant={
-                      milestone.expires_at || milestone.expiration_epoch
-                        ? "secondary"
-                        : "destructive"
-                    }
-                    className="font-mono text-[10px] w-fit"
-                  >
-                    {milestone.expires_at
-                      ? `Expires: ${new Date(milestone.expires_at).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}`
-                      : milestone.expiration_epoch
-                        ? `Expires: Epoch ${milestone.expiration_epoch}`
-                        : "Expiration Unknown"}
-                  </Badge>
-                </div>
-                <p className="text-[10px] text-center sm:text-left text-gray-400 max-w-xs">
-                  Storage is automatically renewed daily by the system.
-                </p>
               </div>
             </div>
           </div>
