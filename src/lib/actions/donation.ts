@@ -341,7 +341,7 @@ async function updateMilestoneProgress(milestoneId: string, amount: number) {
         await mintToWinner(
           milestone.id,
           milestone.title,
-          milestone.walrus_url || "",
+          milestone.image_url || "",
           updateData.winner_address,
         );
       }
@@ -354,7 +354,7 @@ async function updateMilestoneProgress(milestoneId: string, amount: number) {
 async function mintToWinner(
   milestoneId: string,
   title: string,
-  walrusUrl: string,
+  imageUrl: string,
   winnerAddress: string,
 ) {
   try {
@@ -371,7 +371,7 @@ async function mintToWinner(
         tx.object(CONFIG.SUI.ADDRESS.ADMIN_CAP),
         tx.pure.string(title),
         tx.pure.string(""), // DB Schema no longer has description
-        tx.pure.string(walrusUrl),
+        tx.pure.string(imageUrl),
         tx.pure.string(milestoneId), // Passing DB ID as string
         tx.pure.address(winnerAddress),
       ],
