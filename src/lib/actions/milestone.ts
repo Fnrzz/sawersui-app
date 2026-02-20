@@ -6,11 +6,8 @@ import { revalidatePath } from "next/cache";
 export interface CreateMilestoneData {
   title: string;
   target_amount: number;
-  image_blob_id: string;
-  walrus_url: string;
+  image_url: string;
   coin_type: "USDC" | "SUI";
-  blob_object_id?: string;
-  expires_at?: string;
 }
 
 export async function createMilestone(data: CreateMilestoneData) {
@@ -30,8 +27,7 @@ export async function createMilestone(data: CreateMilestoneData) {
   if (
     !data.title ||
     !data.target_amount ||
-    !data.image_blob_id ||
-    !data.walrus_url ||
+    !data.image_url ||
     !data.coin_type
   ) {
     return { error: "Missing required fields" };
@@ -58,12 +54,9 @@ export async function createMilestone(data: CreateMilestoneData) {
     title: data.title,
     target_amount: data.target_amount,
     current_amount: 0,
-    image_blob_id: data.image_blob_id,
-    blob_object_id: data.blob_object_id,
-    walrus_url: data.walrus_url,
+    image_url: data.image_url,
     status: "active",
     coin_type: data.coin_type,
-    expires_at: data.expires_at,
   });
 
   if (error) {
