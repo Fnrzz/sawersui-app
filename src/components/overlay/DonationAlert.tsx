@@ -109,16 +109,6 @@ export function DonationAlert({ streamerId, settings }: DonationAlertProps) {
 
       // Fetch NFT if sender_address exists
       let nftUrl: string | undefined;
-      if (nextDonation.sender_address) {
-        try {
-          const nft = await getLatestMilestoneNft(nextDonation.sender_address);
-          if (nft) {
-            nftUrl = nft.imageUrl;
-          }
-        } catch (error) {
-          console.error("[DonationAlert] Error fetching NFT:", error);
-        }
-      }
 
       // --- Alerts & TTS Logic ---
       const isTTSEnabled =

@@ -28,29 +28,35 @@ export async function getLatestMilestoneNft(
       return null;
     }
 
-    // Sort by objectId descending as a proxy for "latest" since we don't have mint time
-    // This is a heuristic, but often works for sequentially created objects or similar enough
-    const sorted = data.sort((a, b) => {
-      return b.data?.objectId.localeCompare(a.data?.objectId || "") || 0;
-    });
+    // Extract all valid NFTs
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+    const allNfts: RewardNFT[] = [];
 
-    const latest = sorted[0];
-
-    if (
-      latest.data?.display?.data &&
-      typeof latest.data.display.data === "object"
-    ) {
-      const display = latest.data.display.data as Record<string, string>;
-      const imageUrl = display.image_url || "";
-      if (!imageUrl) return null;
-      return {
-        objectId: latest.data.objectId,
-        imageUrl,
-        name: display.name,
-      };
+    for (const item of data) {
+      if (
+        item.data?.display?.data &&
+        typeof item.data.display.data === "object"
+      ) {
+        const display = item.data.display.data as Record<string, string>;
+        const imageUrl = display.image_url || "";
+        if (imageUrl) {
+          allNfts.push({
+            objectId: item.data.objectId,
+            imageUrl,
+            name: display.name,
+          });
+        }
+      }
     }
 
-    return null;
+    if (allNfts.length === 0) return null;
+
+    // Prefer NFTs with Supabase Storage URLs (latest architecture) over old Walrus URLs
+    const supabaseNft = allNfts.find((nft) =>
+      nft.imageUrl.startsWith(`${supabaseUrl}/storage/v1/object/public/`),
+    );
+
+    return supabaseNft || allNfts[0];
   } catch (error) {
     console.error("Error fetching milestone NFT:", error);
     return null;
