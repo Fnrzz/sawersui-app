@@ -79,7 +79,7 @@ export function RealtimeLeaderboard({
           <AnimatePresence mode="popLayout">
             {data.slice(0, 5).map((entry, index) => (
               <motion.div
-                key={entry.donorName}
+                key={`${entry.donorName}-${entry.coinType}`}
                 layout
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}

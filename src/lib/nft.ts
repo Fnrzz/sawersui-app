@@ -1,13 +1,6 @@
 import { getSuiClient } from "@/lib/sui-client";
 import { CONFIG } from "@/lib/config";
 
-/** Only show NFT images hosted on our Supabase Storage bucket */
-function isSupabaseStorageUrl(url: string): boolean {
-  if (!url) return false;
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-  return url.startsWith(`${supabaseUrl}/storage/v1/object/public/nft/`);
-}
-
 export interface RewardNFT {
   objectId: string;
   imageUrl: string;
@@ -49,7 +42,7 @@ export async function getLatestMilestoneNft(
     ) {
       const display = latest.data.display.data as Record<string, string>;
       const imageUrl = display.image_url || "";
-      if (!isSupabaseStorageUrl(imageUrl)) return null;
+      if (!imageUrl) return null;
       return {
         objectId: latest.data.objectId,
         imageUrl,
@@ -99,7 +92,7 @@ export async function getOwnedMilestoneNfts(
           ) {
             const display = item.data.display.data as Record<string, string>;
             const imageUrl = display.image_url || "";
-            if (isSupabaseStorageUrl(imageUrl)) {
+            if (imageUrl) {
               allNfts.push({
                 objectId: item.data.objectId,
                 imageUrl,
