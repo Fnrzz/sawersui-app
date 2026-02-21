@@ -52,16 +52,12 @@ export async function getLeaderboard(
   // Convert map to array and sort
   const leaderboard = Array.from(donorMap.entries())
     .map(([key, totalAmount]) => {
-      const [donorName, coinTypeFull] = key.split("|");
-      // Map full coin type back to short code for UI
-      const coinTypeShort = coinTypeFull.includes("0x2::sui::SUI")
-        ? "SUI"
-        : "USDC";
+      const [donorName, coinType] = key.split("|");
 
       return {
         donorName,
         totalAmount,
-        coinType: coinTypeShort as "USDC" | "SUI",
+        coinType: (coinType === "SUI" ? "SUI" : "USDC") as "USDC" | "SUI",
       };
     })
     .sort((a, b) => b.totalAmount - a.totalAmount) // Sort by amount (absolute value, might mix currencies but valid for "Top Donors")
